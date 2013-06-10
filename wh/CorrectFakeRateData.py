@@ -54,20 +54,42 @@ if __name__ == "__main__":
     def rebin_view(x):
         ''' Make a view which rebins histograms '''
         binning = None
-        if ',' in args.rebin:
-            binning = tuple(int(x) for x in args.rebin.split(','))
-        else:
-            binning = int(args.rebin)
+        # if ',' in args.rebin:
+        # print args.rebin.split(',')
+        if args.rebin:
+            binning = eval(args.rebin)
+            if  isinstance(binning,float) or isinstance(binning,int) :
+                newbinning = int(binning)
+            elif isinstance(binning,list) and isinstance(binning[0],float) or isinstance(binning[0],int)  :
+                newbinning= tuple(float(x) for x in binning)
+            elif isinstance(binning,list) and isinstance(binning[0],list):
+                # print   args.rebin
+                #print binning[0]
+                binningx= tuple(float(x) for x in binning[0])
+                #print binningx
+                binningy= tuple(float(x) for x in binning[1])
+                newbinning = tuple([binningx, binningy]) 
+                
         return RebinView(x, binning)
 
     def round_to_ints(x):
         new = x.Clone()
         new.Reset()
-        for bin in range(x.GetNbinsX()+1):
-            nentries = ROOT.TMath.Nint(x.GetBinContent(bin))
-            center = x.GetBinLowEdge(bin) + 0.5*x.GetBinWidth(bin)
-            for _ in range(nentries):
-                new.Fill(center)
+        if isinstance(x , ROOT.TH2):
+            for xbin in range(x.GetNbinsX()+1):
+                for ybin in range (x.GetNbinsY()+1):
+                    nentries = ROOT.TMath.Nint(x.GetBinContent(xbin,ybin))
+                    xcenter = x.GetXaxis().GetBinLowEdge(xbin) + 0.5*x.GetXaxis().GetBinWidth(xbin)
+                    ycenter = x.GetYaxis().GetBinLowEdge(ybin) + 0.5*x.GetYaxis().GetBinWidth(ybin)
+                    for i in range(nentries):
+                        new.Fill(xcenter, ycenter)
+                    
+        else: 
+            for bin in range(x.GetNbinsX()+1):
+                nentries = ROOT.TMath.Nint(x.GetBinContent(bin))
+                center = x.GetBinLowEdge(bin) + 0.5*x.GetBinWidth(bin)
+                for _ in range(nentries):
+                    new.Fill(center)
         return new
 
     def int_view(x):
