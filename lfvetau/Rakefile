@@ -45,6 +45,8 @@ samples = Hash[
   "wjetsmin" => get_sample_names('WplusJets_madgraph_Extension'),
   "data_Embed_login05"=>get_sample_names('data_Embed'),
   "signal" => get_sample_names('LFV'),
+  "signalMCgg" => get_sample_names('ggHiggsToETau'),
+  "signalMCvbf" => get_sample_names('vbfHiggsToETau'),
   "sm" => Array['VBF_H2Tau_M-125','GGH_H2Tau_M-125'],
 ]
 
@@ -79,6 +81,8 @@ end
 ##  targets:
 ##     mt
 ################################################################################
+
+task :genkin => get_analyzer_results("LHFVAnalyzeGEN.py", samples['signalMCgg'])
 
 task :mttight => get_analyzer_results("AnalyzeMuTauTightvbfNew.py", samples['zjets'] + samples['wjets'] + samples['sm']+samples['new_signal'] + samples['data_mt'] + samples['ttbar'] + samples['wwjets'] + samples['DY'] + samples['embedded']
 	)
