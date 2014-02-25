@@ -5,9 +5,10 @@ export IGNORE_LUMI_ERRORS=1
 
 source jobid.sh
 export jobid=$jobid8
-export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
-
-export MEGAPATH=/hdfs/store/user/$USER
+#export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
+export datasrc=/nfs_scratch/taroni/data
+#export MEGAPATH=/hdfs/store/user/$USER
+export MEGAPATH=/nfs_scratch/taroni/data
 ./make_proxies.sh
 rake "meta:getinputs[$jobid, $datasrc,et/metaInfo]"
 rake "meta:getmeta[inputs/$jobid, et/metaInfo, 8]"

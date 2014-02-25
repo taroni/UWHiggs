@@ -47,7 +47,9 @@ samples = Hash[
   "signal" => get_sample_names('LFV'),
   "signalMCgg" => get_sample_names('ggHiggsToETau'),
   "signalMCvbf" => get_sample_names('vbfHiggsToETau'),
-  "sm" => Array['VBF_H2Tau_M-125','GGH_H2Tau_M-125'],
+  "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
+  "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
+  "sm" => Array['GluGlu_H2Tau_M-125','VBF_H2Tau_M-125'],
 ]
 
 #samples = Hash[
@@ -82,7 +84,7 @@ end
 ##     mt
 ################################################################################
 
-task :genkin => get_analyzer_results("LHFVAnalyzeGEN.py", samples['signalMCgg'])
+task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
 
 task :mttight => get_analyzer_results("AnalyzeMuTauTightvbfNew.py", samples['zjets'] + samples['wjets'] + samples['sm']+samples['new_signal'] + samples['data_mt'] + samples['ttbar'] + samples['wwjets'] + samples['DY'] + samples['embedded']
 	)
