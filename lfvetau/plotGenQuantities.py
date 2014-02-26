@@ -18,8 +18,8 @@ else:
 canvas = ROOT.TCanvas("canvas","canvas",800,800)
 LFVStack = ROOT.THStack("stack","")
 
-lfvfilelist = ['results/MCntuples22FebMaria/LFVHAnalyzeGEN/ggHiggsToETau.root', 'results/MCntuples22FebMaria/LFVHAnalyzeGEN/vbfHiggsToETau.root']
-smfilelist = ['results/MCntuples22FebMaria/LFVHAnalyzeGEN/GluGluToHToTauTau_M-125_8TeV-powheg-pythia6.root', 'results/MCntuples22FebMaria/LFVHAnalyzeGEN/VBF_HToTauTau_M-125_8TeV-powheg-pythia6.root']
+lfvfilelist = ['results/MCntuples25Feb/LFVHAnalyzeGEN/ggHiggsToETau.root', 'results/MCntuples25Feb/LFVHAnalyzeGEN/vbfHiggsToETau.root']
+smfilelist = ['results/MCntuples25Feb/LFVHAnalyzeGEN/GluGluToHToTauTau_M-125_8TeV-powheg-pythia6.root', 'results/MCntuples25Feb/LFVHAnalyzeGEN/VBF_HToTauTau_M-125_8TeV-powheg-pythia6.root']
 
 for n, file in enumerate(lfvfilelist):
 
@@ -57,8 +57,14 @@ for n, file in enumerate(lfvfilelist):
                 if lfv_histo.Integral() != 0 and sm_histo.Integral() != 0  : 
                         lfv_histo.Scale(1./lfv_histo.Integral())
                         sm_histo.Scale(1./sm_histo.Integral())
-                        sm_histo.Draw("E")
-                        lfv_histo.Draw("ESAME") 
+                        p = sm_histo.GetName()[0:1]
+                        if p == 't' : p = '#tau'
+                        if p == 'h' :
+                                lfv_histo.Draw("E") 
+                        else:
+
+                                sm_histo.Draw("E")
+                                lfv_histo.Draw("ESAME") 
                         
                         lfv_histo.SetLineWidth(2)
                         sm_histo.SetLineColor(2)
@@ -66,8 +72,6 @@ for n, file in enumerate(lfvfilelist):
                         
                                
                         canvas.SetLogy(0)
-                        p = sm_histo.GetName()[0:1]
-                        if p == 't' : p = '#tau'
                         variable=''
                         if sm_histo.GetName()[4:7] == "Phi" : variable = "#phi"
                         if sm_histo.GetName()[4:7] == "Eta" : variable = "#eta"
@@ -80,6 +84,9 @@ for n, file in enumerate(lfvfilelist):
                         if sm_histo.GetName()[9:17] == "DeltaPhi" : 
                                 variable = "#Delta#phi"
                                 p = 'e#tau'
+                                canvas.SetLogy(1)
+                        if sm_histo.GetName() == "higgsPt" : 
+                                variable = "p_{T} (GeV)"
                                 canvas.SetLogy(1)
                         axislabel = p+" "+variable
                         if variable != '' : lfv_histo.GetXaxis().SetTitle(axislabel)
@@ -98,9 +105,10 @@ for n, file in enumerate(lfvfilelist):
                                 legend = ROOT.TLegend(0.4,0.15,0.6,0.25)
                         
                         legend.SetFillColor(0)
-                        legend.AddEntry(sm_histo, "H #rightarrow #tau#tau ")
-                        legend.AddEntry(lfv_histo, "H #rightarrow e#tau")
-                        legend.Draw()
+                        legend.AddEntry(sm_histo, "H #rightarrow #tau#tau_{h} ")
+                        legend.AddEntry(lfv_histo, "H #rightarrow e#tau_{h}")
+                        if p != 'h' :
+                                legend.Draw()
 
                         canvas.Update()
                         canvas.SaveAs(filepath+'/gen_'+i.GetName()+'.png')

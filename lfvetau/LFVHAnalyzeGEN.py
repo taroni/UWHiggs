@@ -53,6 +53,9 @@ class LFVHAnalyzeGEN(MegaBase):
         self.book('gen',"tGenPt_all", "gen p_{T}, all taus",  40, 0, 200)
         self.book('gen',"tGenDecayMode_all", "all gen Taus decay mode", 20, 0, 20)
         self.book('gen',"etGenDeltaPhi_all", "all gen e tau delta phi",  50, 0, 3.2)
+
+        self.book('gen', 'higgsPt', 'higgs p_{T}', 40, 0, 200); 
+
             
     def fill_histos(self, row, folder='gen', fakeRate = False):
         histos = self.histograms
@@ -90,7 +93,8 @@ class LFVHAnalyzeGEN(MegaBase):
             #print row.eGenMotherPdgId, " ", row.tGenMotherPdgId
             histos[folder+'/etGenDeltaPhi'].Fill(deltaPhi(row.eGenPhi, row.tGenPhi))
             
- 
+            histos[folder+'/higgsPt'].Fill(sqrt((row.eGenPx+row.tGenPx)**2 + (row.eGenPy+row.tGenPy)**2)) # correct  for LFVHiggsToETau only, add the neutrinos
+            
     
  
     def process(self):
