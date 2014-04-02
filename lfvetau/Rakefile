@@ -3,6 +3,7 @@ recipes = ENV['fsa'] + '/PlotTools/rake/recipes.rake'
 import recipes
 
 $jobid = ENV['jobid']
+#$jobid = 'MCntuples_12March'
 
 # Figure out what run period we are in
 $period = '8TeV'
@@ -25,16 +26,13 @@ end
 #
 samples = Hash[
   "ttbar" => get_sample_names('TTJets'),
-  "ttbar05" => get_sample_names('TTJets'),	
+  "singlet" => get_sample_names('T_t'),
+  "singletbar" => get_sample_names('Tbar_t'), 
   "wjets" => get_sample_names('Wplus'),
   "wwjets" => get_sample_names('WWJets'),
+  "wzjets" => get_sample_names('WZJets'),
+  "zzjets" => get_sample_names('ZZJets'),
   "zjets" => get_sample_names('Zjets_M50'),
-
-  "old_signal" => get_sample_names('H2Tau_M-126'),
-  "new_signal" => get_sample_names('Minus'),	
-  "data_mt" => get_sample_names('data_SingleMu'),
-  "DY" => get_sample_names('DY'),
-  "embedded" => get_sample_names('Embedded'),
 
   "extra" => Array['T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_t-channel','T_t-channel'],
   "ewk" => Array['Zjets_M50', 
@@ -42,31 +40,17 @@ samples = Hash[
           'TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'], 
           # Maria's version
   #"ttbar" => Array['TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'],
-  "wjetsmin" => get_sample_names('WplusJets_madgraph_Extension'),
-  "data_Embed_login05"=>get_sample_names('data_Embed'),
-  "signal" => get_sample_names('LFV'),
+
   "signalMCgg" => get_sample_names('ggHiggsToETau'),
   "signalMCvbf" => get_sample_names('vbfHiggsToETau'),
+  "signalMCMuTaugg" => get_sample_names('ggHiggsToMuTau'),
+  "signalMCMuTauvbf" => get_sample_names('vbfHiggsToMuTau'),
   "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
-  "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
-  "sm" => Array['GluGlu_H2Tau_M-125','VBF_H2Tau_M-125'],
+  "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6')
+
+
 ]
 
-#samples = Hash[
-  #"ewk" => Array[ 
-  #'TTplusJets_madgraph'], 
-  
-#"ttbar" => get_sample_names('TTJets'),
- # "wjets" => get_sample_names('Wplus')
-#  "wwjets" => get_sample_names('WWJets'),
-#  "zjets" => Array['Zjets_M50'],
-
- # "old_signal" => get_sample_names('H2Tau_M-126'),
-#  "new_signal" => get_sample_names('Minus'),   
-#  "sm" => Array['VBF_H2Tau_M-125'],
-        #'GluGlu_H2Tau_M-125'], not working (July 1 2013)
-#  "data_mt" => get_sample_names("data_SingleMu") 
-#]
 
 # Function to get the .root files for an analyzer and samples
 def get_analyzer_results(analyzer, the_samples)
@@ -84,17 +68,32 @@ end
 ##     mt
 ################################################################################
 
-task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
-
-task :mttight => get_analyzer_results("AnalyzeMuTauTightvbfNew.py", samples['zjets'] + samples['wjets'] + samples['sm']+samples['new_signal'] + samples['data_mt'] + samples['ttbar'] + samples['wwjets'] + samples['DY'] + samples['embedded']
-	)
+task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] )
 
 
-##use $PU = false for samples with no pileup
-task :pu1mttight  => get_analyzer_results(  "AnalyzeMuTauTightvbfNew.py",samples['old_signal'])
-#Task for samples on login05
-task :mttight05 => get_analyzer_results("AnalyzeMuTauTightvbf.py", samples['wjets'] + samples['ttbar05'])
-task :analyzeMuTauMC => get_analyzer_results("AnalyzeGG.py", samples['ewk'] + samples['wjets'] +samples['sm']+samples['extra'])
-task :analyzeMuTauData => get_analyzer_results("AnalyzeGG.py", samples['data_mt'])
+task :genkinMuTau => get_analyzer_results("LFVHAnalyzeGENMuTau.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
+
+task :genkinMuTauSIGNAL => get_analyzer_results("LFVHAnalyzeGENMuTau.py", samples['signalMCMuTaugg'])
+
+task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
+
+
+task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
+
+
+$etdir = "plots/#{$jobid}/LFVHETauAnalyzer/et/"
+directory $etdir 
+file  "#{$emtdir}/plot#{$period}.root" do |t|
+  sh "echo $jobid"
+  sh "python myNewPlotterReco.py" 
+  
+end
+
+task :drawplots => "#{$emtdir}/plot#{$period}.root"
+
+
+#task :mttight => get_analyzer_results("AnalyzeMuTauTightvbfNew.py", samples['zjets'] + samples['wjets'] + samples['sm']+samples['new_signal'] + samples['data_mt'] + samples['ttbar'] + samples['wwjets'] + samples['DY'] + samples['embedded']
+#	)
+
 
 # Missing cleaning of my analyzer for Embedded Samples 

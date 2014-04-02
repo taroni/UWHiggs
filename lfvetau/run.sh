@@ -3,11 +3,14 @@
 
 set -o nounset
 set -o errexit
-export MEGAPATH=/nfs_scratch/taroni/data
-source jobid.sh
 
+export MEGAPATH=/hdfs/store/user/taroni/
+source jobid.sh
 export jobid=$jobid8
 
-rake genkin
 
-
+#rake genkin
+rake recoplots
+#rake drawplots
+#rake genkinEMu
+#rake genkinMuTau

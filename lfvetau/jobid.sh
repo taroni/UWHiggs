@@ -1,1 +1,2 @@
-export jobid8='MCntuples25Feb'
+export jobid8='MCntuples_25March'
+#export jobid8='MCntuples_otherCh2'
