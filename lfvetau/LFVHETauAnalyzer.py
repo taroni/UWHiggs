@@ -33,6 +33,7 @@ class LFVHETauAnalyzer(MegaBase):
     def __init__(self, tree, outfile, **kwargs):
         self.channel='ET'
         super(LFVHETauAnalyzer, self).__init__(tree, outfile, **kwargs)
+        self.tree = ETauTree(tree)
         self.out=outfile
         self.histograms = {}
 
@@ -52,47 +53,52 @@ class LFVHETauAnalyzer(MegaBase):
  
 ## 
     def begin(self):
-
         processtype=['gg', 'vbf']
         threshold=['ept0', 'ept40']
         sign=['os', 'ss']
+        jetN = [0, 1, 2, 3]
         for i in sign:
             for j in processtype:
                 for k in threshold:
+                    for jn in jetN: 
+                        folder=[]
 
-                    folder =i+'/'+j+'/'+k
-                   
-                    self.book(folder,"tPt", "tau p_{T}", 200, 0, 200)
-                    self.book(folder,"tPhi", "tau phi", 100, -3.2, 3.2)
-                    self.book(folder,"tEta", "tau eta",  50, -2.5, 2.5)
+                        folder.append(i+'/'+j+'/'+k +'/'+str(jn))
+                        folder.append(i+'/'+j+'/'+k +'/'+str(jn)+'/selected')
+                        
+                        for f in folder: 
+                            self.book(f,"tPt", "tau p_{T}", 200, 0, 200)
+                            self.book(f,"tPhi", "tau phi", 100, -3.2, 3.2)
+                            self.book(f,"tEta", "tau eta",  50, -2.5, 2.5)
                     
-                    self.book(folder,"ePt", "e p_{T}", 200, 0, 200)
-                    self.book(folder,"ePhi", "e phi",  100, -3.2, 3.2)
-                    self.book(folder,"eEta", "e eta", 50, -2.5, 2.5)
-                    
-                    self.book(folder, "et_DeltaPhi", "e-tau DeltaPhi" , 50, 0, 3.2)
-                    self.book(folder, "et_DeltaR", "e-tau DeltaR" , 50, 0, 3.2)
-                    
-                    self.book(folder, "h_collmass_pfmet",  "h_collmass_pfmet",  32, 0, 320)
-                    self.book(folder, "h_collmass_mvamet",  "h_collmass_mvamet",  32, 0, 320)
-                    
-                    self.book(folder, "h_vismass",  "h_vismass",  32, 0, 320)
-    
-                    
-                    self.book(folder, "tPFMET_DeltaPhi", "tau-PFMET DeltaPhi" , 50, 0, 3.2)
-                    self.book(folder, "tPFMET_Mt", "tau-PFMET M_{T}" , 200, 0, 200)
-                    self.book(folder, "tMVAMET_DeltaPhi", "tau-MVAMET DeltaPhi" , 50, 0, 3.2)
-                    self.book(folder, "tMVAMET_Mt", "tau-MVAMET M_{T}" , 200, 0, 200)
+                            self.book(f,"ePt", "e p_{T}", 200, 0, 200)
+                            self.book(f,"ePhi", "e phi",  100, -3.2, 3.2)
+                            self.book(f,"eEta", "e eta", 50, -2.5, 2.5)
+                            
+                            self.book(f, "et_DeltaPhi", "e-tau DeltaPhi" , 50, 0, 3.2)
+                            self.book(f, "et_DeltaR", "e-tau DeltaR" , 50, 0, 3.2)
+                            
+                            self.book(f, "h_collmass_pfmet",  "h_collmass_pfmet",  32, 0, 320)
+                            self.book(f, "h_collmass_mvamet",  "h_collmass_mvamet",  32, 0, 320)
+                            
+                            self.book(f, "h_vismass",  "h_vismass",  32, 0, 320)
+                        
+                            
+                            self.book(f, "tPFMET_DeltaPhi", "tau-PFMET DeltaPhi" , 50, 0, 3.2)
+                            self.book(f, "tPFMET_Mt", "tau-PFMET M_{T}" , 200, 0, 200)
+                            self.book(f, "tMVAMET_DeltaPhi", "tau-MVAMET DeltaPhi" , 50, 0, 3.2)
+                            self.book(f, "tMVAMET_Mt", "tau-MVAMET M_{T}" , 200, 0, 200)
+                            
+                            self.book(f, "ePFMET_DeltaPhi", "e-PFMET DeltaPhi" , 50, 0, 3.2)
+                            self.book(f, "ePFMET_Mt", "e-PFMET M_{T}" , 200, 0, 200)
+                            self.book(f, "eMVAMET_DeltaPhi", "e-MVAMET DeltaPhi" , 50, 0, 3.2)
+                            self.book(f, "eMVAMET_Mt", "e-MVAMET M_{T}" , 200, 0, 200)
+                            
+                            self.book(f, "jetN_20", "Number of jets, p_{T}>20", 10, -0.5, 9.5) 
+                            self.book(f, "jetN_30", "Number of jets, p_{T}>30", 10, -0.5, 9.5) 
 
-                    self.book(folder, "ePFMET_DeltaPhi", "e-PFMET DeltaPhi" , 50, 0, 3.2)
-                    self.book(folder, "ePFMET_Mt", "e-PFMET M_{T}" , 200, 0, 200)
-                    self.book(folder, "eMVAMET_DeltaPhi", "e-MVAMET DeltaPhi" , 50, 0, 3.2)
-                    self.book(folder, "eMVAMET_Mt", "e-MVAMET M_{T}" , 200, 0, 200)
-
-                    self.book(folder, "jetN_20", "Number of jets, p_{T}>20", 10, -0.5, 9.5) 
-                    self.book(folder, "jetN_30", "Number of jets, p_{T}>30", 10, -0.5, 9.5) 
-
-    def fill_histos(self, row, folder='os/gg/ept0', fakeRate = False):
+                    
+    def fill_histos(self, row, folder='os/gg/ept0/0', fakeRate = False):
 
         histos = self.histograms
 
@@ -137,7 +143,8 @@ class LFVHETauAnalyzer(MegaBase):
 #        for i, row in enumerate(self.tree):
 #            if  i >= 100:
 #                return
-
+#           if not bool(row.isoMu24eta2p1Pass) : continue
+ 
             sign = 'ss' if row.e_t_SS else 'os'
             processtype = '' ## use a line as for sign when the vbf when selections are defined            
             ptthreshold = [0,40]
@@ -145,32 +152,51 @@ class LFVHETauAnalyzer(MegaBase):
                 processtype = 'vbf'
             else:
                 processtype ='gg'##changed from 20
+            jn = row.jetVeto30
+            if jn > 3 : jn = 3
+            if not bool(row.singleEPass) : continue
+            if jn != 0 and row.bjetCSVVeto30!=0 : continue 
             
+            if not selections.eSelection(row, 'e'): continue
+            if not selections.lepton_id_iso(row, 'e', 'eid12Loose_etauiso012'): continue
+            if not selections.tauSelection(row, 't'): continue
+            #if not selections.vetos(row) : continue
+            if not row.tTightIso3Hits : continue
+            if not row.tAntiElectronMVA3Tight : continue
+            if not row.tAntiMuon2Loose : continue
+            #if row.tJetOverlap  : continue 
+            #if  row.eJetOverlap : continue
+                
+            if row.tauVetoPt20EleTight3MuLoose : continue 
+            if row.muVetoPt5IsoIdVtx : continue
+            if row.eVetoCicLooseIso : continue # change it with Loose
+  
             for j in ptthreshold:
-                folder = sign+'/'+processtype+'/ept'+str(j)
-                    
+                folder = sign+'/'+processtype+'/ept'+str(j)+'/'+str(int(jn))
+                
                 if row.ePt < j : continue
-                if not selections.eSelection(row, 'e'): continue
-                if not selections.lepton_id_iso(row, 'e', 'eid12Tight_etauiso012'): continue
-                if not selections.tauSelection(row, 't'): continue
-                if not selections.vetos(row) : continue
-                if not row.tTightIso3Hits : continue
-                if not row.tAntiElectronMVA3Tight : continue
-                if not row.tAntiMuonLoose2 : continue
-                #if row.tJetOverlap  : continue 
-                #if  row.eJetOverlap : continue
-                
-                if row.tauVetoPt20EleTight3MuLoose : continue 
-                if row.muVetoPt5IsoIdVtx : continue
-                if row.eVetoCicTightIso : continue # change it with Loose
-                    
-                
-                    
+                  
+                self.fill_histos(row, folder)
+                #selections
+                if jn == 0 :
+                    if row.tPt < 35: continue 
+                    if row.ePt < 40 : continue
+                    if deltaPhi(row.ePhi, row.tPhi) < 2.7 : continue
+                    if row.tMtToPFMET > 50 : continue
+                if jn == 1 :
+                    if row.tPt < 40: continue 
+                    if row.ePt < 35 : continue
+                    if row.tMtToPFMET > 35 : continue
+                if jn == 2 :
+                    if row.tPt < 40: continue 
+                    if row.ePt < 30 : continue # no cut as only electrons with pt>30 are in the ntuples
+                    if row.tMtToPFMET > 35 : continue
+                    if row.vbfMass < 550 : continue
+                    if row.vbfDeta < 3.5 : continue
+                folder = sign+'/'+processtype+'/ept'+str(j)+'/'+str(int(jn))+'/selected'
                 self.fill_histos(row, folder)
                     
-
-           
-            
+             
             
     def finish(self):
         self.write_histos()

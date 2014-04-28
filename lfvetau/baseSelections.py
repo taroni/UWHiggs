@@ -12,7 +12,7 @@ def splitEid(label):
 
 #OBJECT SELECTION
 def muSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 25:       return False
+    if getattr( row, getVar(name,'Pt')) < 30:       return False
     if getattr( row, getVar(name,'AbsEta')) > 2.1:  return False
     if not getattr( row, getVar(name,'PixHits')):   return False
     if getattr( row, getVar(name,'JetCSVBtag')) > 0.8: return False
@@ -66,7 +66,7 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         return bool( RelPFIsoDB < 0.15 or (RelPFIsoDB < 0.20 and AbsEta < 1.479))
     if isolabel == 'idiso02':
         return bool( RelPFIsoDB < 0.20 )
-    if isolabel == 'etauiso012':
+    if isolabel == 'etauiso012' or isolabel == 'mutauiso012': 
         return bool( RelPFIsoDB < 0.12 ) 
 
 def control_region_ee(row):

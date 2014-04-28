@@ -32,22 +32,22 @@ samples = Hash[
   "wwjets" => get_sample_names('WWJets'),
   "wzjets" => get_sample_names('WZJets'),
   "zzjets" => get_sample_names('ZZJets'),
-  "zjets" => get_sample_names('Zjets_M50'),
+  "zjets" => get_sample_names('jets_M50'),
 
   "extra" => Array['T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_t-channel','T_t-channel'],
   "ewk" => Array['Zjets_M50', 
           'WWJetsTo2L2Nu_TuneZ2_8TeV',
           'TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'], 
           # Maria's version
-  #"ttbar" => Array['TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'],
-
+ 
+   
   "signalMCgg" => get_sample_names('ggHiggsToETau'),
   "signalMCvbf" => get_sample_names('vbfHiggsToETau'),
   "signalMCMuTaugg" => get_sample_names('ggHiggsToMuTau'),
   "signalMCMuTauvbf" => get_sample_names('vbfHiggsToMuTau'),
   "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
-  "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6')
-
+  "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
+  "dataSingleE" => get_sample_names('data_SingleElectron_Run2012')
 
 ]
 
@@ -78,7 +78,9 @@ task :genkinMuTauSIGNAL => get_analyzer_results("LFVHAnalyzeGENMuTau.py", sample
 task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
 
 
-task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
+task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + samples['dataSingleE'] )
+
+task :recoplotsMuTau => get_analyzer_results("LFVHMuTauAnalyzer.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
 
 
 $etdir = "plots/#{$jobid}/LFVHETauAnalyzer/et/"
