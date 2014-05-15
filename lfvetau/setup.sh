@@ -10,7 +10,7 @@ export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
 #export datasrc=/nfs_scratch/taroni/data
 export MEGAPATH=/hdfs/store/user/$USER
 #export MEGAPATH=/nfs_scratch/taroni/data
-#./make_proxies.sh
+./make_proxies.sh
 rake "meta:getinputs[$jobid, $datasrc,et/metaInfo]"
 rake "meta:getmeta[inputs/$jobid, et/metaInfo, 8]"
 #export jobid=$jobidmt

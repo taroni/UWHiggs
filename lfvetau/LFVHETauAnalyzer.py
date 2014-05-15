@@ -11,8 +11,8 @@ from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 from math import sqrt, pi, cos
 
 def collmass(row, met, metPhi):
-    ptnu = met*cos(deltaPhi(metPhi, row.tPhi))
-    visfrac = row.tPt/(row.tPt+abs(ptnu))
+    ptnu =abs(met*cos(deltaPhi(metPhi, row.tPhi)))
+    visfrac = row.tPt/(row.tPt+ptnu)
     #print met, cos(deltaPhi(metPhi, row.tPhi)), ptnu, visfrac
     return (row.e_t_Mass / sqrt(visfrac))
 
@@ -53,8 +53,8 @@ class LFVHETauAnalyzer(MegaBase):
  
 ## 
     def begin(self):
-        processtype=['gg', 'vbf']
-        threshold=['ept0', 'ept40']
+        processtype=['gg']
+        threshold=['ept0']
         sign=['os', 'ss']
         jetN = [0, 1, 2, 3]
         for i in sign:
@@ -80,6 +80,20 @@ class LFVHETauAnalyzer(MegaBase):
                             
                             self.book(f, "h_collmass_pfmet",  "h_collmass_pfmet",  32, 0, 320)
                             self.book(f, "h_collmass_mvamet",  "h_collmass_mvamet",  32, 0, 320)
+                            self.book(f, "h_collmassSpread_pfmet",  "h_collmassSpread_pfmet",  40, -100, 100)
+                            self.book(f, "h_collmassSpread_mvamet",  "h_collmassSpread_mvamet",  40, -100, 100)
+                            self.book(f, "h_collmassSpread_lowPhi_pfmet",  "h_collmassSpread_lowPhi_pfmet",  40, -100, 100)
+                            self.book(f, "h_collmassSpread_lowPhi_mvamet",  "h_collmassSpread_lowPhi_mvamet", 40, -100, 100)
+                            self.book(f, "h_collmassSpread_highPhi_pfmet",  "h_collmassSpread_highPhi_pfmet", 40, -100, 100)
+                            self.book(f, "h_collmassSpread_highPhi_mvamet",  "h_collmassSpread_highPhi_mvamet", 40, -100, 100)
+                            self.book(f, "h_collmass_lowPhi_pfmet",  "h_collmass_lowPhi_pfmet",  32, 0, 320)
+                            self.book(f, "h_collmass_lowPhi_mvamet",  "h_collmass_lowPhi_mvamet",  32, 0, 320)
+                            self.book(f, "h_collmass_highPhi_pfmet",  "h_collmass_highPhi_pfmet",  32, 0, 320)
+                            self.book(f, "h_collmass_highPhi_mvamet", "h_collmass_highPhi_mvamet",  32, 0, 320)
+                            self.book(f, "h_collmass_vs_dPhi_pfmet",  "h_collmass_vs_dPhi_pfmet", 50, 0, 3.2, 32, 0, 320, type=ROOT.TH2F)
+                            self.book(f, "h_collmass_vs_dPhi_mvamet",  "h_collmass_vs_dPhi_mvamet", 50, 0, 3.2, 32, 0, 320, type=ROOT.TH2F)
+                            self.book(f, "h_collmassSpread_vs_dPhi_pfmet",  "h_collmassSpread_vs_dPhi_pfmet", 50, 0, 3.2, 20, -100, 100, type=ROOT.TH2F)
+                            self.book(f, "h_collmassSpread_vs_dPhi_mvamet",  "h_collmassSpread_vs_dPhi_mvamet", 50, 0, 3.2, 20, -100, 100, type=ROOT.TH2F)
                             
                             self.book(f, "h_vismass",  "h_vismass",  32, 0, 320)
                         
@@ -114,6 +128,26 @@ class LFVHETauAnalyzer(MegaBase):
         histos[folder+'/et_DeltaR'].Fill(row.e_t_DR)
         
         
+        histos[folder+'/h_collmass_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.pfMetPhi), collmass(row, row.pfMetEt, row.pfMetPhi))
+        histos[folder+'/h_collmass_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi))
+        histos[folder+'/h_collmassSpread_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.pfMetPhi), collmass(row, row.pfMetEt, row.pfMetPhi)-125.0)
+        histos[folder+'/h_collmassSpread_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi)-125.0)
+
+        if deltaPhi(row.tPhi, row.pfMetPhi) > 1.57 :  
+            histos[folder+'/h_collmass_highPhi_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi))
+            histos[folder+'/h_collmassSpread_highPhi_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi)-125.0)
+        if deltaPhi(row.tPhi, row.pfMetPhi) < 1.57 :  
+            histos[folder+'/h_collmass_lowPhi_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi))
+            histos[folder+'/h_collmassSpread_lowPhi_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi)-125.0)
+        if deltaPhi(row.tPhi, row.mva_metPhi) > 1.57 :  
+            histos[folder+'/h_collmass_highPhi_mvamet'].Fill(collmass(row, row.pfMetEt, row.mva_metPhi))
+            histos[folder+'/h_collmassSpread_highPhi_mvamet'].Fill(collmass(row, row.pfMetEt, row.mva_metPhi)-125.0)
+        if deltaPhi(row.tPhi, row.mva_metPhi) < 1.57 :  
+            histos[folder+'/h_collmass_lowPhi_mvamet'].Fill(collmass(row, row.pfMetEt, row.mva_metPhi))
+            histos[folder+'/h_collmassSpread_lowPhi_mvamet'].Fill(collmass(row, row.pfMetEt, row.mva_metPhi)-125.0)
+
+        histos[folder+'/h_collmassSpread_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi)-125.0)
+        histos[folder+'/h_collmassSpread_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0)
         histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi))
         histos[folder+'/h_collmass_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi))
 
@@ -147,11 +181,12 @@ class LFVHETauAnalyzer(MegaBase):
  
             sign = 'ss' if row.e_t_SS else 'os'
             processtype = '' ## use a line as for sign when the vbf when selections are defined            
-            ptthreshold = [0,40]
-            if row.vbfJetVeto30:
-                processtype = 'vbf'
-            else:
-                processtype ='gg'##changed from 20
+            ptthreshold = [0]
+#            if row.vbfJetVeto30:
+#                processtype = 'vbf'
+#            else:
+#                processtype ='gg'##changed from 20
+            processtype ='gg'##changed from 20
             jn = row.jetVeto30
             if jn > 3 : jn = 3
             if not bool(row.singleEPass) : continue
@@ -195,6 +230,8 @@ class LFVHETauAnalyzer(MegaBase):
                     if row.vbfDeta < 3.5 : continue
                 folder = sign+'/'+processtype+'/ept'+str(j)+'/'+str(int(jn))+'/selected'
                 self.fill_histos(row, folder)
+                if deltaPhi(row.pfMetPhi, row.tPhi) < 2.7 : continue
+                 
                     
              
             

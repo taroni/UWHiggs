@@ -6,11 +6,13 @@ set -o errexit
 
 export MEGAPATH=/hdfs/store/user/taroni/
 source jobid.sh
-export jobid=$jobid8
+#export jobid=$jobid8
 #export jobid='MCntuples_25March'
+export jobid='MCntuples_13May'
 
 #rake genkin
-rake recoplots
+#rake recoplots
+rake controlplots
 #export jobid=$jobidmt
 #rake recoplotsMuTau
 #rake drawplots

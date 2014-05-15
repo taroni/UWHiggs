@@ -82,6 +82,7 @@ task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMC
 
 task :recoplotsMuTau => get_analyzer_results("LFVHMuTauAnalyzer.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
 
+task :controlplots => get_analyzer_results("EEAnalyzer.py", samples['ggHiggsTo2Taus'])
 
 $etdir = "plots/#{$jobid}/LFVHETauAnalyzer/et/"
 directory $etdir 
@@ -93,9 +94,3 @@ end
 
 task :drawplots => "#{$emtdir}/plot#{$period}.root"
 
-
-#task :mttight => get_analyzer_results("AnalyzeMuTauTightvbfNew.py", samples['zjets'] + samples['wjets'] + samples['sm']+samples['new_signal'] + samples['data_mt'] + samples['ttbar'] + samples['wwjets'] + samples['DY'] + samples['embedded']
-#	)
-
-
-# Missing cleaning of my analyzer for Embedded Samples 

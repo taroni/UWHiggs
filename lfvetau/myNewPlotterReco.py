@@ -19,6 +19,7 @@ from fnmatch import fnmatch
 from yellowhiggs import xs, br, xsbr
 
 ROOT.gROOT.SetBatch()
+ROOT.gStyle.SetOptStat(0)
 jobid = os.environ['jobid']
 
 print jobid
@@ -69,7 +70,7 @@ def remove_name_entry(dictionary):
 
 
 #sign = ['os', 'ss']
-process = ['gg', 'vbf']
+process = ['gg']
 #ptcut = [0, 40]
 njets= [0,1,2,3]
 sign = ['os']
@@ -138,7 +139,7 @@ for i in sign :
                     foldername = i+'/'+j+'/ept'+str(k)+'/'+str(nj)
 
                     plotter.canvas.SetLogy(True)
-                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=True, ratio_range=1.5,  rescale=10)
+                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=False, ratio_range=1.5,  rescale=10)
                     if not os.path.exists(outputdir+foldername):
                         os.makedirs(outputdir+foldername)
 
@@ -146,7 +147,7 @@ for i in sign :
 
                     foldername = i+'/'+j+'/ept'+str(k)+'/'+str(nj)+'/selected'
                     plotter.canvas.SetLogy(True)
-                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=True,ratio_range=3,  rescale=10)
+                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=False,ratio_range=3,  rescale=10)
                     if not os.path.exists(outputdir+foldername):
                         os.makedirs(outputdir+foldername)
 
