@@ -21,14 +21,14 @@ def muSelection(row, name):
     return True
 
 def eSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 10:           return False #was 30
+    if getattr( row, getVar(name,'Pt')) < 20:           return False #was 30
     if getattr( row, getVar(name,'AbsEta')) > 2.3:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
     if getattr( row, getVar(name,'HasConversion')):     return False
 #    if not getattr( row, getVar(name,'ChargeIdTight')): return False
     if not getattr( row, getVar(name,'ChargeIdLoose')): return False
-    if getattr( row, getVar(name,'JetCSVBtag')) > 0.8: return False
-    #if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
+#    if getattr( row, getVar(name,'JetCSVBtag')) > 0.8:  return False
+    ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'DZ'))) > 0.2:     return False
     return True
     

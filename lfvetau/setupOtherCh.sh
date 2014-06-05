@@ -9,9 +9,9 @@ export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
 #export datasrc=/nfs_scratch/taroni/data
 export MEGAPATH=/hdfs/store/user/$USER
 #export MEGAPATH=/nfs_scratch/taroni/data
-./make_proxies.sh
-rake "meta:getinputs[$jobid, $datasrc,em/metaInfo]"
-rake "meta:getmeta[inputs/$jobid, em/metaInfo, 8]"
+#./make_proxies.sh
+#rake "meta:getinputs[$jobid, $datasrc,em/metaInfo]"
+#rake "meta:getmeta[inputs/$jobid, em/metaInfo, 8]"
 rake "meta:getinputs[$jobid, $datasrc,mt/metaInfo]"
 rake "meta:getmeta[inputs/$jobid, mt/metaInfo, 8]"
 
