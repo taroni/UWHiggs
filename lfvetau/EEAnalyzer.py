@@ -91,23 +91,26 @@ class EEAnalyzer(MegaBase):
             self.book(f, "e1e2Mass",  "e1e2 Inv Mass",  32, 0, 320)
                 
             self.book(f, "pfMetEt", "pfMetEt",  50, 0, 100)
+            self.book(f, "type1_pfMetEt", "type1_pfMetEt",  50, 0, 100)
             self.book(f, "mvaMetEt", "mvaMetEt", 50, 0, 100)
             self.book(f, "pfMetPhi", "pfMetPhi", 100, -3.2, 3.2)
             self.book(f, "type1_pfMetPhi", "type1_pfMetPhi", 100, -3.2, 3.2)
             self.book(f, "mvaMetPhi", "mvaMetPhi", 100, -3.2, 3.2)
+            self.book(f, "type1_pfMetEt_par", "type1_pfMetEt_par", 100, -100, 100)
+            self.book(f, "type1_pfMetEt_perp", "type1_pfMetEt_perp", 50, 0, 100)
             self.book(f, "pfMetEt_par", "pfMetEt_par", 100, -100, 100)
             self.book(f, "pfMetEt_perp", "pfMetEt_perp", 50, 0, 100)
             self.book(f, "mvaMetEt_par", "mvaMetEt_par", 100, -100, 100)
             self.book(f, "mvaMetEt_perp", "mvaMetEt_perp", 50, 0, 100)
                 
                 
-            self.book(f, "e1PFMET_DeltaPhi", "e1-PFMET DeltaPhi" , 50, 0, 3.2)
-            self.book(f, "e1PFMET_Mt", "e1-PFMET M_{T}" , 200, 0, 200)
+            self.book(f, "e1PFMET_DeltaPhi", "e1-type1PFMET DeltaPhi" , 50, 0, 3.2)
+            self.book(f, "e1PFMET_Mt", "e1-type1PFMET M_{T}" , 200, 0, 200)
             self.book(f, "e1MVAMET_DeltaPhi", "e1-MVAMET DeltaPhi" , 50, 0, 3.2)
             self.book(f, "e1MVAMET_Mt", "e1-MVAMET M_{T}" , 200, 0, 200)
             
-            self.book(f, "e2PFMET_DeltaPhi", "e2-PFMET DeltaPhi" , 50, 0, 3.2)
-            self.book(f, "e2PFMET_Mt", "e2-PFMET M_{T}" , 200, 0, 200)
+            self.book(f, "e2PFMET_DeltaPhi", "e2-type1PFMET DeltaPhi" , 50, 0, 3.2)
+            self.book(f, "e2PFMET_Mt", "e2-type1PFMET M_{T}" , 200, 0, 200)
             self.book(f, "e2MVAMET_DeltaPhi", "e2-MVAMET DeltaPhi" , 50, 0, 3.2)
             self.book(f, "e2MVAMET_Mt", "e2-MVAMET M_{T}" , 200, 0, 200)
                 
@@ -137,6 +140,7 @@ class EEAnalyzer(MegaBase):
         histos[folder+'/e1PFMET_Mt'].Fill(row.e1MtToPFMET, weight)
         histos[folder+'/e1MVAMET_Mt'].Fill(row.e1MtToMVAMET, weight)
 
+        histos[folder+'/type1_pfMetEt'].Fill(row.type1_pfMetEt, weight)
         histos[folder+'/pfMetEt'].Fill(row.type1_pfMetEt, weight)
         histos[folder+'/mvaMetEt'].Fill(row.mva_metEt, weight)
         histos[folder+'/type1_pfMetPhi'].Fill(row.type1_pfMetPhi, weight)
@@ -144,6 +148,8 @@ class EEAnalyzer(MegaBase):
         histos[folder+'/mvaMetPhi'].Fill(row.mva_metPhi, weight)
 
         zphi = zPhi (row.e1Pt, row.e1Eta, row.e1Phi, row.e2Pt, row.e2Eta, row.e2Phi)
+        histos[folder+'/type1_pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
+        histos[folder+'/type1_pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
         histos[folder+'/pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
         histos[folder+'/pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
         histos[folder+'/mvaMetEt_par'].Fill(row.mva_metEt*cos(deltaPhi(zphi, row.mva_metPhi)), weight)
@@ -154,8 +160,6 @@ class EEAnalyzer(MegaBase):
         histos[folder+'/e2PFMET_Mt'].Fill(row.e2MtToPFMET, weight)
         histos[folder+'/e2MVAMET_Mt'].Fill(row.e2MtToMVAMET, weight)
 
- 
-        
 
     def process(self):
         for row in self.tree:
@@ -167,14 +171,17 @@ class EEAnalyzer(MegaBase):
             sign = 'ss' if row.e1_e2_SS else 'os'
   
             if not bool(row.singleEPass) : continue
-              
+            if  not bool(row.e1MatchesSingleE) : continue
+            if  not bool(row.e2MatchesSingleE) : continue
+         
             if not selections.eSelection(row, 'e1'): continue
-            if not selections.lepton_id_iso(row, 'e1', 'eidCBLoose_etauiso012'): continue
+            if not selections.lepton_id_iso(row, 'e1', 'eidCBTight_etauiso012'): continue
             if not selections.eSelection(row, 'e2'): continue
-            if not selections.lepton_id_iso(row, 'e2', 'eidCBLoose_etauiso012'): continue
+            if not selections.lepton_id_iso(row, 'e2', 'eidCBTight_etauiso012'): continue
             #if not selections.vetos(row) : continue
             if row.muVetoPt5IsoIdVtx : continue
             if row.eVetoCicLooseIso : continue # change it with Loose
+            if row.tauHpsVetoPt20 : continue #last added
             folder = sign
             self.fill_histos(row, folder)
                                 

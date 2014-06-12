@@ -21,7 +21,7 @@ def muSelection(row, name):
     return True
 
 def eSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 20:           return False #was 30
+    if getattr( row, getVar(name,'Pt')) < 40:           return False #was 20
     if getattr( row, getVar(name,'AbsEta')) > 2.3:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
     if getattr( row, getVar(name,'HasConversion')):     return False

@@ -6,7 +6,7 @@ export IGNORE_LUMI_ERRORS=1
 source jobid.sh
 #export jobid=$jobid8
 #export jobid='MCntuples_13MaySync'
-export jobid='newNtuple_3JuneSync'
+export jobid='newNtuple_11June'
 echo $jobid
 export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
 #export datasrc=/nfs_scratch/taroni/data
