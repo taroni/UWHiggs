@@ -21,13 +21,13 @@ def muSelection(row, name):
     return True
 
 def eSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 40:           return False #was 20
-    if getattr( row, getVar(name,'AbsEta')) > 2.3:      return False
+    if getattr( row, getVar(name,'Pt')) < 20:           return False #was 20
+    if getattr( row, getVar(name,'AbsEta')) > 2.1:      return False#as in H->tau_etau_h # was 2.3
     if getattr( row, getVar(name,'MissingHits')):       return False
     if getattr( row, getVar(name,'HasConversion')):     return False
 #    if not getattr( row, getVar(name,'ChargeIdTight')): return False
     if not getattr( row, getVar(name,'ChargeIdLoose')): return False
-#    if getattr( row, getVar(name,'JetCSVBtag')) > 0.8:  return False
+    if getattr( row, getVar(name,'JetCSVBtag')) > 0.8:  return False
     ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'DZ'))) > 0.2:     return False
     return True
@@ -68,6 +68,27 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         return bool( RelPFIsoDB < 0.20 )
     if isolabel == 'etauiso012' or isolabel == 'mutauiso012': 
         return bool( RelPFIsoDB < 0.12 ) 
+    if isolabel == 'etauiso01' or isolabel == 'mutauiso01': 
+        return bool( RelPFIsoDB < 0.1 ) 
+    ##put the new iso
+    if isolabel == 'mvaLoose' :
+        if AbsEta < 0.8:
+            return bool( RelPFIsoDB < 0.426 ) 
+        if AbsEta > 0.8 and AbsEta < 1.479 :
+            return bool(RelPFIsoDB < 0.481)
+        if AbsEta > 1.479 and AbsEta < 2.5:
+            return bool(RelPFIsoDB < 0.390)
+        return False
+    if isolabel == 'mvaTight':
+        if AbsEta < 0.8:
+            return bool( RelPFIsoDB < 0.105 ) 
+        if AbsEta > 0.8 and AbsEta < 1.479 :
+            return bool(RelPFIsoDB < 0.178)
+        if AbsEta > 1.479 and AbsEta < 2.5:
+            return bool(RelPFIsoDB < 0.150)
+        return False
+        
+        
 
 def control_region_ee(row):
     '''Figure out what control region we are in. Shared among two codes, to avoid mismatching copied here'''

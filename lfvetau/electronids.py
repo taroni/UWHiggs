@@ -40,41 +40,70 @@ def h2tau_2012_tightId(row, name):
 
 #LEPTON ID-ISO
 def summer_2013_eid(row, name):
-    mva_output = getattr(row, getVar(name, 'MVATrigNoIP'))
+    mva_output = getattr(row, getVar(name, 'MVANonTrig')) #was eMVATrigNoIP
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
     if pT < 20    and abseta < 0.8:
-        return ( mva_output > -0.5375 )
+        return ( mva_output > 0.925 )
     elif pT < 20  and 0.8 < abseta < 1.479:
-        return ( mva_output > -0.375 )
+        return ( mva_output > 0.915 )
     elif pT < 20  and abseta > 1.479:
-        return ( mva_output > -0.025 )
+        return ( mva_output > 0.965 )
     elif pT > 20  and abseta < 0.8:
-        return ( mva_output > 0.325 )
+        return ( mva_output > 0.905 )
     elif pT > 20  and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.775 )
+        return ( mva_output > 0.955 )
     elif pT > 20  and abseta > 1.479:
-        return ( mva_output > 0.775 )
+        return ( mva_output > 0.975 )
     return False
 
 def summer_2013_eid_tight(row, name):
-    mva_output = getattr(row, getVar(name, 'MVATrigNoIP'))
+    mva_output = getattr(row, getVar(name, 'MVANonTrig'))
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
-    if pT < 20 and abseta < 0.8:
-        return ( mva_output > -0.35 )
-    elif pT < 20 and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.0 )
-    elif pT < 20 and abseta > 1.479:
-        return ( mva_output > 0.025 )
-    elif pT > 20 and abseta < 0.8:
-        return ( mva_output > 0.7 )
+    if pT > 20 and abseta < 0.8:
+        return ( mva_output > 0.925)
     elif pT > 20 and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.9 )
+        return ( mva_output > 0.975 )
     elif pT > 20 and abseta > 1.479:
-        return ( mva_output > 0.8375 )
+        return ( mva_output > 0.985 )
     return False
 
+#add electron id from AN 2012_463
+def hWW_eid_tight(row, name):
+    mva_output = getattr(row, getVar(name,'MVATrig')) #check if it is correct
+    pT    = getattr(row, getVar(name, 'Pt'))
+    abseta= getattr(row, getVar(name, 'AbsEta'))
+    if pT>20:
+        if abseta <0.8:
+            if mva_output >= 0.914 : return True
+        if abseta <1.479 and abseta > 0.8 :
+            if mva_output >=0.964 : return True
+        if abseta <2.5 and abseta > 1.479:
+            if mva_output >=0.899 : return True
+        
+    return False
+
+def hWW_eid_loose(row, name):
+    mva_output = getattr(row, getVar(name,'MVATrig')) #check if correct
+    pT    = getattr(row, getVar(name, 'Pt'))
+    abseta= getattr(row, getVar(name, 'AbsEta'))
+    if pT>20:
+        if abseta <0.8:
+            if mva_output >= 0.877 : return True
+        if abseta <1.479 and abseta > 0.8 :
+            if mva_output >=0.811 : return True
+        if abseta <2.5 and abseta > 1.479:
+            if mva_output >=0.707 : return True
+        
+    return False
+
+    
+            
+#ID MVA cut value (tight lepton) 0.913 0.964 0.899
+#Isolation cut value (tight lepton) 0.105 0.178 0.150
+#ID MVA cut value (loose lepton) 0.877 0.811 0.707
+#Isolation cut value (loose lepton) 0.426 0.481 0.390
 
 electronIds = {
     'eidCBLoose' : h2etau_looseId,
@@ -82,6 +111,8 @@ electronIds = {
     'eid12Loose' : zh_loose_2012eid,
     'eid12Medium': h2tau_2012_LooseId,
     'eid12Tight' : h2tau_2012_tightId,
-#    'eid13Loose' : summer_2013_eid,
-#    'eid13Tight' : summer_2013_eid_tight,
+    'eid14Loose' : hWW_eid_loose,
+    'eid14Tight' : hWW_eid_tight,
+    'eid13Loose' : summer_2013_eid,
+    'eid13Tight' : summer_2013_eid_tight,
 }
