@@ -150,8 +150,8 @@ class EEAnalyzer(MegaBase):
         zphi = zPhi (row.e1Pt, row.e1Eta, row.e1Phi, row.e2Pt, row.e2Eta, row.e2Phi)
         histos[folder+'/type1_pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
         histos[folder+'/type1_pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
-        histos[folder+'/pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
-        histos[folder+'/pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.type1_pfMetPhi)), weight)
+        histos[folder+'/pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.pfMetPhi)), weight)
+        histos[folder+'/pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.pfMetPhi)), weight)
         histos[folder+'/mvaMetEt_par'].Fill(row.mva_metEt*cos(deltaPhi(zphi, row.mva_metPhi)), weight)
         histos[folder+'/mvaMetEt_perp'].Fill(row.mva_metEt*sin(deltaPhi(zphi, row.mva_metPhi)), weight)
  

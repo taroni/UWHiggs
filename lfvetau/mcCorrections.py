@@ -53,7 +53,7 @@ correct_eiso13_m1s_mva = HetauCorrection.correct_eiso13_m1s_mva
 correct_eid_mva = HetauCorrection.scale_eleId_hww
 correct_eReco_mva = HetauCorrection.scale_elereco_hww
 correct_eIso_mva = HetauCorrection.scale_eleIso_hww
-correct_trigger_mva = HetauCorrection.single_ele_wp80
+correct_trigger_mva = HetauCorrection.single_ele_mva
 
 def get_electron_corrections(row,*args):
     'makes corrections to iso and id of electrons'
@@ -92,6 +92,21 @@ def get_trigger_corrections_MVA(row, *args):
         eta  = getattr(row, '%sEta' % arg)
         pt   = getattr(row, '%sPt'  % arg)
         ret *= correct_trigger_mva(pt,eta)[0]
+    return ret
+def get_trigger_corrections_p1s_MVA(row, *args):
+    ret = 1.
+    for arg in args:
+        eta  = getattr(row, '%sEta' % arg)
+        pt   = getattr(row, '%sPt'  % arg)
+        ret *= correct_trigger_mva(pt,eta)[0]+correct_trigger_mva(pt,eta)[1]
+    return ret
+def get_trigger_corrections_m1s_MVA(row, *args):
+    ret = 1.
+    for arg in args:
+        eta  = getattr(row, '%sEta' % arg)
+        pt   = getattr(row, '%sPt'  % arg)
+        ret *= correct_trigger_mva(pt,eta)[0]-correct_trigger_mva(pt,eta)[1]
+
     return ret
         
 def get_electronId_corrections13_MVA(row, *args):

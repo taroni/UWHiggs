@@ -1,4 +1,5 @@
 import rootpy.plotting.views as views
+from FinalStateAnalysis.PlotTools.SimplePlotter        import SimplePlotter
 from FinalStateAnalysis.PlotTools.Plotter        import Plotter
 from FinalStateAnalysis.PlotTools.BlindView      import BlindView
 from FinalStateAnalysis.PlotTools.PoissonView    import PoissonView
@@ -75,7 +76,7 @@ process = ['gg']
 njets= [0,1,2,3]
 sign = ['os']
 
-ptcut = [0]
+ptcut = [0] #was 0 
 
 
 
@@ -84,6 +85,7 @@ if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
 plotter = Plotter(files, lumifiles, outputdir, None, forceLumi=19800) 
+#plotter = SimplePlotter(files, lumifiles, outputdir)
 
 
 
@@ -120,12 +122,13 @@ new_mc_samples.extend(['EWKDiboson', 'SMH', 'singleT','Wplus', 'DYLL', 'DYTT'
 ])
 print new_mc_samples
 
-histoname = ['tPt','tPhi','tEta','ePt','ePhi','eEta','et_DeltaPhi','et_DeltaR','tPFMET_DeltaPhi','tPFMET_Mt','tMVAMET_DeltaPhi','tMVAMET_Mt','ePFMET_DeltaPhi','ePFMET_Mt','eMVAMET_DeltaPhi','eMVAMET_Mt','jetN_20','jetN_30','h_collmass_pfmet',  'h_collmass_mvamet', 'h_vismass']
-axistitle = ['#tau p_{T} (GeV)','#tau #phi','#tau #eta', 'e p_{T} (GeV)','e #phi','e #eta','e-#tau #Delta#phi','e-#tau #DeltaR','#tau-PFMET #Delta#phi','#tau-PFMET M_{T} (GeV) ','#tau-MVAMET #Delta#phi','#tau-MVAMET M_{T} (GeV)','e-PFMET #Delta#phi','e-PFMET M_{T} (GeV)','e-MVAMET #Delta#phi','e-MVAMET #M_{T} (GeV)','Number of jets','Number of jets','M_{e#tau}coll (GeV)','M_{e#tau}coll (GeV)','M_{e#tau} vis (GeV)']
-
-#histoname = ['tPt']
-#axistitle = ['#tau p_{T} (GeV)']
-rebins = [5,5,2,5,5,2,1, 1, 2, 5,  2, 5, 2, 5, 2, 5,1,1,1,1,1]
+histoname = [('tPt','#tau p_{T} (GeV)',5), ('tPhi','#tau #phi',5), ('tEta','#tau #eta',2), 
+             ('ePt', 'e p_{T} (GeV)', 5), ('ePhi','e #phi', 5), ('eEta','e #eta',2), 
+             ('et_DeltaPhi','e-#tau #Delta#phi',1), ('et_DeltaR','e-#tau #DeltaR',1), ('tPFMET_DeltaPhi','#tau-PFMET #Delta#phi',2) ,
+             ('tPFMET_Mt','#tau-PFMET M_{T} (GeV)',5),  ('tMVAMET_DeltaPhi','#tau-MVAMET #Delta#phi',2), ('tMVAMET_Mt','#tau-MVAMET M_{T} (GeV)',5),
+             ('ePFMET_DeltaPhi','e-PFMET #Delta#phi',2), ('ePFMET_Mt','e-PFMET M_{T} (GeV)',5), ('eMVAMET_DeltaPhi','e-MVAMET #Delta#phi',2),
+             ('eMVAMET_Mt','e-MVAMET #M_{T} (GeV)',5), ('jetN_20','Number of jets',1), ('jetN_30','Number of jets',1), 
+             ('h_collmass_pfmet','M_{e#tau}coll (GeV)',1), ('h_collmass_mvamet','M_{e#tau}coll (GeV)',1), ('h_vismass','M_{e#tau} vis (GeV)',1) ]
 
 plotter.mc_samples = new_mc_samples
 #plotter.mc_samples = mc_samples
@@ -136,19 +139,20 @@ for i in sign :
 
 
                 for n,h in enumerate(histoname) :
-                    foldername = i+'/'+j+'/ept'+str(k)+'/'+str(nj)
+                    foldername = i+'/'+j+'/ept'+str(int(k))+'/'+str(int(nj))
 
-                    plotter.canvas.SetLogy(True)
-                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=False, ratio_range=1.5,  rescale=10)
+                    #plotter.canvas.SetLogy(True)
+                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggToETau'],h[0], rebin=h[2], xaxis=h[1], leftside=False, show_ratio=False, ratio_range=1.5,  rescale=10)
+                    #plotter.simpleplot_mc(foldername,h[0], rebin=h[2], xaxis= h[1], leftside=False)
                     if not os.path.exists(outputdir+foldername):
                         os.makedirs(outputdir+foldername)
 
                     plotter.save(foldername+'/mc_'+h)
 
                     foldername = i+'/'+j+'/ept'+str(k)+'/'+str(nj)+'/selected'
-                    plotter.canvas.SetLogy(True)
-                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=False,ratio_range=3,  rescale=10)
+                    #plotter.canvas.SetLogy(True)
+                    plotter.plot_mc(foldername, ['ggHiggsToETau','vbfHiggsToETau'],h[0], rebin=h[2], xaxis= h[1], leftside=False, show_ratio=False,ratio_range=3,  rescale=10)
                     if not os.path.exists(outputdir+foldername):
                         os.makedirs(outputdir+foldername)
 
-                    plotter.save(foldername+'/mc_'+h)
+                    plotter.save(foldername+'/mc_'+h[0])

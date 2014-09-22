@@ -201,7 +201,7 @@ class LFVHETauAnalyzer(MegaBase):
             jn = row.jetVeto30
             if jn > 3 : jn = 3
             if not bool(row.singleEPass) : continue
-            if jn != 0 and row.bjetCSVVeto30!=0 : continue 
+            if jn != 0 and row.bjetCSVVeto30!=0 : continue  
             
             if not selections.eSelection(row, 'e'): continue
             if not selections.lepton_id_iso(row, 'e', 'eidCBTight_etauiso012'): continue
