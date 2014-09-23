@@ -169,7 +169,7 @@ class EEAnalyzerMVA(MegaBase):
                 for j in jets:
                     folder.append(d+i+'/'+str(j))
         
-        self.book('jobInfo', "jobInfo", "jobInfo", "inputfilename/C:events/l", type=pytree.PyTree)
+        #self.book('jobInfo', "jobInfo", "jobInfo", "inputfilename/C:events/l", type=pytree.PyTree)
 
        
         
@@ -226,39 +226,39 @@ class EEAnalyzerMVA(MegaBase):
             self.book(f,"pfMetPhi_mes","pfMetPhi_mes", 100, -3.2, 3.2)
             self.book(f,"pfMetEt_tes","pfMetEt_tes", 50, 0, 100)
             self.book(f,"pfMetPhi_tes","pfMetPhi_tes", 100, -3.2, 3.2)
-            #self.book(f,"pfMetEt_ees","pfMetEt_ees", 50, 0, 100)
-            #self.book(f,"pfMetPhi_ees","pfMetPhi_ees", 100, -3.2, 3.2)
+            self.book(f,"pfMetEt_ees","pfMetEt_ees", 50, 0, 100)
+            self.book(f,"pfMetPhi_ees","pfMetPhi_ees", 100, -3.2, 3.2)
             self.book(f,"pfMetEt_ues","pfMetEt_ues", 50, 0, 100)
             self.book(f,"pfMetPhi_ues", "pfMetPhi_ues", 100, -3.2, 3.2)
 
             self.book(f,"pfMetEt_perp_jes","pfMetEt_perp_jes", 50, 0, 100)
             self.book(f,"pfMetEt_perp_mes","pfMetEt_perp_mes", 50, 0, 100 )
             self.book(f,"pfMetEt_perp_tes","pfMetEt_perp_tes", 50, 0, 100)
-           #self.book(f,"pfMetEt_perp_ees","pfMetEt_perp_ees", 50, 0, 100)
+            self.book(f,"pfMetEt_perp_ees","pfMetEt_perp_ees", 50, 0, 100)
             self.book(f,"pfMetEt_perp_ues","pfMetEt_perp_ues", 50, 0, 100)
 
             self.book(f,"pfMetEt_par_jes","pfMetEt_par_jes", 100, -100, 100)
             self.book(f,"pfMetEt_par_mes","pfMetEt_par_mes",100, -100, 100 )
             self.book(f,"pfMetEt_par_tes","pfMetEt_par_tes", 100, -100, 100)
-            #self.book(f,"pfMetEt_par_ees","pfMetEt_par_ees", 100, -100, 100)
+            self.book(f,"pfMetEt_par_ees","pfMetEt_par_ees", 100, -100, 100)
             self.book(f,"pfMetEt_par_ues","pfMetEt_par_ues", 100, -100, 100)
             
             self.book(f,"e2PFMET_Mt_jes","e2PFMET_Mt_jes",  200, 0, 200 )
             self.book(f,"e2PFMET_Mt_mes","e2PFMET_Mt_mes",  200, 0, 200 )
-            #self.book(f,"e2PFMET_Mt_ees","e2PFMET_Mt_ees",  200, 0, 200 )
+            self.book(f,"e2PFMET_Mt_ees","e2PFMET_Mt_ees",  200, 0, 200 )
             self.book(f,"e2PFMET_Mt_tes","e2PFMET_Mt_tes",  200, 0, 200 )
             self.book(f,"e2PFMET_Mt_ues","e2PFMET_Mt_ues",  200, 0, 200 )
 
  
             self.book(f,"e1PFMET_Mt_jes","e1PFMET_Mt_jes",  200, 0, 200 )
             self.book(f,"e1PFMET_Mt_mes","e1PFMET_Mt_mes",  200, 0, 200 )
-            #self.book(f,"e1PFMET_Mt_ees","e1PFMET_Mt_ees",  200, 0, 200 )
+            self.book(f,"e1PFMET_Mt_ees","e1PFMET_Mt_ees",  200, 0, 200 )
             self.book(f,"e1PFMET_Mt_tes","e1PFMET_Mt_tes",  200, 0, 200 )
             self.book(f,"e1PFMET_Mt_ues","e1PFMET_Mt_ues",  200, 0, 200 )
 
             self.book(f,"e2PFMET_DeltaPhi_jes","e2PFMET_DeltaPhi_jes",  50, 0, 3.2 )
             self.book(f,"e2PFMET_DeltaPhi_mes","e2PFMET_DeltaPhi_mes",  50, 0, 3.2 )
-            #self.book(f,"e2PFMET_DeltaPhi_ees","e2PFMET_DeltaPhi_ees",  50, 0, 3.2 )
+            self.book(f,"e2PFMET_DeltaPhi_ees","e2PFMET_DeltaPhi_ees",  50, 0, 3.2 )
             self.book(f,"e2PFMET_DeltaPhi_tes","e2PFMET_DeltaPhi_tes",  50, 0, 3.2 )
             self.book(f,"e2PFMET_DeltaPhi_ues","e2PFMET_DeltaPhi_ues",  50, 0, 3.2 )
 
@@ -266,7 +266,7 @@ class EEAnalyzerMVA(MegaBase):
 
             self.book(f,"e1PFMET_DeltaPhi_jes","e1PFMET_DeltaPhi_jes",  50, 0, 3.2 )
             self.book(f,"e1PFMET_DeltaPhi_mes","e1PFMET_DeltaPhi_mes",  50, 0, 3.2 )
-            #self.book(f,"e1PFMET_DeltaPhi_ees","e1PFMET_DeltaPhi_ees",  50, 0, 3.2 )
+            self.book(f,"e1PFMET_DeltaPhi_ees","e1PFMET_DeltaPhi_ees",  50, 0, 3.2 )
             self.book(f,"e1PFMET_DeltaPhi_tes","e1PFMET_DeltaPhi_tes",  50, 0, 3.2 )
             self.book(f,"e1PFMET_DeltaPhi_ues","e1PFMET_DeltaPhi_ues",  50, 0, 3.2 )
 
@@ -335,45 +335,45 @@ class EEAnalyzerMVA(MegaBase):
             histos[folder+'/pfMetPhi_mes'].Fill(row.pfMet_mes_Phi, weight[n])
             histos[folder+'/pfMetEt_tes'].Fill(row.pfMet_tes_Et, weight[n])
             histos[folder+'/pfMetPhi_tes'].Fill(row.pfMet_tes_Phi, weight[n])
-            #histos[folder+'/pfMetEt_ees'].Fill(row.pfMet_ees_Et, weight[n])
-            #histos[folder+'/pfMetPhi_ees'].Fill(row.pfMet_ees_Phi, weight[n])
+            histos[folder+'/pfMetEt_ees'].Fill(row.pfMet_ees_Et, weight[n])
+            histos[folder+'/pfMetPhi_ees'].Fill(row.pfMet_ees_Phi, weight[n])
             histos[folder+'/pfMetEt_ues'].Fill(row.pfMet_ues_Et, weight[n])
             histos[folder+'/pfMetPhi_ues'].Fill(row.pfMet_ues_Phi, weight[n])
             
             histos[folder+'/pfMetEt_par_jes'].Fill(row.pfMet_jes_Et*cos(deltaPhi(zphi, row.pfMet_jes_Phi)), weight[n])
             histos[folder+'/pfMetEt_par_mes'].Fill(row.pfMet_mes_Et*cos(deltaPhi(zphi, row.pfMet_mes_Phi)), weight[n])
             histos[folder+'/pfMetEt_par_tes'].Fill(row.pfMet_tes_Et*cos(deltaPhi(zphi, row.pfMet_tes_Phi)), weight[n])
-           #histos[folder+'/pfMetEt_par_ees'].Fill(row.pfMet_ees_Et*cos(deltaPhi(zphi, row.pfMet_ees_Phi)), weight[n])
+            histos[folder+'/pfMetEt_par_ees'].Fill(row.pfMet_ees_Et*cos(deltaPhi(zphi, row.pfMet_ees_Phi)), weight[n])
             histos[folder+'/pfMetEt_par_ues'].Fill(row.pfMet_ues_Et*cos(deltaPhi(zphi, row.pfMet_ues_Phi)), weight[n])
 
             histos[folder+'/pfMetEt_perp_jes'].Fill(row.pfMet_jes_Et*sin(deltaPhi(zphi, row.pfMet_jes_Phi)), weight[n])
             histos[folder+'/pfMetEt_perp_mes'].Fill(row.pfMet_mes_Et*sin(deltaPhi(zphi, row.pfMet_mes_Phi)), weight[n])
             histos[folder+'/pfMetEt_perp_tes'].Fill(row.pfMet_tes_Et*sin(deltaPhi(zphi, row.pfMet_tes_Phi)), weight[n])
-           #histos[folder+'/pfMetEt_perp_ees'].Fill(row.pfMet_ees_Et*sin(deltaPhi(zphi, row.pfMet_ees_Phi)), weight[n])
+            histos[folder+'/pfMetEt_perp_ees'].Fill(row.pfMet_ees_Et*sin(deltaPhi(zphi, row.pfMet_ees_Phi)), weight[n])
             histos[folder+'/pfMetEt_perp_ues'].Fill(row.pfMet_ues_Et*sin(deltaPhi(zphi, row.pfMet_ues_Phi)), weight[n])
 
   
             histos[folder+'/e2PFMET_Mt_jes'].Fill(row.e2MtToPfMet_jes, weight[n])
             histos[folder+'/e2PFMET_Mt_mes'].Fill(row.e2MtToPfMet_mes, weight[n])
-            #histos[folder+'/e2PFMET_Mt_ees'].Fill(row.e2MtToPfMet_ees, weight[n])
+            histos[folder+'/e2PFMET_Mt_ees'].Fill(row.e2MtToPfMet_ees, weight[n])
             histos[folder+'/e2PFMET_Mt_tes'].Fill(row.e2MtToPfMet_tes, weight[n])
             histos[folder+'/e2PFMET_Mt_ues'].Fill(row.e2MtToPfMet_ues, weight[n])
 
             histos[folder+'/e1PFMET_Mt_jes'].Fill(row.e1MtToPfMet_jes, weight[n])
             histos[folder+'/e1PFMET_Mt_mes'].Fill(row.e1MtToPfMet_mes, weight[n])
-            #histos[folder+'/e1PFMET_Mt_ees'].Fill(row.e1MtToPfMet_ees, weight[n])
+            histos[folder+'/e1PFMET_Mt_ees'].Fill(row.e1MtToPfMet_ees, weight[n])
             histos[folder+'/e1PFMET_Mt_tes'].Fill(row.e1MtToPfMet_tes, weight[n])
             histos[folder+'/e1PFMET_Mt_ues'].Fill(row.e1MtToPfMet_ues, weight[n])
             
             histos[folder+'/e2PFMET_DeltaPhi_jes'].Fill(deltaPhi(row.e2Phi, row.pfMet_jes_Phi), weight[n])
             histos[folder+'/e2PFMET_DeltaPhi_mes'].Fill(deltaPhi(row.e2Phi, row.pfMet_mes_Phi), weight[n])
-           #histos[folder+'/e2PFMET_DeltaPhi_ees'].Fill(deltaPhi(row.e2Phi, row.pfMet_ees_Phi), weight[n])
+            histos[folder+'/e2PFMET_DeltaPhi_ees'].Fill(deltaPhi(row.e2Phi, row.pfMet_ees_Phi), weight[n])
             histos[folder+'/e2PFMET_DeltaPhi_tes'].Fill(deltaPhi(row.e2Phi, row.pfMet_tes_Phi), weight[n])
             histos[folder+'/e2PFMET_DeltaPhi_ues'].Fill(deltaPhi(row.e2Phi, row.pfMet_ues_Phi), weight[n])
 
             histos[folder+'/e1PFMET_DeltaPhi_jes'].Fill(deltaPhi(row.e1Phi, row.pfMet_jes_Phi), weight[n])
             histos[folder+'/e1PFMET_DeltaPhi_mes'].Fill(deltaPhi(row.e1Phi, row.pfMet_mes_Phi), weight[n])
-           #histos[folder+'/e1PFMET_DeltaPhi_ees'].Fill(deltaPhi(row.e1Phi, row.pfMet_ees_Phi), weight[n])
+            histos[folder+'/e1PFMET_DeltaPhi_ees'].Fill(deltaPhi(row.e1Phi, row.pfMet_ees_Phi), weight[n])
             histos[folder+'/e1PFMET_DeltaPhi_tes'].Fill(deltaPhi(row.e1Phi, row.pfMet_tes_Phi), weight[n])
             histos[folder+'/e1PFMET_DeltaPhi_ues'].Fill(deltaPhi(row.e1Phi, row.pfMet_ues_Phi), weight[n])
 
@@ -397,11 +397,11 @@ class EEAnalyzerMVA(MegaBase):
          #   if  i >= 100:
           #      return
 
-            current_file = self.tree.inputfilename
-            if filename != 'unnamed' and current_file <> filename:
-                 self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
-            if not filename == 'unnamed' or current_file <> filename:
-                filename = current_file
+            #current_file = self.tree.inputfilename
+            #if filename != 'unnamed' and current_file <> filename:
+            #     self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
+            #if not filename == 'unnamed' or current_file <> filename:
+            #    filename = current_file
             evts_processed += 1
             #self.histograms[folder+'/jobInfo'].Fill(row)
  

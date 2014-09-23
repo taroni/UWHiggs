@@ -221,7 +221,7 @@ class TauFakeRateAnalyzerMVA(MegaBase):
 
             if not row.tAntiMuon2Loose: continue
             cut_flow_trk.Fill('tAntiMuon')
-            if not row.tAntiElectronMVA3Tight: continue
+            if not row.tAntiElectronMVA5Tight: continue #was 3
             cut_flow_trk.Fill('tAntiEle')
 
             if row.tauVetoPt20EleTight3MuLoose : continue 

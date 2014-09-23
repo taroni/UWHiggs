@@ -45,7 +45,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
 
     @staticmethod 
     def tau_veto(row):
-        if not row.tAntiMuonLoose2 or not row.tAntiElectronMVA3Tight or not row.tDecayFinding :
+        if not row.tAntiMuonLoose2 or not row.tAntiElectronMVA5Tight or not row.tDecayFinding :
             return False
 
     @staticmethod
@@ -140,7 +140,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             self.book(f, "h_collmass_pfmet_jes", "h_collmass_pfmet_jes", 50, 0, 100)
             self.book(f, "h_collmass_pfmet_mes", "h_collmass_pfmet_mes", 50, 0, 100 )
             self.book(f, "h_collmass_pfmet_tes", "h_collmass_pfmet_tes", 50, 0, 100)
-           #self.book(f, "h_collmass_pfmet_ees", "h_collmass_pfmet_ees", 50, 0, 100)
+            self.book(f, "h_collmass_pfmet_ees", "h_collmass_pfmet_ees", 50, 0, 100)
             self.book(f, "h_collmass_pfmet_ues", "h_collmass_pfmet_ues", 50, 0, 100)
 
 
@@ -171,7 +171,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             self.book(f, "tPFMET_Mt_Ty1", "tau-type1PFMET M_{T}" , 200, 0, 200)
             self.book(f, 'tPFMET_Mt_jes', "tau-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'tPFMET_Mt_mes', "tau-MVAMET M_{T} JES" , 200, 0, 200)
-            #self.book(f, 'tPFMET_Mt_ees', "tau-MVAMET M_{T} JES" , 200, 0, 200)
+            self.book(f, 'tPFMET_Mt_ees', "tau-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'tPFMET_Mt_tes', "tau-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'tPFMET_Mt_ues', "tau-MVAMET M_{T} JES" , 200, 0, 200)
             
@@ -184,7 +184,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             self.book(f, "ePFMET_Mt", "e-PFMET M_{T}" , 200, 0, 200)
             self.book(f, 'ePFMET_Mt_jes', "e-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'ePFMET_Mt_mes', "e-MVAMET M_{T} JES" , 200, 0, 200)
-            #self.book(f, 'ePFMET_Mt_ees', "e-MVAMET M_{T} JES" , 200, 0, 200)
+            self.book(f, 'ePFMET_Mt_ees', "e-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'ePFMET_Mt_tes', "e-MVAMET M_{T} JES" , 200, 0, 200)
             self.book(f, 'ePFMET_Mt_ues', "e-MVAMET M_{T} JES" , 200, 0, 200)
 
@@ -267,7 +267,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 histos[folder+'/h_collmass_pfmet_jes'].Fill(collmass(row, row.pfMet_jes_Et, row.pfMet_jes_Phi), frweight)
                 histos[folder+'/h_collmass_pfmet_mes'].Fill(collmass(row, row.pfMet_mes_Et, row.pfMet_mes_Phi), frweight)
                 histos[folder+'/h_collmass_pfmet_tes'].Fill(collmass(row, row.pfMet_tes_Et, row.pfMet_tes_Phi), frweight)
-                #histos[folder+'/h_collmass_pfmet_ees'].Fill(collmass(row, row.pfMet_ees_Et, row.pfMet_ees_Phi), frweight)
+                histos[folder+'/h_collmass_pfmet_ees'].Fill(collmass(row, row.pfMet_ees_Et, row.pfMet_ees_Phi), frweight)
                 histos[folder+'/h_collmass_pfmet_ues'].Fill(collmass(row, row.pfMet_ues_Et, row.pfMet_ues_Phi), frweight)
 
 
@@ -282,7 +282,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 histos[folder+'/ePFMET_Mt_Ty1'].Fill(row.eMtToPfMet_Ty1, frweight)
                 histos[folder+'/ePFMET_Mt_jes'].Fill(row.eMtToPfMet_jes, frweight)
                 histos[folder+'/ePFMET_Mt_mes'].Fill(row.eMtToPfMet_mes, frweight)
-                #histos[folder+'/ePFMET_Mt_ees'].Fill(row.eMtToPfMet_ees, frweight)
+                histos[folder+'/ePFMET_Mt_ees'].Fill(row.eMtToPfMet_ees, frweight)
                 histos[folder+'/ePFMET_Mt_tes'].Fill(row.eMtToPfMet_tes, frweight)
                 histos[folder+'/ePFMET_Mt_ues'].Fill(row.eMtToPfMet_ues, frweight)
                 histos[folder+'/eMVAMET_Mt'].Fill(row.eMtToMVAMET, frweight)
@@ -294,7 +294,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 histos[folder+'/tMVAMET_Mt'].Fill(row.tMtToMVAMET, frweight)
                 histos[folder+'/tPFMET_Mt_jes'].Fill(row.tMtToPfMet_jes, frweight)
                 histos[folder+'/tPFMET_Mt_mes'].Fill(row.tMtToPfMet_mes, frweight)
-                #histos[folder+'/tPFMET_Mt_ees'].Fill(row.tMtToPfMet_ees, frweight)
+                histos[folder+'/tPFMET_Mt_ees'].Fill(row.tMtToPfMet_ees, frweight)
                 histos[folder+'/tPFMET_Mt_tes'].Fill(row.tMtToPfMet_tes, frweight)
                 histos[folder+'/tPFMET_Mt_ues'].Fill(row.tMtToPfMet_ues, frweight)
 
@@ -375,7 +375,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             if row.eEta > 1.4442 and row.eEta < 1.566 : continue
             if not selections.tauSelection(row, 't'): continue
  
-            if not row.tAntiElectronMVA3Tight : continue
+            if not row.tAntiElectronMVA5Tight : continue
             if not row.tAntiMuon2Loose : continue
             
             if not row.tLooseIso3Hits : continue
