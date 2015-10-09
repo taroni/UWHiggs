@@ -1,3 +1,4 @@
+# check in https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2015#MET when the mva met receipe is available.
 from ETauTree import ETauTree
 import os
 import ROOT
@@ -38,9 +39,9 @@ class LFVHETauAnalyzerMVA(MegaBase):
         self.tree = ETauTree(tree)
         self.out=outfile
         self.histograms = {}
-        self.pucorrector = mcCorrections.make_puCorrector('singlee')
-        self.pucorrectorUp = mcCorrections.make_puCorrectorUp('singlee')
-        self.pucorrectorDown = mcCorrections.make_puCorrectorDown('singlee')
+        #self.pucorrector = mcCorrections.make_puCorrector('singlee')
+        #self.pucorrectorUp = mcCorrections.make_puCorrectorUp('singlee')
+        #self.pucorrectorDown = mcCorrections.make_puCorrectorDown('singlee')
      
 
     @staticmethod 
@@ -79,27 +80,25 @@ class LFVHETauAnalyzerMVA(MegaBase):
     
         #pucorrlist = self.pucorrector(row.nTruePU)
         
-        weight =  self.pucorrector(row.nTruePU) *\
-                 allmcCorrections
-        weight_up =  self.pucorrectorUp(row.nTruePU) *\
-                    allmcCorrections
-        weight_down =  self.pucorrectorDown(row.nTruePU) *\
-                      allmcCorrections
-        
-        weight_tr_up = self.pucorrector(row.nTruePU) *\
-                       trUp_mcCorrections
-        weight_tr_down = self.pucorrector(row.nTruePU) *\
-                         trDown_mcCorrections
+##        weight =  self.pucorrector(row.nTruePU) * allmcCorrections
+##        weight_up =  self.pucorrectorUp(row.nTruePU)*allmcCorrections
+##        weight_down =  self.pucorrectorDown(row.nTruePU) *allmcCorrections
+##        weight_tr_up = self.pucorrector(row.nTruePU) * trUp_mcCorrections
+##        weight_tr_down = self.pucorrector(row.nTruePU) * trDown_mcCorrections
+##        weight_eid_up =  self.pucorrector(row.nTruePU) * eidUp_mcCorrections
+##        weight_eid_down =  self.pucorrector(row.nTruePU) * eidDown_mcCorrections
+##        weight_eiso_up =  self.pucorrector(row.nTruePU) * eisoUp_mcCorrections
+##        weight_eiso_down =  self.pucorrector(row.nTruePU) * eisoDown_mcCorrections
 
-        
-        weight_eid_up =  self.pucorrector(row.nTruePU) *\
-                 eidUp_mcCorrections
-        weight_eid_down =  self.pucorrector(row.nTruePU) *\
-                 eidDown_mcCorrections
-        weight_eiso_up =  self.pucorrector(row.nTruePU) *\
-                 eisoUp_mcCorrections
-        weight_eiso_down =  self.pucorrector(row.nTruePU) *\
-                 eisoDown_mcCorrections
+        weight =  1.
+        weight_up =  1.
+        weight_down =  1.
+        weight_tr_up = 1.
+        weight_tr_down = 1.
+        weight_eid_up =  1.
+        weight_eid_down =  1.
+        weight_eiso_up =  1.
+        weight_eiso_down =  1.
         
         return  [weight, weight_up, weight_down, weight_tr_up,  weight_tr_down, weight_eid_up, weight_eid_down, weight_eiso_up,  weight_eiso_down,]
 
@@ -204,10 +203,13 @@ class LFVHETauAnalyzerMVA(MegaBase):
         for n,w in enumerate( central_weights ):
             if abs(tEta) < w[1]:
                 break
-            frweight[0] = w[0]
-            frweight[1] = p1s_weights[n][0]
-            frweight[2] = m1s_weights[n][0]
- 
+            ##frweight[0] = w[0]
+            ##frweight[1] = p1s_weights[n][0]
+            ##frweight[2] = m1s_weights[n][0]
+            freight[0] = 1.
+            freight[1] = 1.
+            freight[2] = 1.
+            
         
         return  frweight;
 
@@ -223,9 +225,10 @@ class LFVHETauAnalyzerMVA(MegaBase):
         #print isTauTight
 
         if not isTauTight:
-            frweight_bv = frw[0]/(1.-frw[0])
-            #print fakerate, frw[0], frweight
-            err = abs(frw[0] - frw[1])* abs(frw[0]/((1-frw[0])*(1-frw[0])) + 1/(1-frw[0]))
+            frweight_bv = 1.
+            ####frweight_bv = frw[0]/(1.-frw[0])
+            err = frweight_bv*0.05
+            ####err = abs(frw[0] - frw[1])* abs(frw[0]/((1-frw[0])*(1-frw[0])) + 1/(1-frw[0]))
             frweight_p1s = frweight_bv*(1+err)
             frweight_m1s = frweight_bv*(1-err)
         
@@ -244,25 +247,25 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 histos[folder+'/et_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.tPhi), frweight)
                 histos[folder+'/et_DeltaR'].Fill(row.e_t_DR, frweight)
                 histos[folder+'/h_collmass_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), frweight)
-                histos[folder+'/h_collmass_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
+                #histos[folder+'/h_collmass_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
                 histos[folder+'/h_collmassSpread_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, frweight)
-                histos[folder+'/h_collmassSpread_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
+                #histos[folder+'/h_collmassSpread_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
                 if deltaPhi(row.tPhi, row.pfMetPhi) > 1.57 :  
                     histos[folder+'/h_collmass_highPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), frweight)
                     histos[folder+'/h_collmassSpread_highPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, frweight)
                 if deltaPhi(row.tPhi, row.pfMetPhi) < 1.57 :  
                     histos[folder+'/h_collmass_lowPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), frweight)
                     histos[folder+'/h_collmassSpread_lowPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, frweight)
-                if deltaPhi(row.tPhi, row.mva_metPhi) > 1.57 :  
-                    histos[folder+'/h_collmass_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
-                    histos[folder+'/h_collmassSpread_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
-                if deltaPhi(row.tPhi, row.mva_metPhi) < 1.57 :  
-                    histos[folder+'/h_collmass_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
-                    histos[folder+'/h_collmassSpread_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
+                #if deltaPhi(row.tPhi, row.mva_metPhi) > 1.57 :  
+                    #histos[folder+'/h_collmass_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
+                    #histos[folder+'/h_collmassSpread_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
+                #if deltaPhi(row.tPhi, row.mva_metPhi) < 1.57 :  
+                    #histos[folder+'/h_collmass_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
+                    #histos[folder+'/h_collmassSpread_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
                 histos[folder+'/h_collmassSpread_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, frweight)
-                histos[folder+'/h_collmassSpread_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
+                #histos[folder+'/h_collmassSpread_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, frweight)
                 histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.pfMetEt, row.pfMetPhi), frweight)
-                histos[folder+'/h_collmass_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
+                #histos[folder+'/h_collmass_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), frweight)
                 histos[folder+'/h_collmass_pfmet_Ty1'].Fill(collmass(row, row.type1_pfMetEt, row.pfMetPhi), frweight)
                 histos[folder+'/h_collmass_pfmet_jes'].Fill(collmass(row, row.pfMet_jes_Et, row.pfMet_jes_Phi), frweight)
                 histos[folder+'/h_collmass_pfmet_mes'].Fill(collmass(row, row.pfMet_mes_Et, row.pfMet_mes_Phi), frweight)
@@ -273,25 +276,25 @@ class LFVHETauAnalyzerMVA(MegaBase):
 
                 histos[folder+'/h_vismass'].Fill(row.e_t_Mass, frweight)
                 histos[folder+'/type1_pfMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), row.type1_pfMetEt, frweight)
-                histos[folder+'/mvaMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), row.mva_metEt, frweight)
+                #histos[folder+'/mvaMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), row.mva_metEt, frweight)
 
                 histos[folder+'/ePFMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.pfMetPhi), frweight)
                 histos[folder+'/ePFMET_DeltaPhi_Ty1'].Fill(deltaPhi(row.ePhi, row.type1_pfMetPhi), frweight)
-                histos[folder+'/eMVAMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mva_metPhi), frweight)
+                #histos[folder+'/eMVAMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mva_metPhi), frweight)
                 histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPFMET, frweight)
                 histos[folder+'/ePFMET_Mt_Ty1'].Fill(row.eMtToPfMet_Ty1, frweight)
                 histos[folder+'/ePFMET_Mt_jes'].Fill(row.eMtToPfMet_jes, frweight)
                 histos[folder+'/ePFMET_Mt_mes'].Fill(row.eMtToPfMet_mes, frweight)
-                #histos[folder+'/ePFMET_Mt_ees'].Fill(row.eMtToPfMet_ees, frweight)
+                ##histos[folder+'/ePFMET_Mt_ees'].Fill(row.eMtToPfMet_ees, frweight)
                 histos[folder+'/ePFMET_Mt_tes'].Fill(row.eMtToPfMet_tes, frweight)
                 histos[folder+'/ePFMET_Mt_ues'].Fill(row.eMtToPfMet_ues, frweight)
-                histos[folder+'/eMVAMET_Mt'].Fill(row.eMtToMVAMET, frweight)
+                #histos[folder+'/eMVAMET_Mt'].Fill(row.eMtToMVAMET, frweight)
 
                 histos[folder+'/tPFMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.pfMetPhi), frweight)
                 histos[folder+'/tPFMET_DeltaPhi_Ty1'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), frweight)
-                histos[folder+'/tMVAMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), frweight)
+                #histos[folder+'/tMVAMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), frweight)
                 histos[folder+'/tPFMET_Mt'].Fill(row.tMtToPFMET, frweight)
-                histos[folder+'/tMVAMET_Mt'].Fill(row.tMtToMVAMET, frweight)
+                #histos[folder+'/tMVAMET_Mt'].Fill(row.tMtToMVAMET, frweight)
                 histos[folder+'/tPFMET_Mt_jes'].Fill(row.tMtToPfMet_jes, frweight)
                 histos[folder+'/tPFMET_Mt_mes'].Fill(row.tMtToPfMet_mes, frweight)
                 #histos[folder+'/tPFMET_Mt_ees'].Fill(row.tMtToPfMet_ees, frweight)
@@ -314,36 +317,36 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 histos[folder+'/et_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.tPhi), weight[n])
                 histos[folder+'/et_DeltaR'].Fill(row.e_t_DR, weight[n])
                 histos[folder+'/h_collmass_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), weight[n])
-                histos[folder+'/h_collmass_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
+                #histos[folder+'/h_collmass_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
                 histos[folder+'/h_collmassSpread_vs_dPhi_pfmet'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, weight[n])
-                histos[folder+'/h_collmassSpread_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
+                #histos[folder+'/h_collmassSpread_vs_dPhi_mvamet'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
                 if deltaPhi(row.tPhi, row.pfMetPhi) > 1.57 :  
                     histos[folder+'/h_collmass_highPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), weight[n])
                     histos[folder+'/h_collmassSpread_highPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, weight[n])
                 if deltaPhi(row.tPhi, row.pfMetPhi) < 1.57 :  
                     histos[folder+'/h_collmass_lowPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), weight[n])
                     histos[folder+'/h_collmassSpread_lowPhi_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, weight[n])
-                if deltaPhi(row.tPhi, row.mva_metPhi) > 1.57 :  
-                    histos[folder+'/h_collmass_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
-                    histos[folder+'/h_collmassSpread_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
-                if deltaPhi(row.tPhi, row.mva_metPhi) < 1.57 :  
-                    histos[folder+'/h_collmass_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
-                    histos[folder+'/h_collmassSpread_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
+                #if deltaPhi(row.tPhi, row.mva_metPhi) > 1.57 :  
+                    #histos[folder+'/h_collmass_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
+                    #histos[folder+'/h_collmassSpread_highPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
+                #if deltaPhi(row.tPhi, row.mva_metPhi) < 1.57 :  
+                    #histos[folder+'/h_collmass_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
+                    #histos[folder+'/h_collmassSpread_lowPhi_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
                 histos[folder+'/h_collmassSpread_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)-125.0, weight[n])
-                histos[folder+'/h_collmassSpread_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
+                #histos[folder+'/h_collmassSpread_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi)-125.0, weight[n])
                 histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi), weight[n])
-                histos[folder+'/h_collmass_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
+                #histos[folder+'/h_collmass_mvamet'].Fill(collmass(row, row.mva_metEt, row.mva_metPhi), weight[n])
                 histos[folder+'/h_vismass'].Fill(row.e_t_Mass, weight[n])
                 histos[folder+'/type1_pfMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), row.type1_pfMetEt, weight[n])
-                histos[folder+'/mvaMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), row.mva_metEt, weight[n])
+                #histos[folder+'/mvaMetEt_vs_dPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), row.mva_metEt, weight[n])
                 histos[folder+'/ePFMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.type1_pfMetPhi), weight[n])
-                histos[folder+'/eMVAMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mva_metPhi), weight[n])
+                #histos[folder+'/eMVAMET_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mva_metPhi), weight[n])
                 histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPFMET, weight[n])
-                histos[folder+'/eMVAMET_Mt'].Fill(row.eMtToMVAMET, weight[n])
+                #histos[folder+'/eMVAMET_Mt'].Fill(row.eMtToMVAMET, weight[n])
                 histos[folder+'/tPFMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.type1_pfMetPhi), weight[n])
-                histos[folder+'/tMVAMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), weight[n])
+                #histos[folder+'/tMVAMET_DeltaPhi'].Fill(deltaPhi(row.tPhi, row.mva_metPhi), weight[n])
                 histos[folder+'/tPFMET_Mt'].Fill(row.tMtToPFMET, weight[n])
-                histos[folder+'/tMVAMET_Mt'].Fill(row.tMtToMVAMET, weight[n])
+                #histos[folder+'/tMVAMET_Mt'].Fill(row.tMtToMVAMET, weight[n])
                 histos[folder+'/jetN_20'].Fill(row.jetVeto20, weight[n]) 
                 histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight[n]) 
 
@@ -353,10 +356,10 @@ class LFVHETauAnalyzerMVA(MegaBase):
 
     def process(self):
         
-        central_weights = fakerate_central_histogram(25,0, 2.5)
-        p1s_weights = fakerate_p1s_histogram(25,0, 2.5)#fakerate_p1s_histogram(25,0, 2.5)
-        m1s_weights = fakerate_m1s_histogram(25,0, 2.5)#fakerate_m1s_histogram(25,0, 2.5)
-
+        #central_weights = fakerate_central_histogram(25,0, 2.5)
+        #p1s_weights = fakerate_p1s_histogram(25,0, 2.5)#fakerate_p1s_histogram(25,0, 2.5)
+        #m1s_weights = fakerate_m1s_histogram(25,0, 2.5)#fakerate_m1s_histogram(25,0, 2.5)
+ 
         frw = []
         for row in self.tree:
  
@@ -365,32 +368,38 @@ class LFVHETauAnalyzerMVA(MegaBase):
             ptthreshold = [30]
             processtype ='gg'##changed from 20
             jn = row.jetVeto30
+            #print 'number of jets', jn
             if jn > 3 : jn = 3
             #if row.run > 2 : #apply the trigger to data only (MC triggers enter in the scale factors)
-            if not bool(row.singleE27WP80Pass) : continue
-            if  not  bool(row.eMatchesSingleE27WP80): continue
-            
+            #print row.singleE32LooseTauPass, row.singleE27LooseTauPass
+            #if not bool(row.singleEPass) : continue
+            #print 'trigger passed'
+            #if  not  bool(row.eMatchesSingleE): continue
+            #print 'trigger matched'
+            #print 'ePt %f, eEta %f, ePhi %f, tPt %f, tEta %f, tPhi %f' %(row.ePt, row.eEta, row.ePhi, row.tPt, row.tEta, row.tPhi) 
             if not selections.eSelection(row, 'e'): continue
-            if not selections.lepton_id_iso(row, 'e', 'eid13Tight_etauiso01'): continue
+            if not selections.lepton_id_iso(row, 'e', 'eid15Tight_etauiso01'): continue
             if row.eEta > 1.4442 and row.eEta < 1.566 : continue
             if not selections.tauSelection(row, 't'): continue
+            #print 'ePt %f, eEta %f, ePhi %f, tPt %f, tEta %f, tPhi %f' %(row.ePt, row.eEta, row.ePhi, row.tPt, row.tEta, row.tPhi) 
  
-            if not row.tAntiElectronMVA3Tight : continue
-            if not row.tAntiMuon2Loose : continue
+            if not row.tAgainstElectronTightMVA5 : continue # from https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV
+            if not row.tAgainstMuonLoose3 : continue # new in 74X
             
-            if not row.tLooseIso3Hits : continue
+            if not row.tByLooseIsolationMVA3newDMwLT : continue ##according to Nathan and Aaron (the TauIDRecommendations are different)
             #isTauTight = False
-            frw=self.fakerate_weights(row.tEta, central_weights, p1s_weights, m1s_weights )
-            
-            isTauTight = bool(row.tTightIso3Hits)
+            ###frw=self.fakerate_weights(row.tEta, central_weights, p1s_weights, m1s_weights )
+            frw=1. ## add the correct fakerate weight once we have it
+            isTauTight = bool(row.tByTightIsolationMVA3newDMwLT)
             
             #print bool(row.tTightIso3Hits)
 
-            if row.tauVetoPt20EleTight3MuLoose : continue 
+            if row.tauVetoPt20EleTightMuLoose : continue 
             #if row.tauHpsVetoPt20 : continue
             if row.muVetoPt5IsoIdVtx : continue
-            if row.eVetoCicLooseIso : continue # change it with Loose
-  
+            #if row.eVetoCicLooseIso : continue # change it with Loose
+            if row.eVetoMVAIsoVtx : continue
+
             for j in ptthreshold:
                 folder = sign+'/'+processtype+'/ept'+str(j)+'/'+str(int(jn))
                 

@@ -55,9 +55,9 @@ class EEAnalyzerMVA(MegaBase):
         self.tree = EETree(tree)
         self.out=outfile
         self.histograms = {}
-        self.pucorrector = mcCorrections.make_puCorrector('singlee')
-        self.pucorrectorUp = mcCorrections.make_puCorrectorUp('singlee')
-        self.pucorrectorDown = mcCorrections.make_puCorrectorDown('singlee')
+        #self.pucorrector = mcCorrections.make_puCorrector('singlee')
+        #self.pucorrectorUp = mcCorrections.make_puCorrectorUp('singlee')
+        #self.pucorrectorDown = mcCorrections.make_puCorrectorDown('singlee')
 
         
     def event_weight(self, row):
@@ -66,8 +66,8 @@ class EEAnalyzerMVA(MegaBase):
         
         etrig = 'e1'
         if row.e2Pt > row.e1Pt : etrig = 'e2'
-        if bool(row.e1MatchesSingleE27WP80) and  not bool(row.e2MatchesSingleE27WP80) : etrig = 'e1'
-        if not bool(row.e1MatchesSingleE27WP80) and  bool(row.e2MatchesSingleE27WP80) :  etrig = 'e2'
+        #if bool(row.e1MatchesSingleE27WP80) and  not bool(row.e2MatchesSingleE27WP80) : etrig = 'e1'
+        #if not bool(row.e1MatchesSingleE27WP80) and  bool(row.e2MatchesSingleE27WP80) :  etrig = 'e2'
 
         allmcCorrections=    mcCorrections.get_electronId_corrections13_MVA(row, 'e1') * \
                           mcCorrections.get_electronIso_corrections13_MVA(row, 'e1') * \
@@ -121,36 +121,36 @@ class EEAnalyzerMVA(MegaBase):
     
         #pucorrlist = self.pucorrector(row.nTruePU)
         
-        weight =  self.pucorrector(row.nTruePU) *\
-                 allmcCorrections
-        weight_up =  self.pucorrectorUp(row.nTruePU) *\
-                    allmcCorrections
-        weight_down =  self.pucorrectorDown(row.nTruePU) *\
-                      allmcCorrections
+        ##weight =  self.pucorrector(row.nTruePU) *  allmcCorrections
+        ##weight_up =  self.pucorrectorUp(row.nTruePU) *   allmcCorrections
+        ##weight_down =  self.pucorrectorDown(row.nTruePU) *   allmcCorrections
+        ##weight_tr_up = self.pucorrector(row.nTruePU) *    trUp_mcCorrections
+        ##weight_tr_down = self.pucorrector(row.nTruePU) *    trDown_mcCorrections
+        ##weight_e1id_up =  self.pucorrector(row.nTruePU) *   e1idUp_mcCorrections
+        ##weight_e2id_up =  self.pucorrector(row.nTruePU) *  e2idUp_mcCorrections
+        ##weight_e1id_down =  self.pucorrector(row.nTruePU) * e1idDown_mcCorrections
+        ##weight_e2id_down =  self.pucorrector(row.nTruePU) * e2idDown_mcCorrections
+        ##weight_e1iso_up =  self.pucorrector(row.nTruePU) *   e1isoUp_mcCorrections
+        ##weight_e2iso_up =  self.pucorrector(row.nTruePU) *  e2isoUp_mcCorrections
+        ##weight_e1iso_down =  self.pucorrector(row.nTruePU) *   e1isoDown_mcCorrections
+        ##weight_e2iso_down =  self.pucorrector(row.nTruePU) *   e2isoDown_mcCorrections
+        weight            =  1.
+        weight_up         =  1.
+        weight_down       =  1.
+        weight_tr_up      =  1.
+        weight_tr_down    =  1.
+        weight_e1id_up    =  1.
+        weight_e2id_up    =  1.
+        weight_e1id_down  =  1.
+        weight_e2id_down  =  1.
+        weight_e1iso_up   =  1.
+        weight_e2iso_up   =  1.
+        weight_e1iso_down =  1.
+        weight_e2iso_down =  1.
         
-        weight_tr_up = self.pucorrector(row.nTruePU) *\
-                       trUp_mcCorrections
-        weight_tr_down = self.pucorrector(row.nTruePU) *\
-                         trDown_mcCorrections
 
-        
-        weight_e1id_up =  self.pucorrector(row.nTruePU) *\
-                 e1idUp_mcCorrections
-        weight_e2id_up =  self.pucorrector(row.nTruePU) *\
-                 e2idUp_mcCorrections
-        weight_e1id_down =  self.pucorrector(row.nTruePU) *\
-                 e1idDown_mcCorrections
-        weight_e2id_down =  self.pucorrector(row.nTruePU) *\
-                 e2idDown_mcCorrections
-        weight_e1iso_up =  self.pucorrector(row.nTruePU) *\
-                 e1isoUp_mcCorrections
-        weight_e2iso_up =  self.pucorrector(row.nTruePU) *\
-                 e2isoUp_mcCorrections
-        weight_e1iso_down =  self.pucorrector(row.nTruePU) *\
-                 e1isoDown_mcCorrections
-        weight_e2iso_down =  self.pucorrector(row.nTruePU) *\
-                 e2isoDown_mcCorrections
-        
+
+
         return  [weight, weight_up, weight_down, weight_tr_up,  weight_tr_down, weight_e1id_up, weight_e1id_down, weight_e1iso_up, weight_e1iso_down, weight_e2id_up, weight_e2id_down,  weight_e2iso_up, weight_e2iso_down]
 
 
@@ -169,7 +169,7 @@ class EEAnalyzerMVA(MegaBase):
                 for j in jets:
                     folder.append(d+i+'/'+str(j))
         
-        self.book('jobInfo', "jobInfo", "jobInfo", "inputfilename/C:events/l", type=pytree.PyTree)
+        #self.book('jobInfo', "jobInfo", "jobInfo", "inputfilename/C:events/l", type=pytree.PyTree)
 
        
         
@@ -300,34 +300,34 @@ class EEAnalyzerMVA(MegaBase):
             histos[folder+'/e1e2Mass'].Fill(row.e1_e2_Mass, weight[n])
             
             histos[folder+'/e1PFMET_DeltaPhi'].Fill(deltaPhi(row.e1Phi, row.pfMetPhi), weight[n])
-            histos[folder+'/e1MVAMET_DeltaPhi'].Fill(deltaPhi(row.e1Phi, row.mva_metPhi), weight[n])
+            #histos[folder+'/e1MVAMET_DeltaPhi'].Fill(deltaPhi(row.e1Phi, row.mva_metPhi), weight[n])
             histos[folder+'/e1PFMET_DeltaPhi_Ty1'].Fill(deltaPhi(row.e1Phi, row.type1_pfMetPhi), weight[n])
             histos[folder+'/e1PFMET_Mt'].Fill(row.e1MtToPFMET, weight[n])
-            histos[folder+'/e1MVAMET_Mt'].Fill(row.e1MtToMVAMET, weight[n])
+            #histos[folder+'/e1MVAMET_Mt'].Fill(row.e1MtToMVAMET, weight[n])
             histos[folder+'/e1PFMET_Mt_Ty1'].Fill(row.e1MtToPfMet_Ty1, weight[n])
 
             histos[folder+'/type1_pfMetEt'].Fill(row.type1_pfMetEt, weight[n])
             histos[folder+'/pfMetEt'].Fill(row.pfMetEt, weight[n])
-            histos[folder+'/mvaMetEt'].Fill(row.mva_metEt, weight[n])
+            #histos[folder+'/mvaMetEt'].Fill(row.mva_metEt, weight[n])
 
             histos[folder+'/type1_pfMetPhi'].Fill(row.type1_pfMetPhi, weight[n])
             histos[folder+'/pfMetPhi'].Fill(row.pfMetPhi, weight[n])
-            histos[folder+'/mvaMetPhi'].Fill(row.mva_metPhi, weight[n])
+            #histos[folder+'/mvaMetPhi'].Fill(row.mva_metPhi, weight[n])
 
             zphi = Z(row).Phi()
             histos[folder+'/type1_pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.type1_pfMetPhi)), weight[n])
             histos[folder+'/type1_pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.type1_pfMetPhi)), weight[n])
             histos[folder+'/pfMetEt_par'].Fill(row.pfMetEt*cos(deltaPhi(zphi, row.pfMetPhi)), weight[n])
             histos[folder+'/pfMetEt_perp'].Fill(row.pfMetEt*sin(deltaPhi(zphi, row.pfMetPhi)), weight[n])
-            histos[folder+'/mvaMetEt_par'].Fill(row.mva_metEt*cos(deltaPhi(zphi, row.mva_metPhi)), weight[n])
-            histos[folder+'/mvaMetEt_perp'].Fill(row.mva_metEt*sin(deltaPhi(zphi, row.mva_metPhi)), weight[n])
+            #histos[folder+'/mvaMetEt_par'].Fill(row.mva_metEt*cos(deltaPhi(zphi, row.mva_metPhi)), weight[n])
+            #histos[folder+'/mvaMetEt_perp'].Fill(row.mva_metEt*sin(deltaPhi(zphi, row.mva_metPhi)), weight[n])
             
             histos[folder+'/e2PFMET_DeltaPhi'].Fill(deltaPhi(row.e2Phi, row.pfMetPhi), weight[n])
-            histos[folder+'/e2MVAMET_DeltaPhi'].Fill(deltaPhi(row.e2Phi, row.mva_metPhi), weight[n])
+            #histos[folder+'/e2MVAMET_DeltaPhi'].Fill(deltaPhi(row.e2Phi, row.mva_metPhi), weight[n])
             histos[folder+'/e2PFMET_DeltaPhi_Ty1'].Fill(deltaPhi(row.e2Phi, row.type1_pfMetPhi), weight[n])
             histos[folder+'/e2PFMET_Mt'].Fill(row.e2MtToPFMET, weight[n])
             histos[folder+'/e2PFMET_Mt_Ty1'].Fill(row.e2MtToPfMet_Ty1, weight[n])
-            histos[folder+'/e2MVAMET_Mt'].Fill(row.e2MtToMVAMET, weight[n])
+            #histos[folder+'/e2MVAMET_Mt'].Fill(row.e2MtToMVAMET, weight[n])
 
             histos[folder+'/pfMetEt_jes'].Fill(row.pfMet_jes_Et, weight[n])
             histos[folder+'/pfMetPhi_jes'].Fill(row.pfMet_jes_Phi, weight[n])
@@ -397,11 +397,11 @@ class EEAnalyzerMVA(MegaBase):
          #   if  i >= 100:
           #      return
 
-            current_file = self.tree.inputfilename
-            if filename != 'unnamed' and current_file <> filename:
-                 self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
-            if not filename == 'unnamed' or current_file <> filename:
-                filename = current_file
+            #current_file = self.tree.inputfilename
+            #if filename != 'unnamed' and current_file <> filename:
+            #     self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
+            #if not filename == 'unnamed' or current_file <> filename:
+            #    filename = current_file
             evts_processed += 1
             #self.histograms[folder+'/jobInfo'].Fill(row)
  
@@ -410,29 +410,27 @@ class EEAnalyzerMVA(MegaBase):
             if jn > 3 : jn = 3
             sign = 'ss' if row.e1_e2_SS else 'os'
             #if row.run > 2 : #apply the trigger to data only (MC triggers enter in the scale factors)
-            if not bool(row.singleE27WP80Pass) : continue
-            if  not  bool(row.e1MatchesSingleE27WP80) and   not bool(row.e1MatchesSingleE27WP80) : continue
+            #if not bool(row.singleE27WP80Pass) : continue
+            #if  not  bool(row.e1MatchesSingleE27WP80) and   not bool(row.e1MatchesSingleE27WP80) : continue
            
-            if jn != 0 and row.bjetCSVVeto30!=0 : continue 
-            
+            #if jn != 0 and row.bjetCSVVeto30!=0 : continue 
+            if jn != 0 and row.bjetCISVVeto30Loose!=0 : continue 
             if row.e1Pt < 30 : continue
             if row.e2Pt < 30 : continue
             if not abs(row.e1_e2_Mass-91.2) < 20: continue
             
             if not selections.eSelection(row, 'e1'): continue
-            if not selections.lepton_id_iso(row, 'e1', 'eid13Tight_etauiso01'): continue
+            if not selections.lepton_id_iso(row, 'e1', 'eid15Tight_etauiso01'): continue
             if abs(row.e1Eta) > 1.4442 and abs(row.e1Eta) < 1.566 : continue
             
             if not selections.eSelection(row, 'e2'): continue
-            if not selections.lepton_id_iso(row, 'e2', 'eid13Tight_etauiso01'): continue
+            if not selections.lepton_id_iso(row, 'e2', 'eid15Tight_etauiso01'): continue
             if abs(row.e2Eta) > 1.4442 and abs(row.e2Eta) < 1.566 : continue
            
 
-            #if not selections.vetos(row) : continue
             if row.muVetoPt5IsoIdVtx : continue
-            if row.eVetoCicLooseIso : continue # change it with Loose
-#            if row.tauVetoPt20EleTight3MuLoose : continue           
-            if row.tauHpsVetoPt20 : continue
+            if row.eVetoMVAIsoVtx : continue
+            if row.tauVetoPt20Loose3HitsVtx : continue
         
 
             folder = sign
@@ -444,8 +442,8 @@ class EEAnalyzerMVA(MegaBase):
                 folder = sign+'/'+str(int(jn)) 
                 self.fill_histos(row, folder)
              
-        if filename != 'unnamed':
-            self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
+        #if filename != 'unnamed':
+        #    self.histograms['jobInfo/jobInfo'].Fill([[i for i in filename], evts_processed])
             
     def finish(self):
         self.write_histos()

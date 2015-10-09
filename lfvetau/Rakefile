@@ -8,7 +8,7 @@ require 'pathname'
 $jobid = ENV['jobid']
 $blind = ENV['blind']
 # Figure out what run period we are in
-$period = '8TeV'
+$period = '13TeV'
 PU = ENV['PU']
 #if $jobid.include? '8TeV'
 #  $period = '8TeV'
@@ -41,10 +41,10 @@ samples = Hash[
                               'WWJetsTo2L2Nu_TuneZ2_8TeV',
                               'TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'], 
                # Maria's version
-               
+               "DY" => get_sample_names('DYJetsToLL'),
    
-               "signalMCgg" => get_sample_names('ggHiggsToETau'),
-               "signalMCvbf" => get_sample_names('vbfHiggsToETau'),
+               "signalMCgg" => get_sample_names('GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8'),
+               "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M125_13TeV_powheg_pythia8'),
                "signalMCMuTaugg" => get_sample_names('ggHiggsToMuTau'),
                "signalMCMuTauvbf" => get_sample_names('vbfHiggsToMuTau'),
                "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
@@ -359,7 +359,7 @@ end
 ##     mt
 ################################################################################
 
-task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] )
+task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py",samples['signalMCgg']+samples['signalMCvbf'])
 
 
 task :genkinMuTau => get_analyzer_results("LFVHAnalyzeGENMuTau.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
@@ -371,16 +371,14 @@ task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalM
 
 task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'])# + samples['dataSingleE'] )
 
-task :recoplotsMVA => get_analyzer_results("LFVHETauAnalyzerMVA.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + 
-                                           samples['dataSingleE'] )
+task :recoplotsMVA => get_analyzer_results("LFVHETauAnalyzerMVA.py", samples['signalMCgg']+samples['signalMCvbf'])
 
 
 task :recoplotsMuTau => get_analyzer_results("LFVHMuTauAnalyzer.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
 
 task :controlplots => get_analyzer_results("EEAnalyzer.py",samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + samples['dataSingleE'])
 
-task :controlplotsMVA => get_analyzer_results("EEAnalyzerMVA.py", #samples['signalMCvbf'] )#samples['zjets'])
-                                              samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + samples['dataSingleE'])
+task :controlplotsMVA => get_analyzer_results("EEAnalyzerMVA.py", samples['DY'])
 
 
 task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +

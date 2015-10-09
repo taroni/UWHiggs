@@ -30,13 +30,13 @@ class LFVHAnalyzeGEN(MegaBase):
         self.book('gen',"eGenMotherPdgId", "gen Mother pdgId", 200, 0, 200)
         self.book('gen',"eGenEta", "gen Eta, electron", 50, -2.5, 2.5)
         self.book('gen',"eGenPhi", "gen Phi, electron", 100, -3.2, 3.2)
-        self.book('gen',"eGenEnergy", "gen Energy, electron", 40, 0, 200)
-        self.book('gen',"eGenPt", "gen p_{T}, electron", 40, 0, 200)
+        self.book('gen',"eGenEnergy", "gen Energy, electron", 40, 0, 400)
+        self.book('gen',"eGenPt", "gen p_{T}, electron", 40, 0, 400)
         
         self.book('gen',"tGenEta", "gen Eta, tau", 50, -2.5, 2.5)
         self.book('gen',"tGenPhi", "gen Phi, tau",  100, -3.2, 3.2)
-        self.book('gen',"tGenEnergy", "gen Energy, tau", 40, 0, 200)
-        self.book('gen',"tGenPt", "gen p_{T}, tau", 40 , 0, 200)
+        self.book('gen',"tGenEnergy", "gen Energy, tau", 40, 0, 400)
+        self.book('gen',"tGenPt", "gen p_{T}, tau", 40 , 0, 400)
         self.book('gen',"tGenDecayMode", "gen Tau, decay mode", 20, 0, 20)
         self.book('gen',"etGenDeltaPhi", "gen e tau, delta phi",  50, 0, 3.2)
 
@@ -44,17 +44,17 @@ class LFVHAnalyzeGEN(MegaBase):
         self.book('gen',"eGenMotherPdgId_all", "gen Mother pdfId, all electrons", 200, 0, 200)
         self.book('gen',"eGenEta_all", "gen Eta, all electrons", 50, -2.5, 2.5)
         self.book('gen',"eGenPhi_all", "gen Phi, all electrons",  100, -3.2, 3.2)
-        self.book('gen',"eGenPt_all", "gen p_{T}, all electrons", 40, 0, 200)
-        self.book('gen',"eGenEnergy_all", "gen Energy, all electrons", 40, 0, 200)
+        self.book('gen',"eGenPt_all", "gen p_{T}, all electrons", 40, 0, 400)
+        self.book('gen',"eGenEnergy_all", "gen Energy, all electrons", 40, 0, 400)
     
         self.book('gen',"tGenEta_all", "gen Eta, all taus", 50, -2.5, 2.5)
         self.book('gen',"tGenPhi_all", "gen Phi, all taus",  100, -3.2, 3.2)
-        self.book('gen',"tGenEnergy_all", "gen Energy, all taus", 40, 0, 200)
-        self.book('gen',"tGenPt_all", "gen p_{T}, all taus",  40, 0, 200)
+        self.book('gen',"tGenEnergy_all", "gen Energy, all taus", 40, 0, 400)
+        self.book('gen',"tGenPt_all", "gen p_{T}, all taus",  40, 0, 400)
         self.book('gen',"tGenDecayMode_all", "all gen Taus decay mode", 20, 0, 20)
         self.book('gen',"etGenDeltaPhi_all", "all gen e tau delta phi",  50, 0, 3.2)
 
-        self.book('gen', 'higgsPt', 'higgs p_{T}', 40, 0, 200); 
+        self.book('gen', 'higgsPt', 'higgs p_{T}', 40, 0, 400); 
 
             
     def fill_histos(self, row, folder='gen', fakeRate = False):
@@ -93,7 +93,7 @@ class LFVHAnalyzeGEN(MegaBase):
             #print row.eGenMotherPdgId, " ", row.tGenMotherPdgId
             histos[folder+'/etGenDeltaPhi'].Fill(deltaPhi(row.eGenPhi, row.tGenPhi))
             
-            histos[folder+'/higgsPt'].Fill(sqrt((row.eGenPx+row.tGenPx)**2 + (row.eGenPy+row.tGenPy)**2)) # correct  for LFVHiggsToETau only, add the neutrinos
+            histos[folder+'/higgsPt'].Fill(row.eGenMotherPt) 
             
     
  
@@ -103,6 +103,9 @@ class LFVHAnalyzeGEN(MegaBase):
         #for i, row in enumerate(self.tree):
          #   if  i >= 1000:
           #      return
+            #print row.eGenMotherPdgId, row.eGenPdgId, row.eComesFromHiggs, row.tComesFromHiggs
+            if row.eGenMotherPdgId==23:
+                print row.eComesFromHiggs, row.eGenMotherPdgId, row.eGenPdgId
             self.fill_histos(row, 'gen')
     def finish(self):
         self.write_histos()

@@ -68,6 +68,35 @@ def summer_2013_eid_tight(row, name):
     elif pT > 20 and abseta > 1.479:
         return ( mva_output > 0.985 )
     return False
+def summer_2015_eid(row, name):
+    mva_output = getattr(row, getVar(name, 'MVANonTrigID')) #was eMVATrigNoIP
+    pT    = getattr(row, getVar(name, 'Pt'))
+    abseta= getattr(row, getVar(name, 'AbsEta'))
+    if pT < 20    and abseta < 0.8:
+        return ( mva_output > 0.925 )
+    elif pT < 20  and 0.8 < abseta < 1.479:
+        return ( mva_output > 0.915 )
+    elif pT < 20  and abseta > 1.479:
+        return ( mva_output > 0.965 )
+    elif pT > 20  and abseta < 0.8:
+        return ( mva_output > 0.905 )
+    elif pT > 20  and 0.8 < abseta < 1.479:
+        return ( mva_output > 0.955 )
+    elif pT > 20  and abseta > 1.479:
+        return ( mva_output > 0.975 )
+    return False
+
+def summer_2015_eid_tight(row, name):
+    mva_output = getattr(row, getVar(name, 'MVANonTrigID'))
+    pT    = getattr(row, getVar(name, 'Pt'))
+    abseta= getattr(row, getVar(name, 'AbsEta'))
+    if pT > 20 and abseta < 0.8:
+        return ( mva_output > 0.925)
+    elif pT > 20 and 0.8 < abseta < 1.479:
+        return ( mva_output > 0.975 )
+    elif pT > 20 and abseta > 1.479:
+        return ( mva_output > 0.985 )
+    return False
 
 #add electron id from AN 2012_463
 def hWW_eid_tight(row, name):
@@ -115,4 +144,6 @@ electronIds = {
     'eid14Tight' : hWW_eid_tight,
     'eid13Loose' : summer_2013_eid,
     'eid13Tight' : summer_2013_eid_tight,
+    'eid15Loose' : summer_2015_eid,
+    'eid15Tight' : summer_2015_eid_tight,
 }
