@@ -43,8 +43,8 @@ samples = Hash[
                # Maria's version
                "DY" => get_sample_names('DYJetsToLL'),
    
-               "signalMCgg" => get_sample_names('GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8'),
-               "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M125_13TeV_powheg_pythia8'),
+               "signalMCgg" => get_sample_names('GluGlu_LFV_HToETau_M'),
+               "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M'),
                "signalMCMuTaugg" => get_sample_names('ggHiggsToMuTau'),
                "signalMCMuTauvbf" => get_sample_names('vbfHiggsToMuTau'),
                "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
