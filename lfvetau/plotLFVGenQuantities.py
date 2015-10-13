@@ -5,6 +5,8 @@ import ROOT
 import sys
 from FinalStateAnalysis.PlotTools.MegaBase import make_dirs
 
+jobid = os.environ['jobid']
+
 ROOT.gROOT.SetStyle("Plain")
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -18,10 +20,16 @@ else:
 canvas = ROOT.TCanvas("canvas","canvas",800,800)
 LFVStack = ROOT.THStack("stack","")
 
-mydir = 'results/ntupleTest_7Oct/LFVHAnalyzeGEN/'
+mydir = 'results/'+jobid+'/LFVHAnalyzeGEN/'
 
 vbffile = ROOT.TFile(mydir+'VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.root')
 ggfile =  ROOT.TFile(mydir+'GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.root')
+
+vbflumifile=open('inputs/'+jobid+'/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.lumicalc.sum', 'r')
+gglumifile = open('inputs/'+jobid+'/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.lumicalc.sum', 'r')
+
+vbflumi = float(vbflumifile.readline())
+gglumi = float(gglumifile.readline())
 
 gendir = vbffile.Get('gen')
 hlist = gendir.GetListOfKeys()
@@ -54,8 +62,8 @@ for i in iter:
         vbf_histo = vbffile.Get('gen/'+i.GetName())
         
         if gg_histo.Integral() != 0 and vbf_histo.Integral() != 0  : 
-                gg_histo.Scale(1./5634.83018008)
-                vbf_histo.Scale(1./64394.7649573)
+                gg_histo.Scale(1./gglumi)
+                vbf_histo.Scale(1./vbflumi)
                 
                 p = gg_histo.GetName()[0:1]
                 if p == 't' : p = '#tau'
