@@ -3,18 +3,6 @@
 set -o nounset
 set -o errexit
 
-#export jobid=SubmitMuTauSingleMU
-#export jobid=MuTauSingleMUV6
-#export jobid=MuTauSingleMuJetReReco
-#export jobid=MuTauSingleMuJetReReco
-export jobid=MuTauSingleMuJetReRecoSkim
-export PU=true
-rake mttight
-export PU=false
-rake pu1mttight
-export jobid=MuTauSingleMuJetReReco
-export jobidPU=MuTauSingleMuJetReReco
-
-rake analyzeMuTauData
-rake analyzeMuTauMC
-
+#export jobid=MiniAODSIM-Spring15
+export jobid=MiniAODSIM-Spring15-25ns_LFV_V1_October10
+rake analyzeSpring2015
