@@ -4,7 +4,7 @@
 
 source jobid.sh
 
-<<<<<<< HEAD
+
 export jobid=$jobid13
 export datasrc=/hdfs/store/user/$USER/$jobid
 
