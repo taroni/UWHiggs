@@ -68,6 +68,7 @@ def summer_2013_eid_tight(row, name):
     elif pT > 20 and abseta > 1.479:
         return ( mva_output > 0.985 )
     return False
+
 def summer_2015_eid(row, name):
     mva_output = getattr(row, getVar(name, 'MVANonTrigID')) #was eMVATrigNoIP
     pT    = getattr(row, getVar(name, 'Pt'))

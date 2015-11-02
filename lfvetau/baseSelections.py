@@ -21,21 +21,55 @@ def muSelection(row, name):
     return True
 
 def eSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 20:           return False #was 20
-    if getattr( row, getVar(name,'AbsEta')) > 2.1:      return False#as in H->tau_etau_h # was 2.3
+    eAbsEta = getattr( row, getVar(name,'AbsEta'))
+    ept = getattr( row, getVar(name,'Pt_ees_minus')) 
+    if ept:
+        if ept < 30:           return False 
+    else:
+        if getattr( row, getVar(name,'Pt')) < 30:   return False #was 20
+
+    if eAbsEta > 2.3:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
     if getattr( row, getVar(name,'HasConversion')):     return False
+    if eAbsEta > 1.4442 and eAbsEta < 1.566: return False
 #    if not getattr( row, getVar(name,'ChargeIdTight')): return False
     if not getattr( row, getVar(name,'ChargeIdLoose')): return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
     ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
+    #if getattr(row, getVar(name, 'MuonIdIsoVtxOverlap')): return False
+    return True
+def eLowPtSelection(row, name):
+    eAbsEta = getattr( row, getVar(name,'AbsEta'))
+    ept = getattr( row, getVar(name,'Pt_ees_minus'))
+    if ept:
+        if ept < 15:           return False 
+    else:
+        if getattr( row, getVar(name,'Pt')) < 15:   return False #was 20
+
+    if eAbsEta > 2.3:      return False
+    if getattr( row, getVar(name,'MissingHits')):       return False
+    if getattr( row, getVar(name,'HasConversion')):     return False
+    if eAbsEta > 1.4442 and eAbsEta < 1.566: return False
+#    if not getattr( row, getVar(name,'ChargeIdTight')): return False
+    if not getattr( row, getVar(name,'ChargeIdLoose')): return False
+    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
+    ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
+    if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
+    #if getattr(row, getVar(name, 'MuonIdIsoVtxOverlap')): return False
     return True
     
 def tauSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 30:          return False
+    tpt = getattr( row, getVar(name,'Pt_tes_minus'))
+    if tpt:
+        if tpt < 30:           return False 
+    else:
+        if getattr( row, getVar(name,'Pt')) < 30:          return False
     if getattr( row, getVar(name,'AbsEta')) > 2.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:    return False
+    if getattr( row, getVar(name, 'MuonIdIsoVtxOverlap')): return False
+    if getattr( row, getVar(name, 'ElectronPt10IdIsoVtxOverlap')): return False # change to tCiCLooseElecOverlap 
+
     return True
 
 
@@ -66,6 +100,10 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         return bool( RelPFIsoDB < 0.15 or (RelPFIsoDB < 0.20 and AbsEta < 1.479))
     if isolabel == 'idiso02':
         return bool( RelPFIsoDB < 0.20 )
+    if isolabel == 'idiso05':
+        return bool( RelPFIsoDB < 0.5 )
+    if isolabel == 'idantiso':
+        return bool( RelPFIsoDB > 0.20 )
     if isolabel == 'etauiso012' or isolabel == 'mutauiso012': 
         return bool( RelPFIsoDB < 0.12 ) 
     if isolabel == 'etauiso01' or isolabel == 'mutauiso01': 

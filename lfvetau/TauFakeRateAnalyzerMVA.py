@@ -16,7 +16,11 @@ from cutflowtracker import cut_flow_tracker
 #Makes the cut flow histogram
 cut_flow_step = ['allEvents', 'e1sel', 'e1IDiso', 'e2sel', 'e2IDiso', 'ZMass', 'tsel', 'tAntiMuon', 'tAntiEle',  'MtToMet', 'tRawIso10','tRawIso5',  'tLooseIso', 'tTightIso' 
 ]
+from inspect import currentframe
 
+def get_linenumber():
+    cf = currentframe()
+    return cf.f_back.f_lineno
 
 def deltaPhi(phi1, phi2):
     PHI = abs(phi1-phi2)
@@ -75,13 +79,13 @@ class TauFakeRateAnalyzerMVA(MegaBase):
         if bool(row.e1MatchesSingleE27WP80) and  not bool(row.e2MatchesSingleE27WP80) : etrig = 'e1'
         if not bool(row.e1MatchesSingleE27WP80) and  bool(row.e2MatchesSingleE27WP80) :  etrig = 'e2'
 
+            
+            
         return self.pucorrector(row.nTruePU) * \
-            mcCorrections.get_electronId_corrections13_MVA(row, 'e1') * \
-            mcCorrections.get_electronIso_corrections13_MVA(row, 'e1') * \
-            mcCorrections.get_electronId_corrections13_MVA(row, 'e2') * \
-            mcCorrections.get_electronIso_corrections13_MVA(row, 'e2')* mcCorrections.get_trigger_corrections_MVA(row, etrig) 
-##add the trigger correction 
-
+            mcCorrections.eid_correction( row, 'e1', 'e2') * \
+            mcCorrections.eiso_correction(row, 'e1', 'e2') * \
+            mcCorrections.trig_correction(row, etrig     )
+            
     def begin(self):
         
         tauiso = ['tNoCuts', 'tSuperSuperLoose', 'tSuperLoose', 'tLoose', 'tTigh']
@@ -177,23 +181,28 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             
 
     def process(self):
- 
         cut_flow_histo = self.cut_flow_histo
         cut_flow_trk   = cut_flow_tracker(cut_flow_histo)
-
+        myevent =()
+        #print self.tree.inputfilename
         for row in self.tree:
             jn = row.jetVeto30
             if jn > 3 : jn = 3
             
             #if row.run > 2: 
             if not bool(row.singleE27WP80Pass) : continue
+            #            if hasattr(self.tree, 'row.e1MatchesEle27WP80') and hasattr(self.tree, 'row.e2MatchesEle27WP80') :
+            #if not bool(row.e1MatchesEle27WP80) and not bool(row.e2MatchesEle27WP80) : continue
+            
+            #else :
             if not bool(row.e1MatchesSingleE27WP80) and  not bool(row.e2MatchesSingleE27WP80) : continue
                 #if not bool(row.singleEPass) : continue
                 #if not bool(row.e1MatchesSingleE) and  not bool(row.e2MatchesSingleE) : continue
-            if jn != 0 and row.bjetCSVVeto30!=0 : continue 
+                
+            if row.bjetCSVVeto30!=0 : continue 
             if row.e1Pt < 30 : continue
             if row.e2Pt < 30 : continue
-            
+                       
 #        for i, row in enumerate(self.tree):
 #            if  i >= 100:
 #                return
@@ -206,7 +215,6 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             if not selections.lepton_id_iso(row, 'e1', 'eid13Tight_etauiso01'): continue
             if abs(row.e1Eta) > 1.4442 and abs(row.e1Eta < 1.566) : continue
             
-
             cut_flow_trk.Fill('e1IDiso')
             if not selections.eSelection(row, 'e2'): continue
             cut_flow_trk.Fill('e2sel')
@@ -217,11 +225,12 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             if not abs(row.e1_e2_Mass-91.2) < 20: continue
             cut_flow_trk.Fill('ZMass')
             if not selections.tauSelection(row, 't'): continue
+            if row.tPt < 30 : continue
             cut_flow_trk.Fill('tsel')
 
             if not row.tAntiMuon2Loose: continue
             cut_flow_trk.Fill('tAntiMuon')
-            if not row.tAntiElectronMVA3Tight: continue
+            if not row.tAntiElectronMVA5Tight: continue #was 3
             cut_flow_trk.Fill('tAntiEle')
 
             if row.tauVetoPt20EleTight3MuLoose : continue 
@@ -233,6 +242,13 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             cut_flow_trk.Fill('MtToMet')
             
 #            if  etDR(row) < 1. : continue 
+            
+            # if not row.tMtToMET < 50:  continue
+            cut_flow_trk.Fill('MtToMet')
+            
+            #            if  etDR(row) < 1. : continue 
+            if (row.run, row.lumi, row.evt, row.e1Pt, row.e2Pt)==myevent: continue
+            myevent=(row.run, row.lumi, row.evt, row.e1Pt, row.e2Pt)
 
             tauiso = 'tNoCuts'
             sign = 'ss' if row.e1_e2_SS else 'os'
@@ -275,8 +291,6 @@ class TauFakeRateAnalyzerMVA(MegaBase):
                 folder = sign+'/'+tauiso+'/tptregion'
                 self.fill_histos(row, folder)
 
-             
-            
             if  row.tLooseIso3Hits : 
                 tauiso = 'tLoose'
                 folder = sign+'/'+tauiso

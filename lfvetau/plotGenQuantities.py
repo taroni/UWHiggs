@@ -19,7 +19,6 @@ canvas = ROOT.TCanvas("canvas","canvas",800,800)
 LFVStack = ROOT.THStack("stack","")
 
 
-
 lfvfilelist = ['results/MCntuples_otherCh2/LFVHAnalyzeGENEMu/ggHiggsToMuTau.root', 'results/MCntuples_otherCh2/LFVHAnalyzeGENEMu/vbfHiggsToMuTau.root','results/MCntuples_otherCh2/LFVHAnalyzeGENMuTau/ggHiggsToMuTau.root', 'results/MCntuples_otherCh2/LFVHAnalyzeGENMuTau/vbfHiggsToMuTau.root']
 smfilelist = ['results/MCntuples_otherCh2/LFVHAnalyzeGENEMu/GluGluToHToTauTau_M-125_8TeV-powheg-pythia6.root', 'results/MCntuples_otherCh2/LFVHAnalyzeGENEMu/VBF_HToTauTau_M-125_8TeV-powheg-pythia6.root','results/MCntuples_otherCh2/LFVHAnalyzeGENMuTau/GluGluToHToTauTau_M-125_8TeV-powheg-pythia6.root', 'results/MCntuples_otherCh2/LFVHAnalyzeGENMuTau/VBF_HToTauTau_M-125_8TeV-powheg-pythia6.root']
 

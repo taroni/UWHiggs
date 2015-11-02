@@ -1,15 +1,29 @@
 #from mauro plotters
-import os
-from sys import argv, stdout, stderr
-import ROOT
+
+#Set logging before anything to override rootpy very verbose defaults
 import sys
+import logging
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
+import os
+import ROOT
+from pdb import set_trace
 from FinalStateAnalysis.PlotTools.MegaBase import make_dirs
 from FinalStateAnalysis.MetaData.data_styles import data_styles
 from FinalStateAnalysis.PlotTools.BlindView import BlindView,  blind_in_range
+from FinalStateAnalysis.PlotTools.SubtractionView      import SubtractionView, PositiveView
+import itertools
 import glob
-import logging
 import sys
 from BasePlotter import BasePlotter
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument('--no-plots', dest='no_plots', action='store_true',
+                    default=False, help='Does not print plots')
+parser.add_argument('--no-shapes', dest='no_shapes', action='store_true',
+                    default=False, help='Does not create shapes for limit computation')
+args = parser.parse_args()
 
 jobid = os.environ['jobid']
 #jobid = 'MCntuples_3March' 
@@ -22,144 +36,110 @@ ROOT.gStyle.SetOptStat(0)
 
 print "\nPlotting %s for %s\n" % (channel, jobid)
 
-mc_samples = [
-    'ggHiggsToETau',
-    'vbfHiggsToETau',
-    'GluGluToHToTauTau_M-125_8TeV-powheg-pythia6',
-    'VBF_HToTauTau_M-125_8TeV-powheg-pythia6',
-    #'Zjets_M50', 
-    'Zjets_M50_skimmedLL',
-    'Z1jets_M50_skimmedLL',
-    'Z2jets_M50_skimmedLL',
-    'Z3jets_M50_skimmedLL',
-    'Z4jets_M50_skimmedLL',
-    'Zjets_M50_skimmedTT',
-    'Z1jets_M50_skimmedTT',
-    'Z2jets_M50_skimmedTT',
-    'Z3jets_M50_skimmedTT',
-    'Z4jets_M50_skimmedTT',
-    'TTJets*',
-    'T_t*',
-    'Tbar_t*', 
-    'WplusJets_madgraph_skimmed',
-    'Wplus1Jets_madgraph*',
-    #'Wplus1Jets_madgraph_tapas',
-    'Wplus2Jets_madgraph*',
-    #'Wplus2Jets_madgraph_tapas',
-    'Wplus3Jets_madgraph',
-    'Wplus4Jets_madgraph',
-    'WWJets*',
-    'WZJets*',
-    'ZZJets*',
-    'rakerate*',
-    'data*'
-]
+#check if blind
+blind   = 'blind' not in os.environ or os.environ['blind'] == 'YES'
+print 'blind?', blind
+blind_region=[100, 150] if blind else None
+#blind_region=[100, 200] if blind else None
 
-        
-files = []
-lumifiles = []
+embedded = True
 
-for x in mc_samples:
-        files.extend(glob.glob('results/%s/LFVHETauAnalyzerMVA/%s.root' % (jobid, x)))
-        lumifiles.extend(glob.glob('inputs/%s/%s.lumicalc.sum' % (jobid, x)))
-
-sign = ['os']
-jets = [0, 1, 2, 3]
-processtype=['gg']
-threshold=['ept30']
-
-outputdir = 'plots/%s/LFVHETauAnalyzerMVA/%s/' % (jobid, channel)
-if not os.path.exists(outputdir):
-        os.makedirs(outputdir)
-
-
-        
-def remove_name_entry(dictionary):
-    return dict( [ i for i in dictionary.iteritems() if i[0] != 'name'] )
-
-
-
-plotter = BasePlotter(channel,files, lumifiles, outputdir) 
-EWKDiboson = views.StyleView(
-    views.SumView( 
-        *[ plotter.get_view(regex) for regex in \
-          filter(lambda x : x.startswith('WW') or x.startswith('WZ') or x.startswith('ZZ') or x.startswith('WG'), mc_samples )]
-    ), **remove_name_entry(data_styles['WW*'#,'WZ*', 'WG*', 'ZZ*'
-])
-)
-Wplus = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('Wplus'), mc_samples )]), **remove_name_entry(data_styles['Wplus*Jets*']))
-DYLL = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('skimmedLL'), mc_samples )]), **remove_name_entry(data_styles['Z*jets*LL']))
-DYTT = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('jets_M50_skimmedTT'), mc_samples )]), **remove_name_entry(data_styles['Z*jets*TT']))
-TT = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('TT') , mc_samples)]), **remove_name_entry(data_styles['TTJets*']))
-singleT = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('T_') or x.startswith('Tbar_'), mc_samples)]), **remove_name_entry(data_styles['T*_t*']))
-SMH = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x : 'HToTauTau' in x , mc_samples)]), **remove_name_entry(data_styles['GluGluToHToTauTau*']))
-
-
-plotter.views['EWKDiboson']={'view' : EWKDiboson }
-#plotter.views['Wplus']={'view' : Wplus }
-plotter.views['DYLL']={'view' : DYLL }
-plotter.views['DYTT']={'view' : DYTT }
-plotter.views['singleT']={'view' : singleT }
-plotter.views['SMH']={'view' : SMH }
-plotter.views['TT']={'view' : TT }
-#plotter.views['DY']={'view' : DY }
-new_mc_samples =[]
-
-new_mc_samples.extend(['EWKDiboson', 
-                       'SMH', 'singleT',#'Wplus',  
-                       'TT',
-                       'DYLL', 'DYTT'
-])
-def get_fakeTaus(x):
-        y=x
-        if x.startswith('os') or x.startswith('ss'):
-                y = x.replace('.*s/', 'tLoose/*s/')
-        
-        return y
-
-myFake = views.TitleView(views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('rakerate'), mc_samples)]),**data_styles['Fakes*']), 'Fakes')
-
-Fakes =  views.TitleView(views.StyleView(views.#SubdirectoryView(myFake, 'tLoose'),**data_styles['Fakes*']), 'Fakes')
-SumView(views.PathModifierView( myFake,  get_fakeTaus)),**data_styles['Fakes*']), 'Fakes')
-plotter.views['Fakes']= {'view': Fakes}
-new_mc_samples.extend(['Fakes'])
-
-print new_mc_samples
-
-histoname = [('tPt', 'p_T(#tau) (GeV)', 5), ('tEta', '#eta(#tau)', 2),  ('tPhi', '#phi(#tau)', 5), 
-             ('ePt', 'p_T(e) (GeV)', 5), ('eEta', '#eta(e)', 2),  ('ePhi', '#phi(e)', 5), 
-             ('et_DeltaPhi', 'e#tau #Delta#phi', 1.), ('et_DeltaR', 'e#tau #Delta{R}', 1.),
-             ('h_collmass_pfmet', 'M_{coll}(e#tau) (GeV)', 1.), ('h_vismass', 'M_{vis} (GeV)', 1.),
-             ('jetN_30', 'number of jets (p_T > 30 GeV)', 1.) ]
-
-
-plotter.mc_samples = new_mc_samples
-foldernames = []
-for i in sign:
-        for j in processtype:
-                for k in threshold:
-                        for jn in jets: 
-
-                                #folder.append(i+'/'+j+'/'+k +'/'+str(jn))
-                                foldernames.append(i+'/'+j+'/'+k +'/'+str(jn)+'/selected')
-
-
-
-for foldername in foldernames:
-        for n,h in enumerate(histoname) :
-        
-        
-                plotter.pad.SetLogy(False)
-                #print foldername
-                
-                plotter.plot_with_bkg_uncert(foldername,h[0], rebin=int(h[2]), xaxis=h[1], leftside=False, show_ratio=False, ratio_range=0.5, sort=True, obj=['e'])
-                #plotter.plot_mc_vs_data(foldername, h[0], rebin=int(h[2]), xaxis=h[1], leftside=False, show_ratio=False, ratio_range=0.2)
-
-
-
-                if not os.path.exists(outputdir+foldername):
-                        os.makedirs(outputdir+foldername)
+plotter = BasePlotter(blind_region,use_embedded=embedded)
+if not args.no_plots:
+   signs = ['os']
+   jets = ['0',
+      '1',
+      '2'
+   ]
+   processtype = ['gg']
+   threshold = ['ept30']
+   
+   histo_info = [
+      ('h_collmass_pfmet', 'M_{coll}(e#tau) (GeV)', 1)##,
+      ##('tPt', 'p_{T}(#tau) (GeV)', 1), 
+      ##('tEta', '#eta(#tau)', 1),  
+      ##('tPhi', '#phi(#tau)', 1), 
+      ##('ePt', 'p_{T}(e) (GeV)', 1), 
+      ##('eEta', '#eta(e)', 1),  
+      ##('ePhi', '#phi(e)', 1), 
+      ##('e_t_DPhi', 'e#tau #Delta#phi', 1), 
+      ##('e_t_DR', 'e#tau #Delta R', 1),
+      ##('e_t_Mass', 'M_{vis} (GeV)', 1),
+      ##('jetVeto30', 'number of jets (p_{T} > 30 GeV)', 1) , 
+      ##('eMtToPfMet', 'M_{T} e-PFMET', 1), 
+      ##('tMtToPfMet', 'M_{T} #tau-PFMET', 1) , 
+      ##('type1_pfMet_Et', 'pfMet', 1),
+      ##('vbfMass', 'M(j_{1},j_{2}) (GeV)', 1),
+      ##('vbfDeta', '#Delta#eta (j_{1}, j_{2})', 1)
+      
+   ]
+   
+   logging.debug("Starting plotting")
+   for sign, proc, thr, njet in itertools.product(signs, processtype, threshold, jets):
+      path = os.path.join(sign, proc, thr, njet)
+      
+      plotter.set_subdir(os.path.join('embedded',path)) if embedded else plotter.set_subdir(path)
+      
+      for var, xlabel, rebin in histo_info:
+         logging.debug("Plotting %s/%s" % (path, var) )
+         plotter.pad.SetLogy(False)
+         ## if int(njet)==2: 
+         ##   if 'collmass' in var or 'Mass' in var: 
+         ##      rebin=rebin
+         ##   elif not 'Eta' in var and not 'jet' in var: 
+         ##       rebin = rebin*2
+         plotter.plot_with_bkg_uncert(path, var, rebin, xlabel,
+                                      leftside=False, show_ratio=True, ratio_range=1., 
+                                      sort=True, obj=['e'],  plot_data=True)
+         
             
-                plotter.save(foldername+'/'+h[0])
+         plotter.save(var,dotroot=True)
+         
+      plotter.set_subdir(os.path.join('embedded', path+'/selected'))if embedded else plotter.set_subdir(path+'/selected')
+
+      for var, xlabel, rebin in histo_info:
+         ##if int(njet)==1: 
+         ##   if not 'Eta' in var and not 'jet' in var: rebin = rebin
+         ##if int(njet) ==2: 
+         ##   if 'collmass' in var or 'Mass' in var: rebin=rebin
+         ##   if 'Pt' in var or 'Mt' in var or 'pfMet' in var : rebin=rebin*4         
+            
+         logging.debug("Plotting %s/%s" % (path, var) )
+         plotter.pad.SetLogy(False)
+         plotter.plot_with_bkg_uncert(path+'/selected', var, rebin, xlabel,
+                                      leftside=False, show_ratio=True, ratio_range=1., 
+                                      sort=True, obj=['e'], plot_data=True)
+      
+
+         plotter.save(var,dotroot=True)
+
+#make shapes for limit setting
+if not args.no_shapes:
+   signal_region = 'os/gg/ept30/%s/selected'
+   ##signal_region = 'os/gg/ept30/%s'
+   jets_names = [
+           ('0', 'gg0etau'  , 1),
+           ('1', 'boostetau', 1),#was 2
+           ('2', 'vbfetau'  , 1),#was 5
+   ]
+   pjoin = os.path.join
+   for njets, cat_name, rebin in jets_names:
+      output_path = plotter.base_out_dir
+      tfile = ROOT.TFile(pjoin(output_path, 'shapes.%s.root' % njets), 'recreate')
+      output_dir = tfile.mkdir(cat_name)
+      unc_conf_lines, unc_vals_lines = plotter.write_shapes( 
+         signal_region % njets, 'h_collmass_pfmet', output_dir, rebin=rebin,
+         br_strenght=1, last=300)
+      logging.warning('shape file %s created' % tfile.GetName()) 
+      tfile.Close()
+      with open(pjoin(output_path, 'unc.%s.conf' % njets), 'w') as conf:
+         conf.write('\n'.join(unc_conf_lines))
+      with open(pjoin(output_path, 'unc.%s.vals' % njets), 'w') as vals:
+         vals.write('\n'.join(unc_vals_lines))
+
+   with open(pjoin(output_path,'.shapes_timestamp'),'w') as stamp:
+      stamp.write('no use')
+
+>>>>>>> 2fcd4d93b74351811ef0eaeb8c6681cbe9887018
 
 

@@ -41,7 +41,7 @@ mc_samples = [
     'TTJets*',
     'T_t*',
     'Tbar_t*', 
-    'WplusJets_madgraph_skimmed',
+    #'WplusJets_madgraph_skimmed',
     'Wplus1Jets_madgraph*',
     #'Wplus1Jets_madgraph_tapas',
     'Wplus2Jets_madgraph*',
@@ -51,7 +51,7 @@ mc_samples = [
     'WWJets*',
     'WZJets*',
     'ZZJets*',
-    'rakerate*',
+    'Fake*',
     'data*'
 ]
 
@@ -78,7 +78,6 @@ def remove_name_entry(dictionary):
     return dict( [ i for i in dictionary.iteritems() if i[0] != 'name'] )
 
 
-
 plotter = BasePlotter(channel,files, lumifiles, outputdir) 
 EWKDiboson = views.StyleView(
     views.SumView( 
@@ -96,7 +95,7 @@ SMH = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in fil
 
 
 plotter.views['EWKDiboson']={'view' : EWKDiboson }
-#plotter.views['Wplus']={'view' : Wplus }
+plotter.views['Wplus']={'view' : Wplus }
 plotter.views['DYLL']={'view' : DYLL }
 plotter.views['DYTT']={'view' : DYTT }
 plotter.views['singleT']={'view' : singleT }
@@ -107,8 +106,8 @@ new_mc_samples =[]
 
 new_mc_samples.extend(['EWKDiboson', 
                        'SMH', 'singleT',#'Wplus',  
-                       'TT',
-                       'DYLL', 'DYTT'
+                       'TT'#,
+                       #'DYLL', #'DYTT'
 ])
 def get_fakeTaus(x):
         y=x
@@ -117,10 +116,12 @@ def get_fakeTaus(x):
         
         return y
 
-myFake = views.TitleView(views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('rakerate'), mc_samples)]),**data_styles['Fakes*']), 'Fakes')
+print mc_samples
 
-Fakes =  views.TitleView(views.StyleView(views.#SubdirectoryView(myFake, 'tLoose'),**data_styles['Fakes*']), 'Fakes')
-SumView(views.PathModifierView( myFake,  get_fakeTaus)),**data_styles['Fakes*']), 'Fakes')
+#myFake = views.TitleView(views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('data'), mc_samples)]),**remove_name_entry(data_styles['Fakes*'])), 'Fakes')
+
+Fakes =  views.SubdirectoryView(views.TitleView(views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  'Fake*' in x, mc_samples)]), **remove_name_entry(data_styles['Fakes*'])),'Fakes'), 'tLoose/')
+
 plotter.views['Fakes']= {'view': Fakes}
 new_mc_samples.extend(['Fakes'])
 
@@ -138,12 +139,11 @@ foldernames = []
 for i in sign:
         for j in processtype:
                 for k in threshold:
+                        #foldernames.append(i+'/'+j+'/'+k)
                         for jn in jets: 
 
-                                #folder.append(i+'/'+j+'/'+k +'/'+str(jn))
-                                foldernames.append(i+'/'+j+'/'+k +'/'+str(jn)+'/selected')
-
-
+                                foldernames.append(i+'/'+j+'/'+k +'/'+str(jn))
+                                #foldernames.append(i+'/'+j+'/'+k +'/'+str(jn)+'/selected')
 
 for foldername in foldernames:
         for n,h in enumerate(histoname) :
@@ -152,7 +152,7 @@ for foldername in foldernames:
                 plotter.pad.SetLogy(False)
                 #print foldername
                 
-                plotter.plot_with_bkg_uncert(foldername,h[0], rebin=int(h[2]), xaxis=h[1], leftside=False, show_ratio=False, ratio_range=0.5, sort=True, obj=['e'])
+                plotter.plot_with_bkg_uncert(foldername,h[0], rebin=int(h[2]), xaxis=h[1], leftside=False, show_ratio=True, ratio_range=1., sort=True, obj=['e'])
                 #plotter.plot_mc_vs_data(foldername, h[0], rebin=int(h[2]), xaxis=h[1], leftside=False, show_ratio=False, ratio_range=0.2)
 
 
