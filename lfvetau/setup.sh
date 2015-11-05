@@ -14,6 +14,7 @@ export MEGAPATH=/hdfs/store/user/cepeda/
 rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
 rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
 
+
 #rake "meta:getinputs[$jobid, $datasrc,ee/metaInfo]"
 #rake "meta:getmeta[inputs/$jobid, ee/metaInfo, 13]"
 
