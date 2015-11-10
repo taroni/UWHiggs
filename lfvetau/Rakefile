@@ -130,8 +130,8 @@ fr_fits["t_os_tLoose_tTigh_tPt"] = Hash[
                                           "min"=>"0",
                                         "max"=>"1"
                                          ]
-efr_fits["e_os_eLoose_eTigh_e3Pt"] = Hash[ 
-                                          "samples" => Array["diboson",  "dataSingleE"],
+efr_fits["e_os_eLoose_eTigh_ePt"] = Hash[ 
+                                          "samples" => Array[  "diboson","dataSingleMu"],
                                           "analyzer" => $efr_analyzer,
                                         #"function" => exponential,
                                           #"variables" => exponential_vars,
@@ -159,8 +159,8 @@ fr_fits["t_os_tLoose_tTigh_tAbsEta"] = Hash[
                                            ]
 
 
-efr_fits["e_os_eLoose_eTigh_e3AbsEta"] = Hash[ 
-                                              "samples" => Array["diboson",  "dataSingleE"],#, "zjets_skimmedLL"],
+efr_fits["e_os_eLoose_eTigh_eAbsEta"] = Hash[ 
+                                              "samples" => Array[ "diboson", "dataSingleMu"],#, "zjets_skimmedLL"],
                                               "analyzer" => $efr_analyzer,
                                               "function" => pol0,
                                               "variables" => pol0_vars,
@@ -347,11 +347,10 @@ task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalM
 task :fakemmtMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py",
                                          samples['dataSingleMu']+samples['diboson'])
 
-task :fakeeeeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py", #samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +   samples['Zembedded']+
-                                         samples['zjets'] +
-                                         samples['wwjets']  + samples['zzjets'] + 
-                                         samples['wzjets']  +
-                                         samples['dataSingleE']
+task :fakemmeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py", #samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +   samples['Zembedded']+
+                                         #samples['zjets'] +
+                                         samples['diboson'] +
+                                         samples['dataSingleMu']
                                          )
 
 

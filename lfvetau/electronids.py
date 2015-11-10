@@ -40,7 +40,7 @@ def h2tau_2012_tightId(row, name):
 
 #LEPTON ID-ISO
 def summer_2013_eid(row, name):
-    mva_output = getattr(row, getVar(name, 'MVANonTrig')) #was eMVATrigNoIP
+    mva_output = getattr(row, getVar(name, 'MVANonTrigWP80')) #was eMVATrigNoIP
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
     if pT < 20    and abseta < 0.8:

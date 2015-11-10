@@ -12,7 +12,7 @@ def splitEid(label):
 
 #OBJECT SELECTION
 def muSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 30:       return False
+    if getattr( row, getVar(name,'Pt')) < 10:       return False
     if getattr( row, getVar(name,'AbsEta')) > 2.1:  return False
     if not getattr( row, getVar(name,'PixHits')):   return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
@@ -22,13 +22,16 @@ def muSelection(row, name):
 
 def eSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
-    
+ 
     try :
-        ept = getattr( row, getVar(name,'Pt_ees_minus')) 
-        if ept < 30:           return False 
+        ept_minus = getattr( row, getVar(name,'Pt_ees_minus')) 
+        if ept_minus==0:
+            if getattr( row, getVar(name,'Pt')) < 20:   return False 
+        else:
+            if ept_minus < 20:           return False 
         
     except:
-        if getattr( row, getVar(name,'Pt')) < 30:   return False #was 20
+        if getattr( row, getVar(name,'Pt')) < 20:   return False #was 20
 
     if eAbsEta > 2.3:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
@@ -94,7 +97,10 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         LEPTON_ID = getattr(row, getVar(name, 'PFIDTight'))
     if not LEPTON_ID:
         return False
-    RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
+    try:
+        RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
+    except:
+        RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDB'))
     AbsEta       = getattr(row, getVar(name, 'AbsEta'))
     if isolabel == 'h2taucuts':
         return bool( RelPFIsoDB < 0.1 or (RelPFIsoDB < 0.15 and AbsEta < 1.479))
