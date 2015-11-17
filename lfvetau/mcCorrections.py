@@ -10,12 +10,13 @@ def getVar(name, var):
 
 is7TeV = bool('7TeV' in os.environ['jobid'])
 pu_distributions  = {
-    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu.root'))}
+    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu.root')),
+    'singlem'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleMuon*pu.root'))}
 pu_distributionsUp  = {
     'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_up.root'))}
 pu_distributionsDown  = {
     'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_down.root'))}
-mc_pu_tag                  = 'S6' if is7TeV else 'S10'
+mc_pu_tag                  = 'Asympt25ns'#'S6' if is7TeV else 'S10'
 
 
 def make_puCorrector(dataset, kind=None):
@@ -24,7 +25,10 @@ def make_puCorrector(dataset, kind=None):
         kind = mc_pu_tag
     weights = []
     if dataset in pu_distributions:# and dataset in pu_distributionsUp and dataset in pu_distributionsDown:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributions[dataset]))
+        pileupid = 'Asympt25ns'
+        #print 'pile up corrector', dataset, mc_pu_tag
+        #print PileupWeight.PileupWeight( mc_pu_tag, *(pu_distributions[dataset]))
+        return PileupWeight.PileupWeight( mc_pu_tag , *(pu_distributions[dataset]))
 #        weights = (PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributions[dataset])), PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsUp[dataset])), PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsDown[dataset])))
 #        return weights
     else:
@@ -34,8 +38,11 @@ def make_puCorrectorUp(dataset, kind=None):
     'makes PU reweighting according to the pu distribution of the reference data and the MC, MC distribution can be forced'
     if not kind:
         kind = mc_pu_tag
+    pileupid = 'Asympt25ns'
     if dataset in pu_distributions:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsUp[dataset]))
+        #print 'pile up corrector up', dataset
+        #return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsUp[dataset]))
+        return PileupWeight.PileupWeight( mc_pu_tag , *(pu_distributions[dataset]))
     else:
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
@@ -43,8 +50,11 @@ def make_puCorrectorDown(dataset, kind=None):
     'makes PU reweighting according to the pu distribution of the reference data and the MC, MC distribution can be forced'
     if not kind:
         kind = mc_pu_tag
+    pileupid = 'Asympt25ns'
     if dataset in pu_distributions:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsDown[dataset]))
+        #print 'pile up corrector down', dataset
+        #return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsDown[dataset]))
+        return PileupWeight.PileupWeight( mc_pu_tag, *(pu_distributions[dataset]))
     else:
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
@@ -172,15 +182,18 @@ def make_shifted_weights(default, shifts, functors):
     def functor(*args, **kwargs):
         shift = ''
         if 'shift' in kwargs:
+            #print shift
             shift = kwargs['shift']
             del kwargs['shift']
 
             #check if to apply shifts
             for tag, fcn in zip(shifts, functors):
                 if tag == shift:
+                    #print 'check if to apply shifts',shift
                     return fcn(*args, **kwargs)
-
+        #print 'def functor',kwargs, default
         return default(*args, **kwargs)
+    #print 'functor', shifts, functor
     return functor
 
 def make_multiple(fcn, indexed=False, shift=0):

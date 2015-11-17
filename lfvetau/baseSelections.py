@@ -33,12 +33,12 @@ def eSelection(row, name):
     except:
         if getattr( row, getVar(name,'Pt')) < 20:   return False #was 20
 
-    if eAbsEta > 2.3:      return False
+    if eAbsEta > 2.1:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
     if getattr( row, getVar(name,'HasConversion')):     return False
     if eAbsEta > 1.4442 and eAbsEta < 1.566: return False
-#    if not getattr( row, getVar(name,'ChargeIdTight')): return False
-    if not getattr( row, getVar(name,'ChargeIdLoose')): return False
+#    Charge id still to add in the ntuples
+#    if not getattr( row, getVar(name,'ChargeIdLoose')): return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
     ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
