@@ -78,8 +78,8 @@ EWKDiboson = views.StyleView(
 ])
 )
 #Wplus = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('WJets'), mc_samples )]), **remove_name_entry(data_styles['WplusJets*']))
-Wplus = views.StyleView(filter( lambda x : x.startswith('WJets'),mc_samples))
-DYLL = views.StyleView(filter(lambda x :  x.startswith('DY'), mc_samples ))
+Wplus = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('WJets'),mc_samples)]), **remove_name_entry(data_styles['WplusJets*']))
+DYLL = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('DYJets'),mc_samples)]), **remove_name_entry(data_styles['DYJets*']))
 #DYLL = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('skimmedLL'), mc_samples )]), **remove_name_entry(data_styles['DY']))
 #DYTT = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('jets_M50_skimmedTT'), mc_samples )]), **remove_name_entry(data_styles['Z*jets*TT']))
 #singleT = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('T_') or x.startswith('Tbar_'), mc_samples)]), **remove_name_entry(data_styles['T*_t*']))
@@ -94,7 +94,7 @@ plotter.views['DYLL']={'view' : DYLL }
 plotter.views['SMH']={'view' : SMH }
 
 
-new_mc_samples = filter( lambda x : x.startswith('TTJets') , mc_samples)
+new_mc_samples = filter( lambda x : x.startswith('TT*') , mc_samples)
 
 #Wplus =  filter( lambda x : x.startswith('WJets'),mc_samples)
 
@@ -109,7 +109,7 @@ print new_mc_samples
 
 histoname = [('m1Pt','#mu_1 p_{T} (GeV)', 2),('m1Phi','#mu_1 #phi',4),('m1Eta','#mu_1 #eta',2),('m2Pt','#mu_2 p_{T} (GeV)',2),('m2Phi','#mu_2 #phi',4),('m2Eta','#mu_2 #eta',2),
              ('m1m2Mass', '#mu-#mu Inv Mass (GeV)',1), ('tPt','#tau p_{T} (GeV)',2), ('tPhi','#tau #phi',4),('tEta','#tau #eta',2),('tAbsEta','#tau |#eta|',2),
-             ('mtDR', '#mu #tau dR', 2),  ('mtDPhi', '#mu #tau #Delta#phi', 2), ('ztDR', 'Z #tau dR', 2),  ('ztDPhi', 'Z #tau #Delta#phi', 2), ('type1_pfMetEt', 'type1_pfMet', 2), ( 'jetN_30', 'Number of jets, p_{T}>30', 1), ('bjetCSVVeto30', 'Number of b-jets',1) , ('tRawIso3Hits', 'tRawIso3Hits', 1)
+             ('mtDR', '#mu #tau dR', 2),  ('mtDPhi', '#mu #tau #Delta#phi', 2), ('ztDR', 'Z #tau dR', 2),  ('ztDPhi', 'Z #tau #Delta#phi', 2), ('type1_pfMetEt', 'type1_pfMet', 2), ( 'jetN_30', 'Number of jets, p_{T}>30', 1), ('bjetCSVVeto30', 'Number of b-jets',1) 
 ]
 
 #rebins = [5, 5, 2, 5, 5, 2, 1, 5, 5, 2, 1]
@@ -139,7 +139,7 @@ for i in tauiso :
             #plotter.canvas.SetLogy(True)
             #plotter.plot_data(foldername, h, rebin=rebins[n],  xaxis= axistitle[n], leftside=False)
             #plotter.plot_mc_vs_data(foldername,h, rebin=rebins[n], xaxis= axistitle[n], leftside=False, show_ratio=True, ratio_range=1.5, sort=True)
-            print 'histoname', h[0]
+            print 'histoname',  h[0]
             plotter.plot_mc_vs_data(foldername,h[0], rebin=h[2], xaxis=h[1], leftside=False, show_ratio=True, ratio_range=1.5, sort=True)
             plotter.save(foldername+'/'+h[0])
             
@@ -159,7 +159,7 @@ for i in tauiso :
             if not os.path.exists(outputdir+foldername):
                 os.makedirs(outputdir+foldername)
             for h in histoname:
-                plotter.plot_mc_vs_data(foldername,h[0], rebin=h[2], xaxis=h[1], leftside=False, show_ratio=True, ratio_range=1.5, sorted=True)
+                plotter.plot_mc_vs_data(foldername,h[0], rebin=h[2], xaxis=h[1], leftside=False, show_ratio=True, ratio_range=1.5, sort=True)
                 plotter.save(foldername+'/'+h[0])
  #           foldername = s+'/'+i+'/'+str(int(jets))+'/tptregion'
  #           if not os.path.exists(outputdir+foldername):
