@@ -1,5 +1,5 @@
 from FinalStateAnalysis.PlotTools.decorators import memo
-from FinalStateAnalysis.Utilities.struct import struct
+from FinalStateAnalysis.Utilities.struct import Struct
 from electronids import electronIds
 
 @memo

@@ -88,15 +88,22 @@ def summer_2015_eid(row, name):
     return False
 
 def summer_2015_eid_tight(row, name):
+    #WP90 https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2#Non_triggering_electron_MVA_deta
     mva_output = getattr(row, getVar(name, 'MVANonTrigID'))
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
-    if pT > 20 and abseta < 0.8:
-        return ( mva_output > 0.925)
-    elif pT > 20 and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.975 )
-    elif pT > 20 and abseta > 1.479:
-        return ( mva_output > 0.985 )
+    if pT > 10 and abseta < 0.8:
+        return ( mva_output > 0.913286 )
+    elif pT > 10 and 0.8 < abseta < 1.479:
+        return ( mva_output > 0.805013  )
+    elif pT > 10 and abseta > 1.479:
+        return ( mva_output >  0.358969 )
+    elif pT < 10 and abseta < 0.8:
+        return ( mva_output > 0.726311  )
+    elif pT < 10 and 0.8 < abseta < 1.479:
+        return ( mva_output > -0.235222  )
+    elif pT < 10 and abseta > 1.479:
+        return ( mva_output >  -0.67099 )
     return False
 
 #add electron id from AN 2012_463

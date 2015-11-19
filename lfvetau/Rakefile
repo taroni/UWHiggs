@@ -27,10 +27,10 @@ def get_sample_names(substring)
 end
 #
 samples = Hash[
-               "ttbar" => get_sample_names('TTJets'),
+               "ttbar" => get_sample_names('TT_'),
                "singlet" => get_sample_names('T_t'),
                "singletbar" => get_sample_names('Tbar_t'), 
-               "wjets" => get_sample_names('Wplus'),
+               "wjets" => get_sample_names('WJets'),
                "wwjets" => get_sample_names('WWJets'),
                "wzjets" => get_sample_names('WZJets'),
                "zzjets" => get_sample_names('ZZJets'),
@@ -49,10 +49,10 @@ samples = Hash[
                "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M'),
                "signalMCMuTaugg" => get_sample_names('ggHiggsToMuTau'),
                "signalMCMuTauvbf" => get_sample_names('vbfHiggsToMuTau'),
-               "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
-               "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
+               "ggHiggsTo2Taus" => get_sample_names('GluGluHToTauTau'),
+               "vbfHiggsTo2Taus" => get_sample_names('VBFHToTauTau'),
                "Zembedded" => get_sample_names('ZetauEmbedded'),
-               "dataSingleE" => get_sample_names('data_SingleElectron_Run2012'),
+               "dataSingleE" => get_sample_names('data_SingleElectron_Run2015'),
                "dataSingleMu" => get_sample_names('data_SingleMuon_Run2015')
                
 ]
@@ -277,20 +277,20 @@ fr_fits["t_os_tMedium_tVVTigh_tPt"] = Hash[
                                         "max"=>"1"
                                          ]
 #----------
-fr_fits["t_os_tTigh_tVTigh_tPt"] = Hash[ 
-                                          "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
-                                          "analyzer" => $fr_analyzer,
-                                        #"function" => exponential,
-                                          #"variables" => exponential_vars,
-                                          "function" => pol0, 
-                                          "variables"=>pol1_vars, 
-                                          #"rebin" => 1,
-                                          "rebin" => $fr_binning,
-                                          "range" => "30 200",
-                                          "title" => "#tau p_{T} (GeV)",
-                                          "min"=>"0",
-                                        "max"=>"1"
-                                         ]
+##fr_fits["t_os_tTigh_tVTigh_tPt"] = Hash[ 
+##                                          "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
+##                                          "analyzer" => $fr_analyzer,
+##                                        #"function" => exponential,
+##                                          #"variables" => exponential_vars,
+##                                          "function" => pol0, 
+##                                          "variables"=>pol1_vars, 
+##                                          #"rebin" => 1,
+##                                          "rebin" => $fr_binning,
+##                                          "range" => "30 200",
+##                                          "title" => "#tau p_{T} (GeV)",
+##                                          "min"=>"0",
+##                                        "max"=>"1"
+##                                         ]
 fr_fits["t_os_tTigh_tVVTigh_tPt"] = Hash[ 
                                           "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
                                           "analyzer" => $fr_analyzer,
@@ -499,18 +499,18 @@ fr_fits["t_os_tMedium_tVVTigh_tAbsEta"] = Hash[
                                               "max"=>"1"
                                           ]
 #----
-fr_fits["t_os_tTigh_tVTigh_tAbsEta"] = Hash[ 
-                                              "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
-                                              "analyzer" => $fr_analyzer,
-                                              "function" => pol0,
-                                              "variables" => pol0_vars,
-                                              "rebin" => 1,
-                                              "range" => "0 2.3",
-                                              #"range" => "-2.3 2.3",
-                                              "title" => "#tau #eta",
-                                              "min"=>"0",
-                                              "max"=>"1"
-                                           ]
+##fr_fits["t_os_tTigh_tVTigh_tAbsEta"] = Hash[ 
+##                                              "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
+##                                              "analyzer" => $fr_analyzer,
+##                                              "function" => pol0,
+##                                              "variables" => pol0_vars,
+##                                              "rebin" => 1,
+##                                              "range" => "0 2.3",
+##                                              #"range" => "-2.3 2.3",
+##                                              "title" => "#tau #eta",
+##                                              "min"=>"0",
+##                                              "max"=>"1"
+##                                           ]
 fr_fits["t_os_tTigh_tVVTigh_tAbsEta"] = Hash[ 
                                               "samples" => Array["diboson",  "dataSingleMu"],#, "zjets_skimmedLL"],
                                               "analyzer" => $fr_analyzer,
@@ -716,7 +716,7 @@ task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalM
 
 task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'])# + samples['dataSingleE'] )
 
-task :recoplotsMVA => get_analyzer_results("LFVHETauAnalyzerMVA.py", samples['signalMCgg']+samples['signalMCvbf']+samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
+task :recoplotsMVA => get_analyzer_results("LFVHETauAnalyzerMVA.py", samples['signalMCgg']+samples['signalMCvbf']+samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['diboson']  + samples['DY'] + samples['dataSingleE'] )
 
 
 task :recoplotsMuTau => get_analyzer_results("LFVHMuTauAnalyzer.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
