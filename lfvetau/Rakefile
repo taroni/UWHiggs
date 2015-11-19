@@ -732,8 +732,7 @@ task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalM
                                       samples['wzjets'] +
                                       samples['zjets'] +   samples['Zembedded']+samples['dataSingleE'])
 
-task :fakemmtMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py",
-                                         samples['dataSingleMu']+samples['diboson'])
+task :fakemmtMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py", samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])#samples['signalMCgg']+samples['signalMCvbf']+samples['wjets'] + samples['diboson']  + samples['DY'] + samples['dataSingleMu']  )
 
 task :fakemmmMVA => get_analyzer_results("MuFakeRateAnalyzerMVA.py",
                                          samples['dataSingleMu']+samples['diboson'])

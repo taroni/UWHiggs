@@ -516,7 +516,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             #if row.ePt < 30 : continue
             if not selections.tauSelection(row, 't'): continue
             if not row.tAgainstElectronTightMVA5 : continue
-            if not row.tAgainstMuonLoose3 : continue
+            if not row.tAgainstMuonTight3 : continue
             if not row.tByLooseCombinedIsolationDeltaBetaCorr3Hits : continue
             logging.debug('object selection passed')
             #e ID/ISO

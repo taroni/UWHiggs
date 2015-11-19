@@ -1,5 +1,5 @@
 from FinalStateAnalysis.PlotTools.decorators import memo
-from FinalStateAnalysis.Utilities.struct import Struct
+from FinalStateAnalysis.Utilities.struct import struct
 from electronids import electronIds
 
 @memo
@@ -16,7 +16,6 @@ def muSelection(row, name):
     if getattr( row, getVar(name,'AbsEta')) > 2.1:  return False
     if not getattr( row, getVar(name,'PixHits')):   return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
-    #if getattr( row, getVar(name,'JetBtag')) > 3.3: return False #was 3.3 
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
     return True
 
@@ -40,10 +39,9 @@ def eSelection(row, name):
 #    Charge id still to add in the ntuples
 #    if not getattr( row, getVar(name,'ChargeIdLoose')): return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
-    ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
-    #if getattr(row, getVar(name, 'MuonIdIsoVtxOverlap')): return False
     return True
+
 def eLowPtSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
     ept = getattr( row, getVar(name,'Pt_ees_minus'))
@@ -59,17 +57,15 @@ def eLowPtSelection(row, name):
 #    if not getattr( row, getVar(name,'ChargeIdTight')): return False
     if not getattr( row, getVar(name,'ChargeIdLoose')): return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
-    ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
-    #if getattr(row, getVar(name, 'MuonIdIsoVtxOverlap')): return False
     return True
     
 def tauSelection(row, name):
     try:
         tpt = getattr( row, getVar(name,'Pt_tes_minus'))
-        if tpt < 30:           return False 
+        if tpt < 20:           return False 
     except:
-        if getattr( row, getVar(name,'Pt')) < 30:          return False
+        if getattr( row, getVar(name,'Pt')) < 20:          return False
     if getattr( row, getVar(name,'AbsEta')) > 2.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:    return False
     if getattr( row, getVar(name, 'MuonIdIsoVtxOverlap')): return False

@@ -1,11 +1,3 @@
-'''
-
-Base class which makes nice plots.
-
-Author: Evan K. Friis, UW
-
-'''
-
 import fnmatch
 import re
 import os
@@ -29,7 +21,6 @@ import ROOT
 import glob
 from pdb import set_trace
 from FinalStateAnalysis.PlotTools.THBin import zipBins
-
 
 def create_mapper(mapping):
     def _f(path):
@@ -160,68 +151,44 @@ class BasePlotter(Plotter):
         super(BasePlotter, self).__init__(files, lumifiles, outputdir, blinder, forceLumi=forceLumi)
 
         self.mc_samples = [
-            'ggH[tWB][tWB]',
-            'vbfH[tWB][tWB]',
-            #'GluGluToHToTauTau_M-125*', 
-            #'VBF_HToTauTau_M-125*',
-            'TTJets*',
-            'T*_t*',
-            '[WZ][WZ]Jets',
-            #'Wplus*Jets_madgraph*', #superseded by fakes #add in case of optimization study
-            'Z*jets_M50_skimmedLL',
-            #'WH*HToTauTau',
-            #'WH*HToWW',
-            ##'vbfHWW',
-            ##'ggHWW',
-            'Z*jets_M50_skimmedTT'
-            
+            'VBFHToTauTau*', 
+            'GluGluHToTauTau*',
+            'TT*',
+            #'T*_t*',
+            '[WZ][WZ]_*',
+            'DYJets*'            
         ]
         
         if use_embedded:            
             self.mc_samples.pop()
-            embedded_view, weight = self.make_embedded('os/gg/ept30/h_collmass_pfmet')
+            embedded_view, weight = self.make_embedded('os/h_collmass_pfmet')
             self.views['ZetauEmbedded'] = {
                 'view' : embedded_view,
                 'weight' : weight
                 }
         self.views['fakes'] = {'view' : self.make_fakes('t')} # comment in case of optimization study
-        #self.views['efakes'] = {'view' : self.make_fakes('e')}
-        #self.views['etfakes'] = {'view' : self.make_fakes('et')}
+        self.views['efakes'] = {'view' : self.make_fakes('e')}
+        self.views['etfakes'] = {'view' : self.make_fakes('et')}
 
         #names must match with what defined in self.mc_samples
         self.datacard_names = {
-            ##'GluGluToHToTauTau_M-125*' : 'SMGG126'   , 
-            ##'VBF_HToTauTau_M-125*'     : 'SMVBF126'  ,
-            'ggH[tWB][tWB]' : 'SMGG126'   , 
-            'vbfH[tWB][tWB]' : 'SMVBF126'   ,
-            'TTJets*'                  : 'ttbar'     ,
-            'T*_t*'                    : 'singlet'   ,
-            '[WZ][WZ]Jets'             : 'diboson'   ,
-            'Z*jets_M50_skimmedTT'     : 'ztautau'   ,
-            'ZetauEmbedded'            : 'ztautau'   ,
-            'Z*jets_M50_skimmedLL'     : 'zjetsother',
-            #'missing1'       : 'WWVBF126',
-            #'missing2'       : 'WWGG126',
-            ##'vbfHWW'       :  'WWVBF126',
-            ##'ggHWW'        :  'WWGG126',
-            ##'vbfHBB'       :  'BBVBF126',
-            ##'ggHBB'        :  'BBGG126',
-            'ggHiggsToETau'  : 'LFVGG',
-            'vbfHiggsToETau' : 'LFVVBF',
-#           'Wplus*Jets_madgraph*' : 'wplusjets'#add in case of optimization study
-            'fakes' : 'fakes',
-            #'WH*HToTauTau' : 'VHtautau'   , #"VHtautau",
-            #'WH*HToWW'     : 'VHWW'   , #"VHWW",
-            ##'efakes' : 'efakes',
-            ##'etfakes' : 'etfakes'            
+            'GluGluHToTauTau*' : 'SMGG126'   , 
+            'VBFHToTauTau*'     : 'SMVBF126'  ,
+            'TT*'                  : 'ttbar'     ,
+            'DYJets*'                  : 'DY'     ,
+#            'T*_t*'                    : 'singlet'   ,
+            '[WZ][WZ]_*'             : 'diboson'   ,
+            'GluGlu_LFV_HToETau'  : 'LFVGG',
+            'VBF_LFV_HToETau' : 'LFVVBF',
+            'fakes' : 'fakes'
         }
 
         self.sample_groups = {#parse_cgs_groups('card_config/cgs.0.conf')
-            'fullsimbkg' : ['SMGG126', 'SMVBF126','LFVGG', 'LFVVBF','ttbar', 'singlet', 
-                            'diboson', 'zjetsother'],# 'WWVBF126', 'WWGG126','VHWW','VHtautau'], #wplusjets added in case of optimization study# 'wplusjets'],
-            'simbkg' : ['SMGG126', 'SMVBF126', 'LFVGG', 'LFVVBF', 'ttbar', 'singlet', 'ztautau',
-                        'diboson', 'zjetsother'],#, 'WWVBF126', 'WWGG126','VHWW','VHtautau'],# 'wplusjets'],
-            'realtau' : ['diboson', 'ttbar', 'singlet', 'ztautau', 'SMGG126', 'SMVBF126','LFVGG', 'LFVVBF'],#, 'VHtautau'],
+            'fullsimbkg' : ['SMGG126', 'SMVBF126','LFVGG', 'LFVVBF','ttbar','DY', 
+                            'diboson', 'zjetsother'],
+            'simbkg' : ['SMGG126', 'SMVBF126', 'LFVGG', 'LFVVBF', 'ttbar','DY',
+                        'diboson', 'zjetsother'],
+            'realtau' : ['diboson', 'ttbar', 'DY', 'SMGG126', 'SMVBF126','LFVGG', 'LFVVBF'],
             'Zee' : ['zjetsother']
             }
 
@@ -232,73 +199,73 @@ class BasePlotter(Plotter):
                 '-' : dir_systematic('m1s'),
                 'apply_to' : ['fullsimbkg'],
             },
-            'E_Trig' : {
-                'type' : 'yield',
-                '+' : dir_systematic('trp1s'),
-                '-' : dir_systematic('trm1s'),
-                'apply_to' : ['simbkg'],
-            },
-            ##'E_ID' : { ## to comment in case of optimization study
+            ##'E_Trig' : {
             ##    'type' : 'yield',
-            ##    '+' : dir_systematic('eidp1s'),
-            ##    '-' : dir_systematic('eidm1s'),
+            ##    '+' : dir_systematic('trp1s'),
+            ##    '-' : dir_systematic('trm1s'),
             ##    'apply_to' : ['simbkg'],
             ##},
-            ##'E_Iso' : { ## to comment in case of optimization study
+            ####'E_ID' : { ## to comment in case of optimization study
+            ####    'type' : 'yield',
+            ####    '+' : dir_systematic('eidp1s'),
+            ####    '-' : dir_systematic('eidm1s'),
+            ####    'apply_to' : ['simbkg'],
+            ####},
+            ####'E_Iso' : { ## to comment in case of optimization study
+            ####    'type' : 'yield',
+            ####    '+' : dir_systematic('eisop1s'),
+            ####    '-' : dir_systematic('eisom1s'),
+            ####    'apply_to' : ['simbkg'],
+            ####},
+            ##'JES' : {
             ##    'type' : 'yield',
-            ##    '+' : dir_systematic('eisop1s'),
-            ##    '-' : dir_systematic('eisom1s'),
-            ##    'apply_to' : ['simbkg'],
+            ##    '+' : lambda x: os.path.join('jes_plus', x)+'_jes_plus' ,
+            ##    '-' : lambda x: os.path.join('jes_minus', x)+'_jes_minus' ,
+            ##    'apply_to' : ['fullsimbkg'],
             ##},
-            'JES' : {
-                'type' : 'yield',
-                '+' : lambda x: os.path.join('jes_plus', x)+'_jes_plus' ,
-                '-' : lambda x: os.path.join('jes_minus', x)+'_jes_minus' ,
-                'apply_to' : ['fullsimbkg'],
-            },
-            'TES' : {
-                'type' : 'shape',
-                '+' : lambda x: os.path.join('tes_plus', x)+'_tes_plus' ,
-                '-' : lambda x: os.path.join('tes_minus', x)+'_tes_minus' ,
-                'apply_to' : ['realtau'],
-            },
-            ##'EES' : {
+            ##'TES' : {
             ##    'type' : 'shape',
-            ##    '+' : lambda x: os.path.join('ees_plus', x) +'_ees_plus' ,
-            ##    '-' : lambda x: os.path.join('ees_minus', x)+'_ees_minus' ,
-            ##    'apply_to' : ['simbkg'],
+            ##    '+' : lambda x: os.path.join('tes_plus', x)+'_tes_plus' ,
+            ##    '-' : lambda x: os.path.join('tes_minus', x)+'_tes_minus' ,
+            ##    'apply_to' : ['realtau'],
             ##},
-            'UES' : { ## to comment in case of optimization study
-                'type' : 'yield',
-                '+' : name_systematic('_ues_plus'),
-                '-' : name_systematic('_ues_minus'),
-                'apply_to' : ['fullsimbkg'],
-            },
-            'shape_FAKES' : { ## to comment in case of optimization study
-                'type' : 'shape',
-                '+' : dir_systematic('Up'),
-                '-' : dir_systematic('Down'),
-                'apply_to' : ['fakes']#,'efakes','etfakes'],
-            },
-            'norm_etaufake' : { ## was shape etaufake
-                'type' : 'yield',
-                '+' : dir_systematic('etaufakep1s'),
-                '-' : dir_systematic('etaufakem1s'),
-                'apply_to' : ['Zee']#,'efakes','etfakes'],
-            },
-            'shape_ZeeMassShift' : { ## to comment in case of optimization study
-                'type' : 'shape',
-                '+' : name_systematic('_Zee_p1s'),
-                '-' : name_systematic('_Zee_m1s'),
-                'apply_to' : ['Zee']#,'efakes','etfakes'],
-            },
-            ##'stat' : {
-            ##    'type' : 'stat',
-            ##    '+' : lambda x: x,
-            ##    '-' : lambda x: x,
-            ##    'apply_to' : ['fakes','simbkg'],
-            ##    #'apply_to' : [ 'simbkg'],#['fakes','simbkg'],  ## no fakes in case of optimization study
-            ##}
+            ####'EES' : {
+            ####    'type' : 'shape',
+            ####    '+' : lambda x: os.path.join('ees_plus', x) +'_ees_plus' ,
+            ####    '-' : lambda x: os.path.join('ees_minus', x)+'_ees_minus' ,
+            ####    'apply_to' : ['simbkg'],
+            ####},
+            ##'UES' : { ## to comment in case of optimization study
+            ##    'type' : 'yield',
+            ##    '+' : name_systematic('_ues_plus'),
+            ##    '-' : name_systematic('_ues_minus'),
+            ##    'apply_to' : ['fullsimbkg'],
+            ##},
+            ##'shape_FAKES' : { ## to comment in case of optimization study
+            ##    'type' : 'shape',
+            ##    '+' : dir_systematic('Up'),
+            ##    '-' : dir_systematic('Down'),
+            ##    'apply_to' : ['fakes']#,'efakes','etfakes'],
+            ##},
+            ##'norm_etaufake' : { ## was shape etaufake
+            ##    'type' : 'yield',
+            ##    '+' : dir_systematic('etaufakep1s'),
+            ##    '-' : dir_systematic('etaufakem1s'),
+            ##    'apply_to' : ['Zee']#,'efakes','etfakes'],
+            ##},
+            ##'shape_ZeeMassShift' : { ## to comment in case of optimization study
+            ##    'type' : 'shape',
+            ##    '+' : name_systematic('_Zee_p1s'),
+            ##    '-' : name_systematic('_Zee_m1s'),
+            ##    'apply_to' : ['Zee']#,'efakes','etfakes'],
+            ##},
+            ####'stat' : {
+            ####    'type' : 'stat',
+            ####    '+' : lambda x: x,
+            ####    '-' : lambda x: x,
+            ####    'apply_to' : ['fakes','simbkg'],
+            ####    #'apply_to' : [ 'simbkg'],#['fakes','simbkg'],  ## no fakes in case of optimization study
+            ####}
         }
 
         
@@ -533,6 +500,7 @@ class BasePlotter(Plotter):
         self.pad.cd()
         return data_clone
 
+ 
     def add_ratio_diff(self, data_hist, mc_stack, err_hist,  x_range=None, ratio_range=0.2):
         #resize the canvas and the pad to fit the second pad
         self.canvas.SetCanvasSize( self.canvas.GetWw(), int(self.canvas.GetWh()*1.3) )
@@ -691,11 +659,11 @@ class BasePlotter(Plotter):
         ]
 
         met_systematics = [ #it was without plus
-            ('_jes_plus', '_jes_minus'), 
-            ('_mes_plus', '_mes_minus'), 
-            #('_ees_plus', '_ees_minus'), 
-            ('_tes_plus', '_tes_minus'), 
-            ('_ues_plus', '_ues_minus'), 
+           ## ('_jes_plus', '_jes_minus'), 
+           ## ('_mes_plus', '_mes_minus'), 
+           ## #('_ees_plus', '_ees_minus'), 
+           ## ('_tes_plus', '_tes_minus'), 
+           ## ('_ues_plus', '_ues_minus'), 
         ]
 
         name_systematics = [] #which are not MET
@@ -748,15 +716,15 @@ class BasePlotter(Plotter):
 
         #Add MC and embed systematics
         folder_systematics = [
-            ('trp1s', 'trm1s'), #trig scale factor
+         #   ('trp1s', 'trm1s'), #trig scale factor
         ]
         
         #print folder_systematics
         #Add as many eid sys as requested
         for name in obj:
             folder_systematics.extend([
-                ('%sidp1s'  % name, '%sidm1s'  % name), #eID scale factor
-                ('%sisop1s' % name, '%sisom1s' % name), #e Iso scale factor
+               # ('%sidp1s'  % name, '%sidm1s'  % name), #eID scale factor
+               # ('%sisop1s' % name, '%sisom1s' % name), #e Iso scale factor
                 
             ])
         
@@ -781,7 +749,7 @@ class BasePlotter(Plotter):
             fakes, 
             path, 
             fakes_view, 
-            [('Up','Down')]
+            #[('Up','Down')]
         )
         fakes = SystematicsView.add_error(fakes, 0.30)
         #add them to backgrounds
@@ -789,6 +757,7 @@ class BasePlotter(Plotter):
         
         mc_err.Sumw2()
         mc_err.Add(fakes)
+
         #set_trace()
          
         #####get efakes
@@ -857,8 +826,8 @@ class BasePlotter(Plotter):
         
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8',
+            'VBF_LFV_HToETau_M125_13TeV_powheg_pythia8'
         ]
         sig = []
         for name in signals:
@@ -914,6 +883,7 @@ class BasePlotter(Plotter):
         
 
         mc_stack_view = self.make_stack(rebin, preprocess, folder, sort)
+
         mc_stack = mc_stack_view.Get(variable)
         mc_stack.Draw()
         
@@ -966,6 +936,7 @@ class BasePlotter(Plotter):
        ## if isETFakesIn:
        ##     self.mc_samples.append('etFakes')
        ##     if not 'finalDYLL' in self.mc_samples:  self.mc_samples.append('finalDYLL')
+
 
         finalhisto.Draw('samee2')
         finalhisto.SetMarkerStyle(0)
@@ -1376,164 +1347,6 @@ class BasePlotter(Plotter):
                 )
 
         return unc_conf_lines, unc_vals_lines
-##        output_dir.cd()
-##        path = os.path.join(folder,variable)
-##
-##        #make MC views with xsec error
-##        bkg_views  = dict(
-##            [(self.datacard_names[i], j) for i, j in zip(self.mc_samples, self.mc_views(rebin, preprocess))]
-##        )
-##        bkg_weights = dict(
-##            [(self.datacard_names[i], self.get_view(i, 'weight')) for i in self.mc_samples]
-##        )
-##        #cache histograms, since getting them is time consuming
-##        bkg_histos = {}
-##        for name, view in bkg_views.iteritems():
-##            mc_histo = view.Get(path)
-##            bkg_histos[name] = mc_histo.Clone()
-##            #mc_histo = remove_empty_bins(
-##            #    mc_histo, bkg_weights[name])
-##            mc_histo.SetName(name)
-##            mc_histo.Write()
-##
-##        if self.use_embedded:            
-##            view = self.get_view('ZetauEmbedded')
-##            weight = self.get_view('ZetauEmbedded', 'weight')
-##            if preprocess:
-##                view = preprocess(view)
-##            view = self.rebin_view(view, rebin)
-##            name = self.datacard_names['ZetauEmbedded']
-##            bkg_weights[name] = weight
-##            bkg_views[name] = view
-##            mc_histo = view.Get(path)
-##            bkg_histos[name] = mc_histo.Clone()
-##            #mc_histo = remove_empty_bins(
-##            #    mc_histo, weight)
-##            mc_histo.SetName(name)
-##            mc_histo.Write()
-##          
-##        fakes_view = self.get_view('fakes')#to comment for optimization study
-##        d_view = self.get_view('data')
-##        weights_view = views.SumView(
-##            views.SubdirectoryView(d_view, 'tLoose'),
-##            views.SubdirectoryView(d_view, 'eLoose'),
-##            views.SubdirectoryView(d_view, 'etLoose')
-##            )
-##        if preprocess:
-##            fakes_view = preprocess(fakes_view)
-##            weights_view = preprocess(weights_view)
-##        weights = weights_view.Get(os.path.join(folder,'weight')) #to comment for optimization study
-##        fakes_view = self.rebin_view(fakes_view, rebin)
-##        bkg_views['fakes'] = fakes_view
-##        bkg_weights['fakes'] = mean(weights)
-##        fake_shape = bkg_views['fakes'].Get(path)
-##        bkg_histos['fakes'] = fake_shape.Clone()
-##        #fake_shape = remove_empty_bins(
-##        #    fake_shape, bkg_weights['fakes'])
-##        fake_shape.SetName('fakes')
-##        fake_shape.Write()
-##
-##        unc_conf_lines = []
-##        unc_vals_lines = []
-##        category_name  = output_dir.GetName()
-##        for unc_name, info in self.systematics.iteritems():
-##            print unc_name
-##            targets = []
-##            for target in info['apply_to']:
-##                if target in self.sample_groups:
-##                    targets.extend(self.sample_groups[target])
-##                else:
-##                    targets.append(target)
-##
-##            unc_conf = 'lnN' if info['type'] == 'yield' or info['type'] == 'stat' else 'shape'            
-##            #stat shapes are uncorrelated between samples
-##            if info['type'] <> 'stat':
-##                unc_conf_lines.append('%s %s' % (unc_name, unc_conf))
-##            shift = 0.
-##            path_up = info['+'](path)
-##            path_dw = info['-'](path)
-##            for target in targets:
-##                up      = bkg_views[target].Get(
-##                    path_up
-##                )
-##                down    = bkg_views[target].Get(
-##                    path_dw
-##                )
-##                if info['type'] == 'yield':
-##                    central = bkg_histos[target]
-##                    integral = central.Integral()
-##                    integral_up = up.Integral()
-##                    integral_down = down.Integral()
-##                    if integral == 0  and integral_up == 0 and integral_down ==0 :
-##                        shift=shift
-##                    else:
-##                        shift = max(
-##                            shift,
-##                            (integral_up - integral) / integral,
-##                            (integral - integral_down) / integral
-##                        )
-##                elif info['type'] == 'shape':
-##                    #remove empty bins also for shapes 
-##                    #(but not in general to not spoil the stat uncertainties)
-##                    #up = remove_empty_bins(up, bkg_weights[target])
-##                    #down = remove_empty_bins(down, bkg_weights[target])
-##                    up.SetName('%s_%sUp' % (target, unc_name))
-##                    down.SetName('%s_%sDown' % (target, unc_name))
-##                    up.Write()
-##                    down.Write()
-##                elif info['type'] == 'stat':
-##                    nbins = up.GetNbinsX()
-##                    up.Rebin(nbins)
-##                    yield_val = up.GetBinContent(1)
-##                    yield_err = up.GetBinError(1)
-##                    print target, yield_val, yield_err, 
-##                    if yield_val==0:
-##                        unc_value = 0.
-##                    else:
-##                        unc_value = 1. + (yield_err / yield_val)
-##                    stat_unc_name = '%s_%s_%s' % (target, category_name, unc_name)
-##                    unc_conf_lines.append('%s %s' % (stat_unc_name, unc_conf))
-##                    unc_vals_lines.append(
-##                        '%s %s %s %.2f' % (category_name, target, stat_unc_name, unc_value)
-##                    )
-##                else:
-##                    raise ValueError('systematic uncertainty type:"%s" not recognised!' % info['type'])
-##
-##            if info['type'] <> 'stat':
-##                shift += 1
-##                unc_vals_lines.append(
-##                    '%s %s %s %.2f' % (category_name, ','.join(targets), unc_name, shift)
-##                )
-##
-##        #Get signal
-##        signals = [
-##            'ggHiggsToETau',
-##            'vbfHiggsToETau',
-##        ]
-##        for name in signals:
-##            sig_view = self.get_view(name)
-##            if preprocess:
-##                sig_view = preprocess(sig_view)
-##            sig_view = views.ScaleView(
-##                RebinView(sig_view, rebin),
-##                br_strenght
-##                )
-##            
-##            histogram = sig_view.Get(path)
-##            histogram.SetName(self.datacard_names[name])
-##            histogram.Write()
-##
-##        # Draw data
-##        data_view = self.get_view('data')
-##        if preprocess:
-##            data_view = preprocess( data_view )
-##        data_view = self.rebin_view(data_view, rebin)
-##        data = data_view.Get(path)
-##        data.SetName('data_obs')
-##        data.Write()
-##
-##        return unc_conf_lines, unc_vals_lines
-                       
 ##-----
 
 
@@ -1701,9 +1514,3 @@ class BasePlotter(Plotter):
         data.Write()
 
         return unc_conf_lines, unc_vals_lines
-                       
-##-----
-
-    
- 
-  

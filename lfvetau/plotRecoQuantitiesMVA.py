@@ -42,7 +42,7 @@ print 'blind?', blind
 blind_region=[100, 150] if blind else None
 #blind_region=[100, 200] if blind else None
 
-embedded = True
+embedded = False
 
 plotter = BasePlotter(blind_region,use_embedded=embedded)
 if not args.no_plots:
@@ -55,28 +55,23 @@ if not args.no_plots:
    threshold = ['ept30']
    
    histo_info = [
-      ('h_collmass_pfmet', 'M_{coll}(e#tau) (GeV)', 1)##,
-      ##('tPt', 'p_{T}(#tau) (GeV)', 1), 
-      ##('tEta', '#eta(#tau)', 1),  
-      ##('tPhi', '#phi(#tau)', 1), 
-      ##('ePt', 'p_{T}(e) (GeV)', 1), 
-      ##('eEta', '#eta(e)', 1),  
-      ##('ePhi', '#phi(e)', 1), 
-      ##('e_t_DPhi', 'e#tau #Delta#phi', 1), 
-      ##('e_t_DR', 'e#tau #Delta R', 1),
-      ##('e_t_Mass', 'M_{vis} (GeV)', 1),
-      ##('jetVeto30', 'number of jets (p_{T} > 30 GeV)', 1) , 
-      ##('eMtToPfMet', 'M_{T} e-PFMET', 1), 
-      ##('tMtToPfMet', 'M_{T} #tau-PFMET', 1) , 
-      ##('type1_pfMet_Et', 'pfMet', 1),
-      ##('vbfMass', 'M(j_{1},j_{2}) (GeV)', 1),
-      ##('vbfDeta', '#Delta#eta (j_{1}, j_{2})', 1)
-      
+      ('h_collmass_pfmet', 'M_{coll}(e#tau) (GeV)', 1),##,
+      ('tPt', 'p_{T}(#tau) (GeV)', 1), 
+      ('tEta', '#eta(#tau)', 1),  
+      ('tPhi', '#phi(#tau)', 1), 
+      ('ePt', 'p_{T}(e) (GeV)', 1), 
+      ('eEta', '#eta(e)', 1),  
+      ('ePhi', '#phi(e)', 1), 
+      ('e_t_DPhi', 'e#tau #Delta#phi', 1), 
+      ('e_t_DR', 'e#tau #Delta R', 1),
+      ('e_t_Mass', 'M_{vis} (GeV)', 1),
+      ('jetVeto30', 'number of jets (p_{T} > 30 GeV)', 1) , 
+      ('type1_pfMetEt', 'pfMet', 1)      
    ]
    
    logging.debug("Starting plotting")
-   for sign, proc, thr, njet in itertools.product(signs, processtype, threshold, jets):
-      path = os.path.join(sign, proc, thr, njet)
+   for sign,  njet in itertools.product(signs,  jets):
+      path = os.path.join(sign,  njet)
       
       plotter.set_subdir(os.path.join('embedded',path)) if embedded else plotter.set_subdir(path)
       
@@ -89,7 +84,7 @@ if not args.no_plots:
          ##   elif not 'Eta' in var and not 'jet' in var: 
          ##       rebin = rebin*2
          plotter.plot_with_bkg_uncert(path, var, rebin, xlabel,
-                                      leftside=False, show_ratio=True, ratio_range=1., 
+                                      leftside=False, xrange=(0.,300.), show_ratio=True, ratio_range=1., 
                                       sort=True, obj=['e'],  plot_data=True)
          
             
@@ -107,7 +102,7 @@ if not args.no_plots:
          logging.debug("Plotting %s/%s" % (path, var) )
          plotter.pad.SetLogy(False)
          plotter.plot_with_bkg_uncert(path+'/selected', var, rebin, xlabel,
-                                      leftside=False, show_ratio=True, ratio_range=1., 
+                                      leftside=False, xrange=(0.,300.), show_ratio=True, ratio_range=1., 
                                       sort=True, obj=['e'], plot_data=True)
       
 
@@ -115,7 +110,7 @@ if not args.no_plots:
 
 #make shapes for limit setting
 if not args.no_shapes:
-   signal_region = 'os/gg/ept30/%s/selected'
+   signal_region = 'os/%s/selected'
    ##signal_region = 'os/gg/ept30/%s'
    jets_names = [
            ('0', 'gg0etau'  , 1),
@@ -139,7 +134,4 @@ if not args.no_shapes:
 
    with open(pjoin(output_path,'.shapes_timestamp'),'w') as stamp:
       stamp.write('no use')
-
->>>>>>> 2fcd4d93b74351811ef0eaeb8c6681cbe9887018
-
 
