@@ -119,36 +119,29 @@ def find_fill_range(histo):
     return first, last
 
 class BasePlotter(Plotter):
-    def __init__ (self, blind_region=None, forceLumi=-1, use_embedded=False): 
+    def __init__ (self,  files, outputdir, blind_region=None, forceLumi=-1, use_embedded=False): 
         cwd = os.getcwd()
         self.period = '8TeV'
         self.sqrts  = 8
         jobid = os.environ['jobid']
         self.use_embedded = use_embedded
         print "\nPlotting e tau for %s\n" % jobid
-
-        files     = glob.glob('results/%s/LFVHETauAnalyzerMVA/*.root' % jobid)
-        #files     = glob.glob('results/%s/ControlRegionZee_invertedAntiE/*.root' % jobid)
-        #files     = glob.glob('results/%s/EmbeddedCheck/*.root' % jobid)
-        #files     = glob.glob('results/%s/TTbarControlRegion/*.root' % jobid)
+        files=files
+        outputdir = outputdir
+        #self.files     = glob.glob('results/%s/%s/*.root' % (jobid, self.files))
         lumifiles = glob.glob('inputs/%s/*.lumicalc.sum' % jobid)
 
-        #outputdir = 'plots/%s/ControlRegionZee_invertedAntiE' % jobid
-        outputdir = 'plots/%s/lfvet' % jobid
-        #outputdir = 'plots/%s/EmbeddedCheck' % jobid
-        #outputdir = 'plots/%s/TTBar' % jobid
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
-
-        samples = [os.path.basename(i).split('.')[0] for i in files]
         
+        samples = [os.path.basename(i).split('.')[0] for i in files]
         self.blind_region=blind_region
         blinder=None
         if self.blind_region:
             # Don't look at the SS all pass region
             blinder = lambda x: BlindView(x, "os/.*ass*",blind_in_range(*self.blind_region))
-            
+        print files
         super(BasePlotter, self).__init__(files, lumifiles, outputdir, blinder, forceLumi=forceLumi)
+
+
 
         self.mc_samples = [
             'VBFHToTauTau*', 
@@ -1514,3 +1507,43 @@ class BasePlotter(Plotter):
         data.Write()
 
         return unc_conf_lines, unc_vals_lines
+
+    def plot_mc_vs_data_witherrors(self, folder, variable, rebin=1, xaxis='',
+                        leftside=True, xrange=None, preprocess=None,
+                        show_ratio=False, ratio_range=0.2, sort=False):
+        ''' Compare Monte Carlo to data '''
+
+        mc_stack_view = self.make_stack(rebin, preprocess, folder, sort)
+        mc_stack = mc_stack_view.Get(variable)
+        mc_stack.Draw()
+        mc_err = mc_stack.GetStack().Last().Clone();
+        mc_err.SetMarkerStyle(0)
+        mc_err.SetLineColor(0)
+        mc_err.SetFillStyle(3002)
+        mc_err.SetFillColor(1)
+        mc_err.Draw('pe2 same')
+        mc_stack.GetHistogram().GetXaxis().SetTitle(xaxis)
+        if xrange:
+            mc_stack.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+            mc_stack.Draw()
+        self.keep.append(mc_stack)
+        # Draw data
+        data_view = self.get_view('data')
+        if preprocess:
+            data_view = preprocess( data_view )
+        data_view = self.get_wild_dir(
+            self.rebin_view(data_view, rebin),
+            folder
+            )
+        data = data_view.Get(variable)
+        data.Draw('same')
+        self.keep.append(data)
+        # Make sure we can see everything
+        if data.GetMaximum() > mc_stack.GetMaximum():
+            mc_stack.SetMaximum(1.2*data.GetMaximum())
+        # Add legend
+        self.add_legend([data, mc_stack], leftside, entries=len(mc_stack.GetHists())+1)
+        if show_ratio:
+            self.add_ratio_plot(data, mc_stack, xrange, ratio_range=0.2)
+
+ 
