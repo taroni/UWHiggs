@@ -56,7 +56,7 @@ class TauFakeRateAnalyzerMVA(MegaBase):
         self.tree = MMTTree(tree)
         self.out=outfile
         self.histograms = {}
-        #self.pucorrector = mcCorrections.make_puCorrector('singlem')
+        self.pucorrector = mcCorrections.make_puCorrector('singlem')
 
 
         if  ('RUN_OPTIMIZATION' in os.environ) and eval(os.environ['RUN_OPTIMIZATION']):
@@ -77,11 +77,12 @@ class TauFakeRateAnalyzerMVA(MegaBase):
         if row.m2Pt > row.m1Pt : etrig = 'm2'
         #if bool(row.m1MatchesSingleE27WP80) and  not bool(row.e2MatchesSingleE27WP80) : etrig = 'e1'
         #if not bool(row.m1MatchesSingleE27WP80) and  bool(row.e2MatchesSingleE27WP80) :  etrig = 'e2'
-
+        
+        #print 'eventWeight',row.GenWeight 
             
-        return 1.    
-#        return self.pucorrector(row.nTruePU) * \
-#            mcCorrections.eid_correction( row, 'e1', 'e2') * \
+        return self.pucorrector(row.nTruePU) *\
+            row.GenWeight *\
+            mcCorrections.eid15_correction( row, 'e1', 'e2') 
 #            mcCorrections.eiso_correction(row, 'e1', 'e2') * \
 #            mcCorrections.trig_correction(row, etrig     )
 
@@ -196,17 +197,18 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             if not abs(row.m1_m2_Mass-91.2) < 20: continue
             if not selections.tauSelection(row, 't'): continue
             if row.tPt < 30 : continue
+            
+            if not bool(row.tDecayModeFinding) : continue
+            if not bool(row.tAgainstMuonTight3): continue
+            if not bool(row.tAgainstElectronTightMVA5): continue #was 3
 
-            if not row.tAgainstMuonTight3: continue
-            if not row.tAgainstElectronTightMVA5: continue #was 3
-
-            if row.tauVetoPt20Loose3HitsNewDMVtx : continue 
-            if row.muVetoPt5IsoIdVtx : continue
-            if row.eVetoMVAIso: continue # change it with Loose
+            if bool(row.tauVetoPt20Loose3HitsVtx) : continue 
+            if bool(row.muVetoPt5IsoIdVtx) : continue
+            if bool(row.eVetoMVAIso): continue # change it with Loose
 
             
             #            if  etDR(row) < 1. : continue 
-            if (row.run, row.lumi, row.evt, row.m1Pt, row.m2Pt)==myevent: continue
+            #if (row.run, row.lumi, row.evt, row.m1Pt, row.m2Pt)==myevent: continue
             myevent=(row.run, row.lumi, row.evt, row.m1Pt, row.m2Pt)
 
             tauiso = 'tNoCuts'
@@ -224,52 +226,69 @@ class TauFakeRateAnalyzerMVA(MegaBase):
             folder=folder+'/'+str(int(jn))
             self.fill_histos(row, folder)                
             #if not row.tByPileupWeightedIsolationRaw3Hits < 5 : continue
-            if row.tByVLooseIsolationMVA3newDMwLT :
-                tauiso = 'tVLoose'
-                folder = sign+'/'+tauiso
-                self.fill_histos(row, folder)
-                folder=folder+'/'+str(int(jn))
-                self.fill_histos(row, folder)
 
-            if  row.tByLooseIsolationMVA3newDMwLT : 
+            
+            if row.tByLooseCombinedIsolationDeltaBetaCorr3Hits :
                 tauiso = 'tLoose'
                 folder = sign+'/'+tauiso
                 self.fill_histos(row,  folder)
-                
                 folder=folder+'/'+str(int(jn))
                 self.fill_histos(row, folder)
-
-            if  row.tByMediumIsolationMVA3newDMwLT : 
-                tauiso = 'tMedium'
+                    
+            if row.tByTightCombinedIsolationDeltaBetaCorr3Hits :
+                tauiso = 'tTigh'
                 folder = sign+'/'+tauiso
                 self.fill_histos(row,  folder)
-                
-                folder=folder+'/'+str(int(jn))
-                self.fill_histos(row, folder)
-               
-            if row.tByTightIsolationMVA3newDMwLT :
-                tauiso = 'tTigh' 
-                folder = sign+'/'+tauiso
-                self.fill_histos(row,  folder)
-
                 folder=folder+'/'+str(int(jn))
                 self.fill_histos(row, folder)
 
-            if row.tByVTightIsolationMVA3newDMwLT :
-                tauiso = 'tVTigh' 
-                folder = sign+'/'+tauiso
-                self.fill_histos(row,  folder)
 
-                folder=folder+'/'+str(int(jn))
-                self.fill_histos(row, folder)
-              
-            if row.tByVVTightIsolationMVA3newDMwLT :
-                tauiso = 'tVTigh' 
-                folder = sign+'/'+tauiso
-                self.fill_histos(row,  folder)
-
-                folder=folder+'/'+str(int(jn))
-                self.fill_histos(row, folder)
+            ##if row.tByVLooseIsolationMVA3newDMwLT :
+            ##    tauiso = 'tVLoose'
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row, folder)
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
+            ##
+            ##if  row.tByLooseIsolationMVA3newDMwLT : 
+            ##    tauiso = 'tLoose'
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row,  folder)
+            ##    
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
+            ##
+            ##if  row.tByMediumIsolationMVA3newDMwLT : 
+            ##    tauiso = 'tMedium'
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row,  folder)
+            ##    
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
+            ##   
+            ##if row.tByTightIsolationMVA3newDMwLT :
+            ##    tauiso = 'tTigh' 
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row,  folder)
+            ##
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
+            ##
+            ##if row.tByVTightIsolationMVA3newDMwLT :
+            ##    tauiso = 'tVTigh' 
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row,  folder)
+            ##
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
+            ##  
+            ##if row.tByVVTightIsolationMVA3newDMwLT :
+            ##    tauiso = 'tVTigh' 
+            ##    folder = sign+'/'+tauiso
+            ##    self.fill_histos(row,  folder)
+            ##
+            ##    folder=folder+'/'+str(int(jn))
+            ##    self.fill_histos(row, folder)
               
     
     def finish(self):

@@ -237,9 +237,14 @@ correct_eid13_mva     = make_multiple(HetauCorrection.correct_eid13_mva    )
 correct_eid13_p1s_mva = make_multiple(HetauCorrection.correct_eid13_p1s_mva)
 correct_eid13_m1s_mva = make_multiple(HetauCorrection.correct_eid13_m1s_mva)
 
+correct_eid15_mva     = make_multiple(HetauCorrection.correct_eid15_mva    )
+correct_eid15_p1s_mva = make_multiple(HetauCorrection.correct_eid15_p1s_mva)
+correct_eid15_m1s_mva = make_multiple(HetauCorrection.correct_eid15_m1s_mva)
+
 correct_eiso13_mva     = make_multiple(HetauCorrection.correct_eiso13_mva    )
 correct_eiso13_p1s_mva = make_multiple(HetauCorrection.correct_eiso13_p1s_mva)
 correct_eiso13_m1s_mva = make_multiple(HetauCorrection.correct_eiso13_m1s_mva)
+
 
 #correct_eid_mva = make_multiple(HetauCorrection.scale_eleId_hww)
 #correct_eReco_mva = make_multiple(HetauCorrection.scale_elereco_hww)
@@ -267,6 +272,12 @@ eid_correction = make_shifted_weights(
     correct_eid13_mva,
     ['eidp1s','eidm1s'],
     [correct_eid13_p1s_mva, correct_eid13_m1s_mva]
+)
+#it is id and iso from https://indico.cern.ch/event/370511/contribution/3/attachments/1168717/1687113/tnP_EGM_Oct_12.pdf
+eid15_correction = make_shifted_weights(
+    correct_eid15_mva,
+    ['eidp1s','eidm1s'],
+    [correct_eid15_p1s_mva, correct_eid15_m1s_mva]
 )
 
 eEmb_correction = make_shifted_weights(
