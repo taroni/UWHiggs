@@ -19,7 +19,7 @@ import math
 from math import sqrt, pi
 
 isData = bool('true' in os.environ['isData'])
-checkZtt = bool('true' in os.environ['checkZtt'])
+#checkZtt = bool('true' in os.environ['checkZtt'])
 
 
 def deltaPhi(phi1, phi2):
@@ -81,20 +81,26 @@ def collMass_type1(row):
 
 def getFakeRateFactor(row, isoName):
   if (isoName == "old"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.47
-      elif (row.tDecayMode==1):
-        fTauIso = 0.44
-      elif (row.tDecayMode==10):
-        fTauIso = 0.28
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.50
-      elif (row.tDecayMode==1):
-        fTauIso = 0.52
-      elif (row.tDecayMode==10):
-        fTauIso = 0.33
+    if (row.tDecayMode==0):
+      fTauIso = 0.380
+    elif (row.tDecayMode==1):
+      fTauIso = 0.431
+    elif (row.tDecayMode==10):
+      fTauIso = 0.304
+#    if (row.tEta <= 1.479):
+#      if (row.tDecayMode==0):
+#        fTauIso = 0.47
+#      elif (row.tDecayMode==1):
+#        fTauIso = 0.44
+#      elif (row.tDecayMode==10):
+#        fTauIso = 0.28
+#    else:
+#      if (row.tDecayMode==0):
+#        fTauIso = 0.50
+#      elif (row.tDecayMode==1):
+#        fTauIso = 0.52
+#      elif (row.tDecayMode==10):
+#        fTauIso = 0.33
   if (isoName == "med"):
     if (row.tEta <= 1.479):
       if (row.tDecayMode==0):
@@ -264,12 +270,25 @@ def getFakeRateFactor(row, isoName):
 #### MC-DATA and PU corrections ################################################
 ################################################################################
 
-class AnalyzeLFVMuTau(MegaBase):
+pu_distributions = glob.glob(os.path.join(
+	'inputs', os.environ['jobid'],'MyDataPileupHistogram.root'))
+
+pu_corrector = PileupWeight.PileupWeight(
+	'Asympt25ns', *pu_distributions)
+
+def mc_corrector_2015(row):
+	pu = pu_corrector(row.nTruePU)
+        
+        return pu
+
+mc_corrector = mc_corrector_2015
+
+class AnalyzeLFVMuTauSignal(MegaBase):
     tree = 'mt/final/Ntuple'
     #tree = 'New_Tree'
 
     def __init__(self, tree, outfile, **kwargs):
-        super(AnalyzeLFVMuTau, self).__init__(tree, outfile, **kwargs)
+        super(AnalyzeLFVMuTauSignal, self).__init__(tree, outfile, **kwargs)
         # Use the cython wrapper
         self.tree = MuTauTree.MuTauTree(tree)
         self.out = outfile
@@ -281,7 +300,8 @@ class AnalyzeLFVMuTau(MegaBase):
 #              "newisotight","newisoloose","newisogg","newisoboost","newisovbf",  "newisoloosegg","newisolooseboost","newisoloosevbf",
 #              "noisogg","noisoboost","noisovbf",
 #              "noTauID","noiso"]
-        names=["preselection","gg","boost","vbf","preselection_mediso","gg_mediso","boost_mediso","vbf_mediso","preselection_newVVTightiso","gg_newVVTightiso","boost_newVVTightiso","vbf_newVVTightiso","preselection_newVTightiso","gg_newVTightiso","boost_newVTightiso","vbf_newVTightiso","preselection_newTightiso","gg_newTightiso","boost_newTightiso","vbf_newTightiso","antiiso_preselection","antiiso_gg","antiiso_boost","antiiso_vbf","antiiso_preselection_mediso","antiiso_gg_mediso","antiiso_boost_mediso","antiiso_vbf_mediso","antiiso_preselection_newVVTightVLooseiso","antiiso_gg_newVVTightVLooseiso","antiiso_boost_newVVTightVLooseiso","antiiso_vbf_newVVTightVLooseiso","antiiso_preselection_newVTightVLooseiso","antiiso_gg_newVTightVLooseiso","antiiso_boost_newVTightVLooseiso","antiiso_vbf_newVTightVLooseiso","antiiso_preselection_newTightVLooseiso","antiiso_gg_newTightVLooseiso","antiiso_boost_newTightVLooseiso","antiiso_vbf_newTightVLooseiso","antiiso_preselection_newVVTightLooseiso","antiiso_gg_newVVTightLooseiso","antiiso_boost_newVVTightLooseiso","antiiso_vbf_newVVTightLooseiso","antiiso_preselection_newVTightLooseiso","antiiso_gg_newVTightLooseiso","antiiso_boost_newVTightLooseiso","antiiso_vbf_newVTightLooseiso","antiiso_preselection_newTightLooseiso","antiiso_gg_newTightLooseiso","antiiso_boost_newTightLooseiso","antiiso_vbf_newTightLooseiso","sspreselection","ssgg","ssboost","ssvbf","sspreselection_mediso","ssgg_mediso","ssboost_mediso","ssvbf_mediso","sspreselection_newVVTightiso","ssgg_newVVTightiso","ssboost_newVVTightiso","ssvbf_newVVTightiso","sspreselection_newVTightiso","ssgg_newVTightiso","ssboost_newVTightiso","ssvbf_newVTightiso","sspreselection_newTightiso","ssgg_newTightiso","ssboost_newTightiso","ssvbf_newTightiso","antiiso_sspreselection","antiiso_ssgg","antiiso_ssboost","antiiso_ssvbf","antiiso_sspreselection_mediso","antiiso_ssgg_mediso","antiiso_ssboost_mediso","antiiso_ssvbf_mediso","antiiso_sspreselection_newVVTightVLooseiso","antiiso_ssgg_newVVTightVLooseiso","antiiso_ssboost_newVVTightVLooseiso","antiiso_ssvbf_newVVTightVLooseiso","antiiso_sspreselection_newVTightVLooseiso","antiiso_ssgg_newVTightVLooseiso","antiiso_ssboost_newVTightVLooseiso","antiiso_ssvbf_newVTightVLooseiso","antiiso_sspreselection_newTightVLooseiso","antiiso_ssgg_newTightVLooseiso","antiiso_ssboost_newTightVLooseiso","antiiso_ssvbf_newTightVLooseiso","antiiso_sspreselection_newVVTightLooseiso","antiiso_ssgg_newVVTightLooseiso","antiiso_ssboost_newVVTightLooseiso","antiiso_ssvbf_newVVTightLooseiso","antiiso_sspreselection_newVTightLooseiso","antiiso_ssgg_newVTightLooseiso","antiiso_ssboost_newVTightLooseiso","antiiso_ssvbf_newVTightLooseiso","antiiso_sspreselection_newTightLooseiso","antiiso_ssgg_newTightLooseiso","antiiso_ssboost_newTightLooseiso","antiiso_ssvbf_newTightLooseiso"]
+        #names=["gg","boost","vbf","gg_mediso","boost_mediso","vbf_mediso","gg_newVVTightiso","boost_newVVTightiso","vbf_newVVTightiso","gg_newVTightiso","boost_newVTightiso","vbf_newVTightiso","gg_newTightiso","boost_newTightiso","vbf_newTightiso","antiiso_gg","antiiso_boost","antiiso_vbf","antiiso_gg_mediso","antiiso_boost_mediso","antiiso_vbf_mediso","antiiso_gg_newVVTightVLooseiso","antiiso_boost_newVVTightVLooseiso","antiiso_vbf_newVVTightVLooseiso","antiiso_gg_newVTightVLooseiso","antiiso_boost_newVTightVLooseiso","antiiso_vbf_newVTightVLooseiso","antiiso_gg_newTightVLooseiso","antiiso_boost_newTightVLooseiso","antiiso_vbf_newTightVLooseiso","antiiso_gg_newVVTightLooseiso","antiiso_boost_newVVTightLooseiso","antiiso_vbf_newVVTightLooseiso","antiiso_gg_newVTightLooseiso","antiiso_boost_newVTightLooseiso","antiiso_vbf_newVTightLooseiso","antiiso_gg_newTightLooseiso","antiiso_boost_newTightLooseiso","antiiso_vbf_newTightLooseiso","ssgg","ssboost","ssvbf","ssgg_mediso","ssboost_mediso","ssvbf_mediso","ssgg_newVVTightiso","ssboost_newVVTightiso","ssvbf_newVVTightiso","ssgg_newVTightiso","ssboost_newVTightiso","ssvbf_newVTightiso","ssgg_newTightiso","ssboost_newTightiso","ssvbf_newTightiso","antiiso_ssgg","antiiso_ssboost","antiiso_ssvbf","antiiso_ssgg_mediso","antiiso_ssboost_mediso","antiiso_ssvbf_mediso","antiiso_ssgg_newVVTightVLooseiso","antiiso_ssboost_newVVTightVLooseiso","antiiso_ssvbf_newVVTightVLooseiso","antiiso_ssgg_newVTightVLooseiso","antiiso_ssboost_newVTightVLooseiso","antiiso_ssvbf_newVTightVLooseiso","antiiso_ssgg_newTightVLooseiso","antiiso_ssboost_newTightVLooseiso","antiiso_ssvbf_newTightVLooseiso","antiiso_ssgg_newVVTightLooseiso","antiiso_ssboost_newVVTightLooseiso","antiiso_ssvbf_newVVTightLooseiso","antiiso_ssgg_newVTightLooseiso","antiiso_ssboost_newVTightLooseiso","antiiso_ssvbf_newVTightLooseiso","antiiso_ssgg_newTightLooseiso","antiiso_ssboost_newTightLooseiso","antiiso_ssvbf_newTightLooseiso"]
+        names=["preselection","gg","boost","vbf","sspreselection","ssgg","ssboost","ssvbf","antiiso_preselection","antiiso_gg","antiiso_boost","antiiso_vbf","antiiso_sspreselection","antiiso_ssgg","antiiso_ssboost","antiiso_ssvbf"]
         namesize = len(names)
 	for x in range(0,namesize):
 
@@ -421,6 +441,8 @@ class AnalyzeLFVMuTau(MegaBase):
             #self.book(names[x], "vbfNJetsPULoose", "g", 5, -0.5, 4.5)
             #self.book(names[x], "vbfNJetsPUTight", "g", 5, -0.5, 4.5)
 
+    def correction(self,row):
+	return mc_corrector(row)
 	     
     def fakeRateMethod(self,row,isoName):
         return getFakeRateFactor(row,isoName)
@@ -429,11 +451,12 @@ class AnalyzeLFVMuTau(MegaBase):
         histos = self.histograms
         weight=1
         if (not(isData)):
- 		weight = row.GenWeight
-          #if (row.GenWeight>=0):
-          #  weight=1
-          #else:
-          #  weight=-1
+		weight = row.GenWeight * self.correction(row)
+                print "correction: " + str(self.correction(row))
+#          if (row.GenWeight>=0):
+#            weight=1
+#          else:
+#            weight=-1
         if (fakeRate == True):
           weight=weight*self.fakeRateMethod(row,isoName)
         histos[name+'/weight'].Fill(weight)
@@ -586,23 +609,21 @@ class AnalyzeLFVMuTau(MegaBase):
              return False
         if abs(row.mEta) >= 2.1:
             return False
-        if row.tPt<20 :
+        if row.tPt<30 :
             return False
-        if abs(row.tEta)>=2.5 :
+        if abs(row.tEta)>=2.3 :
             return False
         return True
 
     def gg(self,row):
-    #   if row.mPt < 50:
-    #       return False
-    #   if deltaPhi(row.mPhi, row.tPhi) <2.7:
-    #       return False
-    #   if row.mPt < 45:
-    #       return False
-    #   if row.tPt < 35:
-    #       return False
-    #   if row.tMtToPfMet_type1 > 50:
-    #       return False
+       if deltaPhi(row.mPhi, row.tPhi) <2.7:
+           return False
+       if row.mPt < 45:
+           return False
+       if row.tPt < 35:
+           return False
+       if row.tMtToPfMet_type1 > 50:
+           return False
        if row.jetVeto30!=0:
            return False
        return True
@@ -610,23 +631,29 @@ class AnalyzeLFVMuTau(MegaBase):
     def boost(self,row):
           if row.jetVeto30!=1:
             return False
-        #  if row.mPt < 35:
-        #        return False
-        #  if row.tPt < 40:
-        #        return False
-        #  if row.tMtToPfMet_type1 > 35:
-        #        return False
+          if row.mPt < 35:
+                return False
+          if row.tPt < 40:
+                return False
+          if row.tMtToPfMet_type1 > 50:
+                return False
           return True
 
     def vbf(self,row):
+        if row.mPt < 30:
+		return False
+        if row.tPt < 40:
+		return False
+	if row.tMtToPfMet_type1 > 50:
+		return False
         if row.jetVeto30<2:
             return False
 	if(row.vbfNJets<2):
 	    return False
-#	if(abs(row.vbfDeta)<3.5):
-#	    return False
- #       if row.vbfMass < 600:
-#	    return False
+	if(abs(row.vbfDeta)<3.5):
+	    return False
+        if row.vbfMass < 600:
+	    return False
         if row.vbfJetVeto30 > 0:
             return False
         return True
@@ -744,7 +771,6 @@ class AnalyzeLFVMuTau(MegaBase):
 
             #if not self.obj2_iso(row):
             #    continue
-            #self.fill_histos(row,'preselection')
 #              self.fill_histos(row,'oldisotight')a
             if self.oppositesign(row):
               if self.obj2_iso(row):
@@ -758,8 +784,8 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf')
             if self.oppositesign(row):
+              '''
               if self.obj2_mediso(row):
-                self.fill_histos(row,'preselection_mediso')
                 if self.gg(row):
                     self.fill_histos(row,'gg_mediso')
 
@@ -769,7 +795,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf_mediso')
               if self.obj2_newTightiso(row):
-                self.fill_histos(row,'preselection_newTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'gg_newTightiso')
                 elif self.boost(row):
@@ -777,7 +802,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf_newTightiso')
               if self.obj2_newVTightiso(row):
-                self.fill_histos(row,'preselection_newVTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'gg_newVTightiso')
                 elif self.boost(row):
@@ -785,7 +809,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf_newVTightiso')
               if self.obj2_newVVTightiso(row):
-                self.fill_histos(row,'preselection_newVVTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'gg_newVVTightiso')
                 elif self.boost(row):
@@ -793,7 +816,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf_newVVTightiso')
 #              if self.obj2_newisonewdm(row):
-#                self.fill_histos(row,'preselection_newiso_newdm')
 #                if self.gg(row):
 #                    self.fill_histos(row,'gg_newiso_newdm')
 # 
@@ -802,8 +824,9 @@ class AnalyzeLFVMuTau(MegaBase):
 # 
 #                elif self.vbf(row):
 #                    self.fill_histos(row,'vbf_newiso_newdm')
+            '''
               if self.obj2_antiiso(row):
-                self.fill_histos(row,'antiiso_preselection', True,'old')
+                self.fill_histos(row,'antiiso_preselection',True,'old')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg', True,'old')
  
@@ -812,8 +835,8 @@ class AnalyzeLFVMuTau(MegaBase):
  
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf', True,'old')
+              '''
               if self.obj2_antimediso(row):
-                self.fill_histos(row,'antiiso_preselection_mediso', True,'med')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_mediso', True,'med')
 
@@ -824,7 +847,6 @@ class AnalyzeLFVMuTau(MegaBase):
                     self.fill_histos(row,'antiiso_vbf_mediso', True,'med')
 
               if self.obj2_antinewVVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVVTightVLooseiso', True,'newVVTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newVVTightVLooseiso', True,'newVVTightVLoose')
  
@@ -834,7 +856,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newVVTightVLooseiso', True,'newVVTightVLoose')
               if self.obj2_antinewVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVTightVLooseiso', True,'newVTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newVTightVLooseiso', True,'newVTightVLoose')
  
@@ -844,7 +865,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newVTightVLooseiso', True,'newVTightVLoose')
               if self.obj2_antinewTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newTightVLooseiso', True,'newTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newTightVLooseiso', True,'newTightVLoose')
  
@@ -854,7 +874,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newTightVLooseiso', True,'newTightVLoose')
               if self.obj2_antinewVVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVVTightLooseiso', True,'newVVTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newVVTightLooseiso', True,'newVVTightLoose')
  
@@ -864,7 +883,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newVVTightLooseiso', True,'newVVTightLoose')
               if self.obj2_antinewVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVTightLooseiso', True,'newVTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newVTightLooseiso', True,'newVTightLoose')
  
@@ -874,7 +892,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newVTightLooseiso', True,'newVTightLoose')
               if self.obj2_antinewTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newTightLooseiso', True,'newTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_gg_newTightLooseiso', True,'newTightLoose')
  
@@ -884,7 +901,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_vbf_newTightLooseiso', True,'newTightLoose')
 #              if self.obj2_antinewisonewdm(row):
-#                self.fill_histos(row,'antiiso_preselection_newiso_newdm', True,'newDM')
 #                if self.gg(row):
 #                    self.fill_histos(row,'antiiso_gg_newiso_newdm', True,'newDM')
 # 
@@ -893,6 +909,7 @@ class AnalyzeLFVMuTau(MegaBase):
 # 
 #                elif self.vbf(row):
 #                    self.fill_histos(row,'antiiso_vbf_newiso_newdm', True,'newDM')
+               '''
             elif not self.oppositesign(row):
               if self.obj2_iso(row):
                 self.fill_histos(row,'sspreselection')
@@ -904,8 +921,8 @@ class AnalyzeLFVMuTau(MegaBase):
   
                 elif self.vbf(row):
                     self.fill_histos(row,'ssvbf')
+              '''
               if self.obj2_mediso(row):
-                self.fill_histos(row,'sspreselection_mediso')
                 if self.gg(row):
                     self.fill_histos(row,'ssgg_mediso')
 
@@ -915,7 +932,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'ssvbf_mediso')
               if self.obj2_newTightiso(row):
-                self.fill_histos(row,'sspreselection_newTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'ssgg_newTightiso')
                 elif self.boost(row):
@@ -923,7 +939,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'ssvbf_newTightiso')
               if self.obj2_newVTightiso(row):
-                self.fill_histos(row,'sspreselection_newVTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'ssgg_newVTightiso')
                 elif self.boost(row):
@@ -931,7 +946,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'ssvbf_newVTightiso')
               if self.obj2_newVVTightiso(row):
-                self.fill_histos(row,'sspreselection_newVVTightiso')
                 if self.gg(row):
                     self.fill_histos(row,'ssgg_newVVTightiso')
                 elif self.boost(row):
@@ -939,7 +953,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'ssvbf_newVVTightiso')
 #              if self.obj2_newisonewdm(row):
-#                self.fill_histos(row,'sspreselection_newiso_newdm')
 #                if self.gg(row):
 #                    self.fill_histos(row,'ssgg_newiso_newdm')
 # 
@@ -948,8 +961,9 @@ class AnalyzeLFVMuTau(MegaBase):
 # 
 #                elif self.vbf(row):
 #                    self.fill_histos(row,'ssvbf_newiso_newdm')
+              '''
               if self.obj2_antiiso(row):
-                self.fill_histos(row,'antiiso_sspreselection', True,'old')
+                self.fill_histos(row,'antiiso_sspreselection',True,'old')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg', True,'old')
  
@@ -958,8 +972,8 @@ class AnalyzeLFVMuTau(MegaBase):
  
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf', True,'old')
+              '''
               if self.obj2_antimediso(row):
-                self.fill_histos(row,'antiiso_sspreselection_mediso', True,'med')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_mediso', True,'med')
 
@@ -969,7 +983,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_mediso', True,'med')
               if self.obj2_antinewVVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVVTightVLooseiso', True,'newVVTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newVVTightVLooseiso', True,'newVVTightVLoose')
  
@@ -979,7 +992,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newVVTightVLooseiso', True,'newVVTightVLoose')
               if self.obj2_antinewVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVTightVLooseiso', True,'newVTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newVTightVLooseiso', True,'newVTightVLoose')
  
@@ -989,7 +1001,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newVTightVLooseiso', True,'newVTightVLoose')
               if self.obj2_antinewTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newTightVLooseiso', True,'newTightVLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newTightVLooseiso', True,'newTightVLoose')
  
@@ -999,7 +1010,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newTightVLooseiso', True,'newTightVLoose')
               if self.obj2_antinewVVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVVTightLooseiso', True,'newVVTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newVVTightLooseiso', True,'newVVTightLoose')
  
@@ -1009,7 +1019,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newVVTightLooseiso', True,'newVVTightLoose')
               if self.obj2_antinewVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVTightLooseiso', True,'newVTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newVTightLooseiso', True,'newVTightLoose')
  
@@ -1019,7 +1028,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newVTightLooseiso', True,'newVTightLoose')
               if self.obj2_antinewTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newTightLooseiso', True,'newTightLoose')
                 if self.gg(row):
                     self.fill_histos(row,'antiiso_ssgg_newTightLooseiso', True,'newTightLoose')
  
@@ -1029,7 +1037,6 @@ class AnalyzeLFVMuTau(MegaBase):
                 elif self.vbf(row):
                     self.fill_histos(row,'antiiso_ssvbf_newTightLooseiso', True,'newTightLoose')
 #              if self.obj2_antinewisonewdm(row):
-#                self.fill_histos(row,'antiiso_sspreselection_newiso_newdm', True,'newDM')
 #                if self.gg(row):
 #                    self.fill_histos(row,'antiiso_ssgg_newiso_newdm', True,'newDM')
 # 
@@ -1038,6 +1045,7 @@ class AnalyzeLFVMuTau(MegaBase):
 # 
 #                elif self.vbf(row):
 #                    self.fill_histos(row,'antiiso_ssvbf_newiso_newdm', True,'newDM')
+               '''
 # 
 #            elif self.obj2_looseiso(row):
 #
