@@ -20,7 +20,8 @@ set -o errexit
 #rake analyzeLFVMuTauData
 
 
-export jobid=MiniAODv2_2fb_v3
+#export jobid=MiniAODv2_2fb_v3
+export jobid=MiniAodV2For25ns_ExtraJets_LFV
 export isData=false
 export checkZtt=false
 rake analyzeSpring2015MiscSignal

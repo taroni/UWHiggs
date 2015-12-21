@@ -76,8 +76,23 @@ def collMass_type1(row):
 
         #print '%4.2f, %4.2f, %4.2f, %4.2f, %4.2f' %(scaleMass(row), den, xth, METproj,mass)
 
-
         return mass
+
+
+def NJ(ptThresh,j1,j2,j3,j4,j5,j6):
+        if (j1 < ptThresh):
+                return 0
+        if (j2 < ptThresh):
+                return 1
+        if (j3 < ptThresh):
+                return 2
+        if (j4 < ptThresh):
+                return 3
+        if (j5 < ptThresh):
+                return 4
+        if (j6 < ptThresh):
+                return 5
+        return 6
 
 def getFakeRateFactor(row, isoName):
   if (isoName == "old"):
@@ -271,7 +286,7 @@ def getFakeRateFactor(row, isoName):
 ################################################################################
 
 pu_distributions = glob.glob(os.path.join(
-	'inputs', os.environ['jobid'],'MyDataPileupHistogram.root'))
+        'inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
 
 pu_corrector = PileupWeight.PileupWeight(
 	'Asympt25ns', *pu_distributions)
@@ -323,7 +338,24 @@ class AnalyzeLFVMuTauSignal(MegaBase):
             #self.book(names[x], "jet2PUMVA ", "Muon  Pt", 100,-1,1)
             #self.book(names[x], "jet1PUTight ", "Muon  Pt", 3,-1,2)
             #self.book(names[x], "jet2PUTight ", "Muon  Pt", 3,-1,2)
+            self.book(names[x], "jet1Pt", "", 300,0,300)
+            self.book(names[x], "jet2Pt", "", 300,0,300)
+            self.book(names[x], "jet3Pt", "", 300,0,300)
+            self.book(names[x], "jet4Pt", "", 300,0,300)
+            self.book(names[x], "jet5Pt", "", 300,0,300)
 
+
+            self.book(names[x], "jet1Eta", "", 200,-5,5)
+            self.book(names[x], "jet2Eta", "", 200,-5,5)
+            self.book(names[x], "jet3Eta", "", 200,-5,5)
+            self.book(names[x], "jet4Eta", "", 200,-5,5)
+            self.book(names[x], "jet5Eta", "", 200,-5,5)
+
+            self.book(names[x], "jet1Phi", "", 280,-7,7)
+            self.book(names[x], "jet2Phi", "", 280,-7,7)
+            self.book(names[x], "jet3Phi", "", 280,-7,7)
+            self.book(names[x], "jet4Phi", "", 280,-7,7)
+            self.book(names[x], "jet5Phi", "", 280,-7,7)
  
             self.book(names[x], "mPt", "Muon  Pt", 300,0,300)
             self.book(names[x], "mEta", "Muon  eta", 100, -2.5, 2.5)
@@ -415,7 +447,8 @@ class AnalyzeLFVMuTauSignal(MegaBase):
    
             #self.book(names[x], 'jetVeto30PUCleanedTight', 'Number of extra jets', 5, -0.5, 4.5)
             #self.book(names[x], 'jetVeto30PUCleanedLoose', 'Number of extra jets', 5, -0.5, 4.5)
-            self.book(names[x], 'jetVeto30', 'Number of extra jets', 5, -0.5, 4.5)	
+            self.book(names[x], 'jetVeto30', 'Number of extra jets', 5, -0.5, 4.5)
+            self.book(names[x], 'NumJets30', 'Number of extra jets pT > 30 (cleaned & id)',7,-0.5,6.5)
 	    #Isolation
 	    self.book(names[x], 'mRelPFIsoDBDefault' ,'Muon Isolation', 100, 0.0,1.0)
    
@@ -475,6 +508,21 @@ class AnalyzeLFVMuTauSignal(MegaBase):
         #histos[name+'/jet2PUTight '].Fill(row.jet2PUTight , weight)
         #histos[name+'/jet1PUMVA '].Fill(row.jet1PUMVA , weight)
         #histos[name+'/jet2PUMVA '].Fill(row.jet2PUMVA , weight)
+        histos[name+'/jet1Pt'].Fill(row.jet1Pt, weight)
+        histos[name+'/jet2Pt'].Fill(row.jet2Pt, weight)
+        histos[name+'/jet3Pt'].Fill(row.jet3Pt, weight)
+        histos[name+'/jet4Pt'].Fill(row.jet4Pt, weight)
+        histos[name+'/jet5Pt'].Fill(row.jet5Pt, weight)
+        histos[name+'/jet1Eta'].Fill(row.jet1Eta, weight)
+        histos[name+'/jet2Eta'].Fill(row.jet2Eta, weight)
+        histos[name+'/jet3Eta'].Fill(row.jet3Eta, weight)
+        histos[name+'/jet4Eta'].Fill(row.jet4Eta, weight)
+        histos[name+'/jet5Eta'].Fill(row.jet5Eta, weight)
+        histos[name+'/jet1Phi'].Fill(row.jet1Phi, weight)
+        histos[name+'/jet2Phi'].Fill(row.jet2Phi, weight)
+        histos[name+'/jet3Phi'].Fill(row.jet3Phi, weight)
+        histos[name+'/jet4Phi'].Fill(row.jet4Phi, weight)
+        histos[name+'/jet5Phi'].Fill(row.jet5Phi, weight)
 
         histos[name+'/mPt'].Fill(row.mPt, weight)
         histos[name+'/mEta'].Fill(row.mEta, weight)
@@ -563,6 +611,8 @@ class AnalyzeLFVMuTauSignal(MegaBase):
         histos[name+'/tauVetoPt20Loose3HitsVtx'].Fill(row.tauVetoPt20Loose3HitsVtx, weight)
         histos[name+'/eVetoMVAIso'].Fill(row.eVetoMVAIso, weight)
         histos[name+'/jetVeto30'].Fill(row.jetVeto30, weight)
+        histos[name+'/NumJets30'].Fill(NJ(30,row.jet1Pt,row.jet2Pt,row.jet3Pt,row.jet4Pt,row.jet5Pt,row.jet6Pt),weight)
+
         #histos[name+'/jetVeto30PUCleanedLoose'].Fill(row.jetVeto30PUCleanedLoose, weight)
         #histos[name+'/jetVeto30PUCleanedTight'].Fill(row.jetVeto30PUCleanedTight, weight)
 
