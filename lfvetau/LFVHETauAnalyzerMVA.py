@@ -16,12 +16,12 @@ import FinalStateAnalysis.PlotTools.pytree as pytree
 from FinalStateAnalysis.PlotTools.decorators import  memo_last
 from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 from math import sqrt, pi, cos
-from fakerate_functions import tau_fake_rate, e_fake_rate , tau_fake_rate_up, tau_fake_rate_dw
+from fakerate_functions import tau_fake_rate, e_fake_rate , tau_fake_rate_up, tau_fake_rate_dw, tau_fake_decayMode, tau_fake_decayMode_up, tau_fake_decayMode_down
 #,  e_fake_rate_up, e_fake_rate_dw
 import itertools
 import traceback
 from FinalStateAnalysis.PlotTools.decorators import memo
-import FinalStateAnalysis.PlotTools.pytree as pytree
+import FinalStateAnalysis.PlotTools.pytree as pytrees
 from FinalStateAnalysis.Utilities.struct import struct
 import optimizer
 
@@ -167,7 +167,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
             ##'trig' : (['', 'trp1s', 'trm1s'] if not self.is_data else []),
             ##'pu'   : (['','p1s', 'm1s'] if self.is_mc else []),
             ##'eid'  : (['', 'eidp1s','eidm1s'] if not self.is_data else []),
-            'etaufake'  : (['', 'etaufakep1s','etaufakem1s'] if self.is_Zee else []),
+            'etaufake'  : (['', 'etaufakep1s','etaufakem1s'] if self.is_Zee else ['']),
             ##'etaufake'  : ([''] if self.is_Zee else []),
             ##'eiso' : (['', 'eisop1s','eisom1s'] if not self.is_data else []),
             ##'jes'  : (['', '_jes_plus','_jes_minus'] if self.is_mc else ['']),
@@ -248,10 +248,11 @@ class LFVHETauAnalyzerMVA(MegaBase):
             return {'' : 1.}
 
         weights = {}
+        weightsign = lambda x: x and (1, -1)[x<0]
         for shift in sys_shifts:
             embedded_weight = row.EmbPtWeight*mcCorrections.eEmb_correction( row, 'e', shift=shift) if self.is_embedded else 1.
             #print 'shift', shift, row.nTruePU
-            weights[shift] =row.GenWeight*self.pucorrector(row.nTruePU, shift=shift)*mcCorrections.eid15_correction( row, 'e', shift=shift)
+            weights[shift] = row.GenWeight*self.pucorrector(row.nTruePU, shift=shift)*mcCorrections.eid15_correction( row, 'e', shift=shift)
            ## weights[shift] = embedded_weight *\
            ##                  mcCorrections.eid_correction( row, 'e', shift=shift) * \
            ##                  mcCorrections.eiso_correction(row, 'e', shift=shift) * \
@@ -316,8 +317,8 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 if 'type1_' in name : name=name[6:] ## remove this line when the ntuples have the correct systematics
                 self.book(location, name+fix,  *args, **kwargs)
 
-        self.book('os', "h_collmass_pfmet" , "h_collmass_pfmet",  32, 0, 320)
-        self.book('os', "e_t_Mass",  "h_vismass",  32, 0, 320)
+        self.book('os', "h_collmass_pfmet" , "h_collmass_pfmet",  160, 0, 320)
+        self.book('os', "e_t_Mass",  "h_vismass",  160, 0, 320)
         #print 'first histos booked'
         for f in folder: 
             #print f
@@ -346,12 +347,12 @@ class LFVHETauAnalyzerMVA(MegaBase):
             self.book(f, "e_t_DR", "e-tau DeltaR" , 20, 0, 3.2)
             
             #self.book(f, "h_collmass_pfmet",  "h_collmass_pfmet",  32, 0, 320)
-            book_with_sys(f, "h_collmass_pfmet",  "h_collmass_pfmet",  40, 0, 400, 
+            book_with_sys(f, "h_collmass_pfmet",  "h_collmass_pfmet",  400, 0, 400, 
                           postfixes=full_met_systematics)
             
             self.book(f, "h_collmass_vs_dPhi_pfmet",  "h_collmass_vs_dPhi_pfmet", 20, 0, 3.2, 40, 0, 400, type=ROOT.TH2F)
            
-            self.book(f, "e_t_Mass",  "h_vismass",  40, 0, 400)
+            self.book(f, "e_t_Mass",  "h_vismass",  200, 0, 400)
             #self.book(f, "e_t_Mass_tes_plus" ,  "h_vismass_tes_plus", 40 , 0, 400)
             #self.book(f, "e_t_Mass_tes_minus",  "h_vismass_tes_minus",40 , 0, 400)
             #self.book(f, "e_t_Mass_ees_plus" ,  "h_vismass_ees_plus", 40 , 0, 400)
@@ -376,9 +377,13 @@ class LFVHETauAnalyzerMVA(MegaBase):
             #self.book(f, "pfMetPhi",  "pfMetPhi", 100, -3.2, 3.2)
             book_with_sys(f, "type1_pfMetPhi",  "type1_pfMetPhi", 26, -3.2, 3.2, postfixes=full_met_systematics)
             
+            self.book(f, "vbfj1eta", "leading jet, #eta", 50, -5., 5.) 
+            self.book(f, "vbfj2eta", "sub-leading jet, #eta", 50, -5., 5.) 
+
             self.book(f, "jetVeto20", "Number of jets, p_{T}>20", 5, -0.5, 4.5) 
             self.book(f, "jetVeto30", "Number of jets, p_{T}>30", 5, -0.5, 4.5) 
            
+            self.book(f, "tDecayMode", "#tau decay mode", 13, -1.5, 11.5)
         #index dirs and histograms
         for key, value in self.histograms.iteritems():
             location = os.path.dirname(key)
@@ -389,10 +394,11 @@ class LFVHETauAnalyzerMVA(MegaBase):
             else:
                 self.histo_locations[location][name] = value
         #print self.histo_locations['os/0']
-    def fakerate_weights(self, tEta, ePt): 
-        tLoose    = tau_fake_rate(tEta)
-        tLooseUp  = tau_fake_rate_up(tEta) 
-        tLooseDown= tau_fake_rate_dw(tEta) 
+    def fakerate_weights(self, tDecayMode, ePt):
+    #(self, tEta, ePt): 
+        tLoose    = tau_fake_decayMode(tDecayMode)
+        tLooseUp  = tau_fake_decayMode_up(tDecayMode) 
+        tLooseDown= tau_fake_decayMode_down(tDecayMode) 
         
         tLoose    = tLoose     / (1. - tLoose    ) 
         tLooseUp  = tLooseUp   / (1. - tLooseUp  ) 
@@ -504,12 +510,13 @@ class LFVHETauAnalyzerMVA(MegaBase):
             #preselection, common to everything and everyone
             #
             #trigger
+            
             if self.is_embedded :
                 if not bool(row.doubleMuPass) : continue
             elif self.is_data:
-                if not bool(row.singleE22eta2p1LoosePass) : continue
+                if not bool(row.singleE23WPLoosePass) : continue
             else: 
-                if not bool(row.singleE22eta2p1WP75Pass) : continue 
+                if not bool(row.singleE22eta2p1LoosePass) : continue 
                 #electron trigger match still to add singleE22 not still in the ntuples
                 #if not bool(row.eMatchesSingleE27WP80): continue
 
@@ -518,7 +525,8 @@ class LFVHETauAnalyzerMVA(MegaBase):
             #if row.ePt < 30 : continue
             if not selections.tauSelection(row, 't'): continue
             if not bool(row.tDecayModeFinding) : continue
-            if not row.tAgainstElectronTightMVA5 : continue
+            #if not row.tAgainstElectronTightMVA5 : continue #changed to Medium to compare with Maria
+            if not row.tAgainstElectronMediumMVA5 : continue
             if not row.tAgainstMuonTight3 : continue
             if not row.tByLooseCombinedIsolationDeltaBetaCorr3Hits : continue
             logging.debug('object selection passed')
@@ -677,7 +685,7 @@ class LFVHETauAnalyzerMVA(MegaBase):
                 mc_weight = weight_map['']
 
                 #weights are the fr ones...
-                weight_map = self.fakerate_weights(row.tEta, row.ePt)
+                weight_map = self.fakerate_weights(row.tDecayMode, row.ePt)
                 for i in weight_map:
                     #...times the mc weight (if any)
                     weight_map[i] *= mc_weight

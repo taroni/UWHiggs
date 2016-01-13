@@ -125,6 +125,7 @@ class BasePlotter(Plotter):
         self.sqrts  = 8
         jobid = os.environ['jobid']
         self.use_embedded = use_embedded
+        forceLumi=forceLumi
         print "\nPlotting e tau for %s\n" % jobid
         files=files
         outputdir = outputdir
@@ -149,7 +150,7 @@ class BasePlotter(Plotter):
             'TT*',
             #'T*_t*',
             '[WZ][WZ]_*',
-            'DYJets*'            
+            'DYJets*'
         ]
         
         if use_embedded:            
@@ -168,20 +169,20 @@ class BasePlotter(Plotter):
             'GluGluHToTauTau*' : 'SMGG126'   , 
             'VBFHToTauTau*'     : 'SMVBF126'  ,
             'TT*'                  : 'ttbar'     ,
-            'DYJets*'                  : 'DY'     ,
+            'DYJets*'                  : 'zjetsother'     ,
 #            'T*_t*'                    : 'singlet'   ,
             '[WZ][WZ]_*'             : 'diboson'   ,
-            'GluGlu_LFV_HToETau'  : 'LFVGG',
-            'VBF_LFV_HToETau' : 'LFVVBF',
+            'GluGlu_LFV_HToETau*'  : 'LFVGG126',
+            'VBF_LFV_HToETau*' : 'LFVVBF126',
             'fakes' : 'fakes'
         }
 
         self.sample_groups = {#parse_cgs_groups('card_config/cgs.0.conf')
-            'fullsimbkg' : ['SMGG126', 'SMVBF126','LFVGG', 'LFVVBF','ttbar','DY', 
+            'fullsimbkg' : ['SMGG126', 'SMVBF126','LFVGG126', 'LFVVBF126','ttbar', 
                             'diboson', 'zjetsother'],
-            'simbkg' : ['SMGG126', 'SMVBF126', 'LFVGG', 'LFVVBF', 'ttbar','DY',
+            'simbkg' : ['SMGG126', 'SMVBF126', 'LFVGG126', 'LFVVBF126', 'ttbar',
                         'diboson', 'zjetsother'],
-            'realtau' : ['diboson', 'ttbar', 'DY', 'SMGG126', 'SMVBF126','LFVGG', 'LFVVBF'],
+            'realtau' : ['diboson', 'ttbar','zjetsother' , 'SMGG126', 'SMVBF126','LFVGG126', 'LFVVBF'],
             'Zee' : ['zjetsother']
             }
 
@@ -620,8 +621,8 @@ class BasePlotter(Plotter):
             'TTJets*' : 0.026,
             'T*_t*' : 0.041,
             '[WZ][WZ]Jets' : 0.056, #diboson
-            'Wplus*Jets_madgraph*' : 0.035, #WJets
-            'Z*jets_M50_skimmedLL' : 0.300, # theoretical 0.032
+            'W*Jets*' : 0.035, #WJets
+            'DY*' : 0.300, # theoretical 0.032
             'Z*jets_M50_skimmedTT' : 0.032,
         }
 
@@ -641,14 +642,15 @@ class BasePlotter(Plotter):
         #make MC stack
         mc_stack_view = views.StackView(*mc_views, sorted=sort) 
         mc_stack = mc_stack_view.Get( path )
-
+        mc_stack.SetMinimum(0)
         #make histo clone for err computation
         mc_sum_view = views.SumView(*mc_views)
         mc_err = mc_sum_view.Get( path )
-        
+
+
         #Add MC-only systematics
         folder_systematics = [
-            ('p1s', 'm1s'), #PU correction
+            #('p1s', 'm1s'), #PU correction
         ]
 
         met_systematics = [ #it was without plus
@@ -668,12 +670,12 @@ class BasePlotter(Plotter):
 
         #add them
         
-        mc_err = self.add_shape_systematics(
-            mc_err, 
-            path, 
-            mc_sum_view, 
-            folder_systematics,
-            name_systematics)
+        ##mc_err = self.add_shape_systematics(
+        ##    mc_err, 
+        ##    path, 
+        ##    mc_sum_view, 
+        ##    folder_systematics,
+        ##    name_systematics)
 
         #add jet category uncertainty
         jetcat_unc_mapper = {
@@ -688,7 +690,7 @@ class BasePlotter(Plotter):
         if found:
             njet = int(found[0].strip('/'))
             jet_unc = jetcat_unc_mapper.get(njet, 0. )
-        mc_err = SystematicsView.add_error(mc_err, jet_unc)
+        #mc_err = SystematicsView.add_error(mc_err, jet_unc)
 
         #check if we are using the embedded sample
         if self.use_embedded:
@@ -722,34 +724,36 @@ class BasePlotter(Plotter):
             ])
         
             
-        mc_err = self.add_shape_systematics(
-            mc_err, 
-            path, 
-            mc_sum_view, 
-            folder_systematics)
+        ##mc_err = self.add_shape_systematics(
+        ##    mc_err, 
+        ##    path, 
+        ##    mc_sum_view, 
+        ##    folder_systematics)
 
         #add lumi uncertainty
-        mc_err = SystematicsView.add_error( mc_err, 0.026 )
-        
-        #get fakes
-        fakes_view = self.get_view('fakes')
-        if preprocess:
-            fakes_view = preprocess(fakes_view)
-        fakes_view = RebinView(fakes_view, rebin)
-        fakes = fakes_view.Get(path)
-        
-        fakes = self.add_shape_systematics(
-            fakes, 
-            path, 
-            fakes_view, 
-            #[('Up','Down')]
-        )
-        fakes = SystematicsView.add_error(fakes, 0.30)
-        #add them to backgrounds
-        mc_stack.Add(fakes)
-        
+        mc_err = SystematicsView.add_error( mc_err, 0.12 )
+
         mc_err.Sumw2()
-        mc_err.Add(fakes)
+        no_fakes=False
+        if not no_fakes:
+            #get fakes
+            fakes_view = self.get_view('fakes')
+            if preprocess:
+                fakes_view = preprocess(fakes_view)
+            fakes_view = RebinView(fakes_view, rebin)
+            fakes = fakes_view.Get(path)
+                
+            ##fakes = self.add_shape_systematics(
+            ##    fakes, 
+            ##    path, 
+            ##    fakes_view, 
+            ##    [('Up','Down')]
+            ##)
+            fakes = SystematicsView.add_error(fakes, 0.30)
+            #add them to backgrounds
+            mc_stack.Add(fakes)
+            
+            mc_err.Add(fakes)
 
         #set_trace()
          
@@ -802,12 +806,23 @@ class BasePlotter(Plotter):
         ##self.pad.SetGridx(True)
         ##self.pad.SetGridy(True)
         
+        for ibin in range(1, mc_stack.GetStack().Last().GetXaxis().GetNbins()+1):
+            for hist in mc_stack.GetHists():
+                if hist.GetBinContent(ibin) < 0:
+                    hist.SetBinContent(ibin,0.000001)
+
+
         mc_stack.GetHistogram().GetXaxis().SetTitle(xaxis)
         if xrange:
             mc_stack.GetXaxis().SetRangeUser(xrange[0], xrange[1])
             mc_stack.Draw()
               
-        #set cosmetics 
+        for ibin in range(1, mc_err.GetXaxis().GetNbins()+1):
+            print 'mc_err large plot',ibin, mc_err.GetBinContent(ibin), mc_err.GetBinError(ibin)
+            if mc_err.GetBinContent(ibin) <= 0 :
+                mc_err.SetBinContent(ibin, 0.00001) 
+                        
+                #set cosmetics 
         mc_err.SetMarkerStyle(0)
         mc_err.SetLineColor(1)
         mc_err.SetFillStyle('x')
@@ -819,8 +834,8 @@ class BasePlotter(Plotter):
         
         #Get signal
         signals = [
-            'GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8',
-            'VBF_LFV_HToETau_M125_13TeV_powheg_pythia8'
+            'GluGlu_LFV_HToETau*',
+            'VBF_LFV_HToETau*'
         ]
         sig = []
         for name in signals:
@@ -828,8 +843,8 @@ class BasePlotter(Plotter):
             if preprocess:
                 sig_view = preprocess(sig_view)
             sig_view = RebinView(sig_view, rebin)
-            if not plot_data:
-                sig_view = views.ScaleView(sig_view, 100)
+            #if not plot_data:
+            sig_view = views.ScaleView(sig_view, 10)
             
             histogram = sig_view.Get(path)
             histogram.Draw('same')
@@ -961,13 +976,13 @@ class BasePlotter(Plotter):
             self.add_ratio_diff(data, mc_stack, finalhisto, xrange, ratio_range)
             
     def write_shapes(self, folder, variable, output_dir, br_strenght=1,
-                     rebin=1, last = 400,  preprocess=None): #, systematics):
+                     rebin=1, last = 300,  preprocess=None): #, systematics):
         '''Makes shapes for computing the limit and returns a list of systematic effects to be added to unc.vals/conf 
         make_shapes(folder, variable, output_dir, [rebin=1, preprocess=None) --> unc_conf_lines (list), unc_vals_lines (list)
         '''
         output_dir.cd()
         path = os.path.join(folder,variable)
-
+        
         # Draw data
         data_view = self.get_view('data')
         if preprocess:
@@ -975,7 +990,7 @@ class BasePlotter(Plotter):
         data_view = self.rebin_view(data_view, rebin)
         data = data_view.Get(path)
        
-        data=change_histo_nbins(data, 0, last)
+        #data=change_histo_nbins(data, 0, last)
         first_filled, last_filled = find_fill_range(data)
         data.SetName('data_obs')
         data.Write()
@@ -991,13 +1006,17 @@ class BasePlotter(Plotter):
         bkg_histos = {}
         for name, view in bkg_views.iteritems():
             mc_histo = view.Get(path)
-            mc_histo = change_histo_nbins(mc_histo, 0, last)
+            #mc_histo = change_histo_nbins(mc_histo, 0, last)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
-            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
             bkg_histos[name] = mc_histo.Clone()
+            for ibin in range(0, mc_histo.GetXaxis().GetNbins()+1):
+                if mc_histo.GetBinContent(ibin) <0 :
+                    mc_histo.SetBinContent(ibin, 0) 
+
             mc_histo = remove_empty_bins(
                 mc_histo, bkg_weights[name],
                 first_filled_bkg, last_filled_bkg)
+            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins(), mc_histo.Integral()
             mc_histo.SetName(name)
             mc_histo.Write()
 
@@ -1011,7 +1030,7 @@ class BasePlotter(Plotter):
             bkg_weights[name] = weight
             bkg_views[name] = view
             mc_histo = view.Get(path)
-            mc_histo = change_histo_nbins(mc_histo, 0, last)
+            #mc_histo = change_histo_nbins(mc_histo, 0, last)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
             bkg_histos[name] = mc_histo.Clone()
             mc_histo = remove_empty_bins(
@@ -1036,9 +1055,9 @@ class BasePlotter(Plotter):
         bkg_views['fakes'] = fakes_view
         bkg_weights['fakes'] = mean(weights)
         fake_shape = bkg_views['fakes'].Get(path)
-        fake_shape = change_histo_nbins(fake_shape, 0, last)
+        #fake_shape = change_histo_nbins(fake_shape, 0, last)
         bkg_histos['fakes'] = fake_shape.Clone()
-        bkg_histos['fakes'] =change_histo_nbins(bkg_histos['fakes'] , 0, last)
+        #bkg_histos['fakes'] =change_histo_nbins(bkg_histos['fakes'] , 0, last)
         first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos['fakes'])
         fake_shape = remove_empty_bins(
             fake_shape, bkg_weights['fakes'],
@@ -1048,8 +1067,8 @@ class BasePlotter(Plotter):
 
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau*',
+            'VBF_LFV_HToETau*'
         ]
         for name in signals:
             sig_view = self.get_view(name)
@@ -1064,12 +1083,14 @@ class BasePlotter(Plotter):
             bkg_views[card_name] = sig_view
             bkg_weights[card_name] = weights
             histogram = sig_view.Get(path)
-            histogram = change_histo_nbins(histogram, 0, last)
+            #histogram = change_histo_nbins(histogram, 0, last)
             bkg_histos[card_name] = histogram.Clone()
             first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos[card_name])
+ 
             histogram = remove_empty_bins(
                 histogram, bkg_weights[card_name],
                 first_filled_bkg, last_filled_bkg)
+            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins(), histogram.Integral()
             histogram.SetName(card_name)
             histogram.Write()
 
@@ -1185,7 +1206,7 @@ class BasePlotter(Plotter):
         for name, view in bkg_views.iteritems():
             mc_histo = view.Get(path)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
-            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
+            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins(), mc_histo.Integral()
             bkg_histos[name] = mc_histo.Clone()
             #mc_histo = remove_empty_bins(
             #    mc_histo, bkg_weights[name],
@@ -1237,8 +1258,8 @@ class BasePlotter(Plotter):
 
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau',
+            'VBF_LFV_HToETau'
         ]
         for name in signals:
             sig_view = self.get_view(name)
@@ -1481,8 +1502,8 @@ class BasePlotter(Plotter):
 
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau',
+            'VBF_LFV_HToETau'
         ]
         for name in signals:
             sig_view = self.get_view(name)
@@ -1538,6 +1559,7 @@ class BasePlotter(Plotter):
         data = data_view.Get(variable)
         data.Draw('same')
         self.keep.append(data)
+        mc_stack.SetMinimum(0)
         # Make sure we can see everything
         if data.GetMaximum() > mc_stack.GetMaximum():
             mc_stack.SetMaximum(1.2*data.GetMaximum())

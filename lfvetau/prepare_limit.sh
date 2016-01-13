@@ -2,7 +2,7 @@
 
 #set -o nounset
 set -o errexit
-
+WDIR=`pwd`
 #$1 --> category (0, 1, 2) --> 0 jets, 1 jet, vbf
 #$2 --> files extensions produced by plotting (used inoptimization)
 category=$1
@@ -38,30 +38,32 @@ elif [ $category == '1' ]; then
     category_name='boostetau'
     samples='fakes'
 else
-    command='vbfetau:fakes,ttbar,singlet,ztautau,SMVBF126,WWVBF126'
+    #command='vbfetau:fakes,ttbar,singlet,ztautau,SMVBF126,WWVBF126'
+    command='vbfetau:fakes,ttbar,SMVBF126,WWVBF126'
     category_name='vbfetau'
-    samples='fakes ttbar singlet ztautau SMVBF126'
+    samples='fakes ttbar  SMVBF126'
+    #samples='fakes ttbar singlet ztautau SMVBF126'
 fi
 
-#TODO: normalize or not?
-#will it work with input and output in the same place?
-echo >> $output_dir/unc.conf
-echo >> $output_dir/unc.vals    
-echo >> $output_dir/unc.conf
-echo >> $output_dir/unc.vals    
-echo "#bbb uncertainties" >> $output_dir/unc.conf
-echo "#bbb uncertainties" >> $output_dir/unc.vals    
-for sample in $samples; do
-    echo "adding bbb errors for $sample"
-    echo add_stat_shapes.py $output_dir/$shapes $output_dir/$shapes --normalize --filter $category_name/$sample --prefix $category_name
-    bbb_added=$(add_stat_shapes.py $output_dir/$shapes $output_dir/$shapes --normalize --filter $category_name/$sample --prefix $category_name | grep _bin_)
-    echo >> $output_dir/unc.conf
-    echo >> $output_dir/unc.vals    
-    for unc in $bbb_added; do
-	echo $unc shape >> $output_dir/unc.conf
-	echo $category_name $sample $unc 1.0 >>  $output_dir/unc.vals    
-    done
-done
+###TODO: normalize or not?
+###will it work with input and output in the same place?
+##echo >> $output_dir/unc.conf
+##echo >> $output_dir/unc.vals    
+##echo >> $output_dir/unc.conf
+##echo >> $output_dir/unc.vals    
+##echo "#bbb uncertainties" >> $output_dir/unc.conf
+##echo "#bbb uncertainties" >> $output_dir/unc.vals    
+##for sample in $samples; do
+##    echo "adding bbb errors for $sample"
+##    echo add_stat_shapes.py $output_dir/$shapes $output_dir/$shapes --normalize --filter $category_name/$sample --prefix $category_name
+##    bbb_added=$(add_stat_shapes.py $output_dir/$shapes $output_dir/$shapes --normalize --filter $category_name/$sample --prefix $category_name | grep _bin_)
+##    echo >> $output_dir/unc.conf
+##    echo >> $output_dir/unc.vals    
+##    for unc in $bbb_added; do
+##	echo $unc shape >> $output_dir/unc.conf
+##	echo $category_name $sample $unc 1.0 >>  $output_dir/unc.vals    
+##    done
+##done
 
 #build datacard
 pushd $output_dir
@@ -70,7 +72,7 @@ pushd 126
 rm -rf $shapes
 ln -s ../$shapes 
 popd
-create-datacard.py -i $shapes -o 126/datacard_et_$category.txt
+create-datacard.py -i $shapes -o 126/datacard_et_$category.txt 126
 popd
 
 exit 0

@@ -18,5 +18,5 @@ export TARGET_LUMI_7TeV=4.9
 
 export MEGAPATH='/scratch/mverzett/data':$hdfs
 
-#check if dev area is up to date
-check_git_updates.sh
+###check if dev area is up to date
+#check_git_updates.sh

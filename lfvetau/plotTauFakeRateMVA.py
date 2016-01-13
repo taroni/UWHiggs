@@ -27,15 +27,15 @@ jobid = os.environ['jobid']
 
 print jobid
 mc_samples = [
-    #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
-    'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'GluGluHToTauTau_M125_13TeV_powheg_pythia8',
     'GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8',
     'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8',
     'VBFHToTauTau_M125_13TeV_powheg_pythia8',
     'VBF_LFV_HToETau_M125_13TeV_powheg_pythia8',
-    #'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
-    'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    #'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'WW_TuneCUETP8M1_13TeV-pythia8',
     'WZ_TuneCUETP8M1_13TeV-pythia8',
     'ZZ_TuneCUETP8M1_13TeV-pythia8',

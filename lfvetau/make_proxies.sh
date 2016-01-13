@@ -6,7 +6,8 @@ source jobid.sh
 
 
 export jobid=$jobid13
-export datasrc=/hdfs/store/user/cepeda/$jobid
+export datasrc=/hdfs/store/user/$USER/$jobid
+#export datasrc=/hdfs/store/user/cepeda/$jobid
 #export datasrc=/hdfs/store/user/ndev/$jobid
 
 if [ -z $1 ]; then

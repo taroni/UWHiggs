@@ -60,7 +60,7 @@ def make_puCorrectorDown(dataset, kind=None):
 
 ##put here the trigger correction as in https://github.com/mverzett/UWHiggs/blob/WH_At_Paper/wh/mcCorrectors.py
 
-correct_e = HetauCorrection.correct_hamburg_e
+#correct_e = HetauCorrection.correct_hamburg_e
 correct_eid13_mva = HetauCorrection.correct_eid13_mva
 correct_eiso13_mva = HetauCorrection.correct_eiso13_mva
 correct_eid13_p1s_mva = HetauCorrection.correct_eid13_p1s_mva
@@ -232,7 +232,7 @@ def make_multiple(fcn, indexed=False, shift=0):
 
 ##put here the trigger correction as in https://github.com/mverzett/UWHiggs/blob/WH_At_Paper/wh/mcCorrectors.py
 
-correct_e             = make_multiple(HetauCorrection.correct_hamburg_e    )
+#correct_e             = make_multiple(HetauCorrection.correct_hamburg_e    )
 correct_eid13_mva     = make_multiple(HetauCorrection.correct_eid13_mva    )
 correct_eid13_p1s_mva = make_multiple(HetauCorrection.correct_eid13_p1s_mva)
 correct_eid13_m1s_mva = make_multiple(HetauCorrection.correct_eid13_m1s_mva)
