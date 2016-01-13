@@ -485,7 +485,6 @@ class AnalyzeLFVMuTauSignal(MegaBase):
         weight=1
         if (not(isData)):
 		weight = row.GenWeight * self.correction(row)
-                print "correction: " + str(self.correction(row))
 #          if (row.GenWeight>=0):
 #            weight=1
 #          else:
@@ -665,6 +664,20 @@ class AnalyzeLFVMuTauSignal(MegaBase):
             return False
         return True
 
+    def noHF(self,row):
+	if abs(row.jet1Eta) >= 2.0
+ 		return False
+        if abs(row.jet2Eta) >= 2.0
+                return False
+        if abs(row.jet3Eta) >= 2.0
+                return False
+        if abs(row.jet4Eta) >= 2.0
+                return False
+        if abs(row.jet5Eta) >= 2.0
+                return False
+        if abs(row.jet6Eta) >= 2.0
+                return False
+
     def gg(self,row):
        if deltaPhi(row.mPhi, row.tPhi) <2.7:
            return False
@@ -696,8 +709,10 @@ class AnalyzeLFVMuTauSignal(MegaBase):
 		return False
 	if row.tMtToPfMet_type1 > 50:
 		return False
-        if row.jetVeto30<2:
-            return False
+        #if row.jetVeto30<2:
+        #    return False
+        if NJ(30,row.jet1Pt,row.jet2Pt,row.jet3Pt,row.jet4Pt,row.jet5Pt,row.jet6Pt) < 2:
+	     return False
 	if(row.vbfNJets<2):
 	    return False
 	if(abs(row.vbfDeta)<3.5):
@@ -833,6 +848,16 @@ class AnalyzeLFVMuTauSignal(MegaBase):
   
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf')
+		if self.NoHF(row):
+		    self.fill_histos(row,'noHFpreselection')
+                    if self.gg(row):
+                        self.fill_histos(row,'noHFgg')
+
+                    elif self.boost(row):
+                        self.fill_histos(row,'noHFboost')
+
+                    elif self.vbf(row):
+                        self.fill_histos(row,'noHFvbf')
             if self.oppositesign(row):
               '''
               if self.obj2_mediso(row):
