@@ -19,7 +19,9 @@ import math
 from math import sqrt, pi
 
 isData = bool('true' in os.environ['isData'])
-#checkZtt = bool('true' in os.environ['checkZtt'])
+checkZtt = bool('true' in os.environ['checkZtt'])
+checkZmm = bool('true' in os.environ['checkZmm'])
+checkZee = bool('true' in os.environ['checkZee'])
 
 
 def deltaPhi(phi1, phi2):
@@ -651,11 +653,22 @@ class AnalyzeLFVMuTauSignal(MegaBase):
             return False
         return True
 
+    def isZmm(self,row):
+        if (checkZmm and not row.isZmumu):
+            return False
+        return True
+
+    def isZee(self,row):
+        if (checkZee and not row.isZee):
+            return False
+        return True
+
+
     def kinematics(self, row):
         #if row.mPt < 30:
         #    return False
         if row.mPt < 25:
-             return False
+            return False
         if abs(row.mEta) >= 2.1:
             return False
         if row.tPt<30 :
@@ -663,20 +676,6 @@ class AnalyzeLFVMuTauSignal(MegaBase):
         if abs(row.tEta)>=2.3 :
             return False
         return True
-
-    def noHF(self,row):
-	if abs(row.jet1Eta) >= 2.0
- 		return False
-        if abs(row.jet2Eta) >= 2.0
-                return False
-        if abs(row.jet3Eta) >= 2.0
-                return False
-        if abs(row.jet4Eta) >= 2.0
-                return False
-        if abs(row.jet5Eta) >= 2.0
-                return False
-        if abs(row.jet6Eta) >= 2.0
-                return False
 
     def gg(self,row):
        if deltaPhi(row.mPhi, row.tPhi) <2.7:
@@ -813,8 +812,12 @@ class AnalyzeLFVMuTauSignal(MegaBase):
 
             if not self.presel(row):
                 continue
-            #if not self.isZtt(row):
-            #    continue
+            if not self.isZtt(row):
+                continue
+            if not self.isZmm(row):
+                continue
+            if not self.isZee(row):
+                continue
             if not self.kinematics(row): 
                 continue
  
@@ -848,16 +851,6 @@ class AnalyzeLFVMuTauSignal(MegaBase):
   
                 elif self.vbf(row):
                     self.fill_histos(row,'vbf')
-		if self.NoHF(row):
-		    self.fill_histos(row,'noHFpreselection')
-                    if self.gg(row):
-                        self.fill_histos(row,'noHFgg')
-
-                    elif self.boost(row):
-                        self.fill_histos(row,'noHFboost')
-
-                    elif self.vbf(row):
-                        self.fill_histos(row,'noHFvbf')
             if self.oppositesign(row):
               '''
               if self.obj2_mediso(row):
