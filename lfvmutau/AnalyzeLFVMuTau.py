@@ -18,9 +18,8 @@ import math
 
 from math import sqrt, pi
 
-isData = bool('true' in os.environ['isData'])
-checkZtt = bool('true' in os.environ['checkZtt'])
-
+data=bool ('true' in os.environ['isRealData'])
+ZTauTau = bool('true' in os.environ['isZTauTau'])
 
 def deltaPhi(phi1, phi2):
   PHI = abs(phi1-phi2)
@@ -79,190 +78,33 @@ def collMass_type1(row):
 
         return mass
 
+
+
 def getFakeRateFactor(row, isoName):
   if (isoName == "old"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.47
-      elif (row.tDecayMode==1):
-        fTauIso = 0.44
-      elif (row.tDecayMode==10):
-        fTauIso = 0.28
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.50
-      elif (row.tDecayMode==1):
-        fTauIso = 0.52
-      elif (row.tDecayMode==10):
-        fTauIso = 0.33
-  if (isoName == "med"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.70
-      elif (row.tDecayMode==1):
-        fTauIso = 0.68
-      elif (row.tDecayMode==10):
-        fTauIso = 0.51
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.71
-      elif (row.tDecayMode==1):
-        fTauIso = 0.74
-      elif (row.tDecayMode==10):
-        fTauIso = 0.56
-  if (isoName == "newTightLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.64
-      elif (row.tDecayMode==1):
-        fTauIso = 0.54
-      elif (row.tDecayMode==10):
-        fTauIso = 0.30
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.60
-      elif (row.tDecayMode==1):
-        fTauIso = 0.49
-      elif (row.tDecayMode==10):
-        fTauIso = 0.36
-  if (isoName == "newVTightLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.50
-      elif (row.tDecayMode==1):
-        fTauIso = 0.43
-      elif (row.tDecayMode==10):
-        fTauIso = 0.17
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.48
-      elif (row.tDecayMode==1):
-        fTauIso = 0.25
-      elif (row.tDecayMode==10):
-        fTauIso = 0.23
-  if (isoName == "newVVTightLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.41
-      elif (row.tDecayMode==1):
-        fTauIso = 0.29
-      elif (row.tDecayMode==10):
-        fTauIso = 0.10
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.30
-      elif (row.tDecayMode==1):
-        fTauIso = 0.15
-      elif (row.tDecayMode==10):
-        fTauIso = 0.16
-  if (isoName == "newTightVLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.47
-      elif (row.tDecayMode==1):
-        fTauIso = 0.38
-      elif (row.tDecayMode==10):
-        fTauIso = 0.13
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.44
-      elif (row.tDecayMode==1):
-        fTauIso = 0.32
-      elif (row.tDecayMode==10):
-        fTauIso = 0.14
-  if (isoName == "newVTightVLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.36
-      elif (row.tDecayMode==1):
-        fTauIso = 0.31
-      elif (row.tDecayMode==10):
-        fTauIso = 0.08
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.35
-      elif (row.tDecayMode==1):
-        fTauIso = 0.17
-      elif (row.tDecayMode==10):
-        fTauIso = 0.09
-  if (isoName == "newVVTightVLoose"):
-    if (row.tEta <= 1.479):
-      if (row.tDecayMode==0):
-        fTauIso = 0.30
-      elif (row.tDecayMode==1):
-        fTauIso = 0.21
-      elif (row.tDecayMode==10):
-        fTauIso = 0.05
-    else:
-      if (row.tDecayMode==0):
-        fTauIso = 0.22
-      elif (row.tDecayMode==1):
-        fTauIso = 0.10
-      elif (row.tDecayMode==10):
-        fTauIso = 0.06
-  '''
-  if (isoName == "old"):
     if (row.tDecayMode==0):
-      fTauIso = 0.48
+      fTauIso = 0.380
     elif (row.tDecayMode==1):
-      fTauIso = 0.46
+      fTauIso = 0.431
     elif (row.tDecayMode==10):
-      fTauIso = 0.30
-  elif (isoName == "newTightLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.63
-    elif (row.tDecayMode==1):
-      fTauIso = 0.53
-    elif (row.tDecayMode==10):
-      fTauIso = 0.31
-  elif (isoName == "newVTightLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.50
-    elif (row.tDecayMode==1):
-      fTauIso = 0.40
-    elif (row.tDecayMode==10):
-      fTauIso = 0.19
-  elif (isoName == "newVVTightLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.39
-    elif (row.tDecayMode==1):
-      fTauIso = 0.26
-    elif (row.tDecayMode==10):
-      fTauIso = 0.12
-  elif (isoName == "newTightVLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.46
-    elif (row.tDecayMode==1):
-      fTauIso = 0.37
-    elif (row.tDecayMode==10):
-      fTauIso = 0.13
-  elif (isoName == "newVTightVLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.36
-    elif (row.tDecayMode==1):
-      fTauIso = 0.28
-    elif (row.tDecayMode==10):
-      fTauIso = 0.08
-  elif (isoName == "newVVTightVLoose"):
-    if (row.tDecayMode==0):
-      fTauIso =0.28
-    elif (row.tDecayMode==1):
-      fTauIso = 0.19
-    elif (row.tDecayMode==10):
-      fTauIso = 0.05
-  elif (isoName =="newDM"):
-    if (row.tDecayMode==0):
-      fTauIso =0.26
-    elif (row.tDecayMode==1):
-      fTauIso =0.16
-    elif (row.tDecayMode==10):
-      fTauIso = 0.03
-    '''
+      fTauIso = 0.304
   fakeRateFactor = fTauIso/(1.0-fTauIso)
   return fakeRateFactor
 ################################################################################
 #### MC-DATA and PU corrections ################################################
 ################################################################################
+
+pu_distributions = glob.glob(os.path.join(
+        'inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
+
+pu_corrector = PileupWeight.PileupWeight('Asympt25ns', *pu_distributions)
+
+def mc_corrector_2015(row):
+	pu = pu_corrector(row.nTruePU)
+        
+        return pu
+
+mc_corrector = mc_corrector_2015
 
 class AnalyzeLFVMuTau(MegaBase):
     tree = 'mt/final/Ntuple'
@@ -277,42 +119,48 @@ class AnalyzeLFVMuTau(MegaBase):
 
     def begin(self):
 
-#        names=["oldisotight","oldisoloose","oldisogg","oldisoboost","oldisovbf", "oldisoloosegg","oldisolooseboost","oldisoloosevbf",
-#              "newisotight","newisoloose","newisogg","newisoboost","newisovbf",  "newisoloosegg","newisolooseboost","newisoloosevbf",
-#              "noisogg","noisoboost","noisovbf",
-#              "noTauID","noiso"]
-        names=["preselection","gg","boost","vbf","preselection_mediso","gg_mediso","boost_mediso","vbf_mediso","preselection_newVVTightiso","gg_newVVTightiso","boost_newVVTightiso","vbf_newVVTightiso","preselection_newVTightiso","gg_newVTightiso","boost_newVTightiso","vbf_newVTightiso","preselection_newTightiso","gg_newTightiso","boost_newTightiso","vbf_newTightiso","antiiso_preselection","antiiso_gg","antiiso_boost","antiiso_vbf","antiiso_preselection_mediso","antiiso_gg_mediso","antiiso_boost_mediso","antiiso_vbf_mediso","antiiso_preselection_newVVTightVLooseiso","antiiso_gg_newVVTightVLooseiso","antiiso_boost_newVVTightVLooseiso","antiiso_vbf_newVVTightVLooseiso","antiiso_preselection_newVTightVLooseiso","antiiso_gg_newVTightVLooseiso","antiiso_boost_newVTightVLooseiso","antiiso_vbf_newVTightVLooseiso","antiiso_preselection_newTightVLooseiso","antiiso_gg_newTightVLooseiso","antiiso_boost_newTightVLooseiso","antiiso_vbf_newTightVLooseiso","antiiso_preselection_newVVTightLooseiso","antiiso_gg_newVVTightLooseiso","antiiso_boost_newVVTightLooseiso","antiiso_vbf_newVVTightLooseiso","antiiso_preselection_newVTightLooseiso","antiiso_gg_newVTightLooseiso","antiiso_boost_newVTightLooseiso","antiiso_vbf_newVTightLooseiso","antiiso_preselection_newTightLooseiso","antiiso_gg_newTightLooseiso","antiiso_boost_newTightLooseiso","antiiso_vbf_newTightLooseiso","sspreselection","ssgg","ssboost","ssvbf","sspreselection_mediso","ssgg_mediso","ssboost_mediso","ssvbf_mediso","sspreselection_newVVTightiso","ssgg_newVVTightiso","ssboost_newVVTightiso","ssvbf_newVVTightiso","sspreselection_newVTightiso","ssgg_newVTightiso","ssboost_newVTightiso","ssvbf_newVTightiso","sspreselection_newTightiso","ssgg_newTightiso","ssboost_newTightiso","ssvbf_newTightiso","antiiso_sspreselection","antiiso_ssgg","antiiso_ssboost","antiiso_ssvbf","antiiso_sspreselection_mediso","antiiso_ssgg_mediso","antiiso_ssboost_mediso","antiiso_ssvbf_mediso","antiiso_sspreselection_newVVTightVLooseiso","antiiso_ssgg_newVVTightVLooseiso","antiiso_ssboost_newVVTightVLooseiso","antiiso_ssvbf_newVVTightVLooseiso","antiiso_sspreselection_newVTightVLooseiso","antiiso_ssgg_newVTightVLooseiso","antiiso_ssboost_newVTightVLooseiso","antiiso_ssvbf_newVTightVLooseiso","antiiso_sspreselection_newTightVLooseiso","antiiso_ssgg_newTightVLooseiso","antiiso_ssboost_newTightVLooseiso","antiiso_ssvbf_newTightVLooseiso","antiiso_sspreselection_newVVTightLooseiso","antiiso_ssgg_newVVTightLooseiso","antiiso_ssboost_newVVTightLooseiso","antiiso_ssvbf_newVVTightLooseiso","antiiso_sspreselection_newVTightLooseiso","antiiso_ssgg_newVTightLooseiso","antiiso_ssboost_newVTightLooseiso","antiiso_ssvbf_newVTightLooseiso","antiiso_sspreselection_newTightLooseiso","antiiso_ssgg_newTightLooseiso","antiiso_ssboost_newTightLooseiso","antiiso_ssvbf_newTightLooseiso"]
+        names=["preselection","preselectionSS", "notIso","notIsoNotWeightedSS","notIsoSS","gg","boost","vbf","ggNotIso","boostNotIso","vbfNotIso","notIsoNotWeighted",
+               "preselection0Jet", "preselection1Jet", "preselection2Jet","notIso0Jet", "notIso1Jet","notIso2Jet"]
         namesize = len(names)
 	for x in range(0,namesize):
 
+
             self.book(names[x], "weight", "Event weight", 100, 0, 5)
             self.book(names[x], "GenWeight", "Gen level weight", 200000 ,-1000000, 1000000)
-            
-            #self.book(names[x], "Event", "Event", 100000001,-0.5,100000000.5)
+            self.book(names[x], "genHTT", "genHTT", 1000 ,0,1000)
+ 
             self.book(names[x], "rho", "Fastjet #rho", 100, 0, 25)
-            self.book(names[x], "nvtx", "Number of vertices", 101, -0.5, 100.5)
+            self.book(names[x], "nvtx", "Number of vertices", 100, -0.5, 100.5)
             self.book(names[x], "prescale", "HLT prescale", 21, -0.5, 20.5)
-   
-            #self.book(names[x], "jet1Pt", "Muon  Pt", 300,0,300)
-            #self.book(names[x], "jet2Pt", "Muon  Pt", 300,0,300)
-            #self.book(names[x], "jet2Eta", "Muon  Pt", 200,-5,5)
-            #self.book(names[x], "jet1Eta", "Muon  Pt", 200,-5,5)
-            #self.book(names[x], "jet1PULoose ", "Muon  Pt", 3,-1,2)
-            #self.book(names[x], "jet2PULoose ", "Muon  Pt", 3,-1,2)
-            #self.book(names[x], "jet1PUMVA ", "Muon  Pt", 100,-1,1)
-            #self.book(names[x], "jet2PUMVA ", "Muon  Pt", 100,-1,1)
-            #self.book(names[x], "jet1PUTight ", "Muon  Pt", 3,-1,2)
-            #self.book(names[x], "jet2PUTight ", "Muon  Pt", 3,-1,2)
 
+   
+            self.book(names[x], "jet1Pt", "", 300,0,300)
+            self.book(names[x], "jet2Pt", "", 300,0,300)
+            self.book(names[x], "jet3Pt", "", 300,0,300)
+            self.book(names[x], "jet4Pt", "", 300,0,300)
+            self.book(names[x], "jet5Pt", "", 300,0,300)
+
+
+            self.book(names[x], "jet1Eta", "", 200,-5,5)
+            self.book(names[x], "jet2Eta", "", 200,-5,5)
+            self.book(names[x], "jet3Eta", "", 200,-5,5)
+            self.book(names[x], "jet4Eta", "", 200,-5,5)
+            self.book(names[x], "jet5Eta", "", 200,-5,5)
+
+            self.book(names[x], "jet1Phi", "", 280,-7,7)
+            self.book(names[x], "jet2Phi", "", 280,-7,7)
+            self.book(names[x], "jet3Phi", "", 280,-7,7)
+            self.book(names[x], "jet4Phi", "", 280,-7,7)
+            self.book(names[x], "jet5Phi", "", 280,-7,7)
  
             self.book(names[x], "mPt", "Muon  Pt", 300,0,300)
             self.book(names[x], "mEta", "Muon  eta", 100, -2.5, 2.5)
-            self.book(names[x], "mMtToPfMet_Ty1", "Muon MT (PF Ty1)", 200, 0, 200)
+            self.book(names[x], "mMtToPfMet_type1", "Muon MT (PF Ty1)", 200, 0, 200)
             self.book(names[x], "mCharge", "Muon Charge", 5, -2, 2)
 
             self.book(names[x], "tPt", "Tau  Pt", 300,0,300)
             self.book(names[x], "tEta", "Tau  eta", 100, -2.5, 2.5)
-            self.book(names[x], "tMtToPfMet_Ty1", "Tau MT (PF Ty1)", 200, 0, 200)
+            self.book(names[x], "tMtToPfMet_type1", "Tau MT (PF Ty1)", 200, 0, 200)
             self.book(names[x], "tCharge", "Tau  Charge", 5, -2, 2)
 	    self.book(names[x], "tJetPt", "Tau Jet Pt" , 500, 0 ,500)	    
             self.book(names[x], "tMass", "Tau  Mass", 1000, 0, 10)
@@ -373,7 +221,10 @@ class AnalyzeLFVMuTau(MegaBase):
 
             self.book(names[x], 'mPixHits', 'Mu 1 pix hits', 10, -0.5, 9.5)
             self.book(names[x], 'mJetBtag', 'Mu 1 JetBtag', 100, -5.5, 9.5)
-    	   
+    	  
+            self.book(names[x],"collMass_type1_1","collMass_type1_1",500,0,500);
+            self.book(names[x],"collMass_type1_2","collMass_type1_2",500,0,500);
+
             self.book(names[x],"collMass_type1","collMass_type1",500,0,500);
             self.book(names[x],"fullMT_type1","fullMT_type1",500,0,500);
             self.book(names[x],"fullPT_type1","fullPT_type1",500,0,500);	    
@@ -385,7 +236,7 @@ class AnalyzeLFVMuTau(MegaBase):
             self.book(names[x], "m_t_DR", "Muon + Tau DR", 100, 0, 10)
             self.book(names[x], "m_t_DPhi", "Muon + Tau DPhi", 100, 0, 4)
             self.book(names[x], "m_t_SS", "Muon + Tau SS", 5, -2, 2)
-            #self.book(names[x], "m_t_ToMETDPhi_Ty1", "Muon Tau DPhi to MET", 100, 0, 4)
+            self.book(names[x], "m_t_ToMETDPhi_Ty1", "Muon Tau DPhi to MET", 100, 0, 4)
     
             # Vetoes
             self.book(names[x], 'muVetoPt5IsoIdVtx', 'Number of extra muons', 5, -0.5, 4.5)
@@ -421,45 +272,52 @@ class AnalyzeLFVMuTau(MegaBase):
             #self.book(names[x], "vbfNJetsPULoose", "g", 5, -0.5, 4.5)
             #self.book(names[x], "vbfNJetsPUTight", "g", 5, -0.5, 4.5)
 
-	     
+    def correction(self,row):
+	return mc_corrector(row)
+	
     def fakeRateMethod(self,row,isoName):
         return getFakeRateFactor(row,isoName)
-     
-    def fill_histos(self, row,name='gg',fakeRate = False, isoName="old"):
+	     
+    def fill_histos(self, row,name='gg', fakeRate=False, isoName="old"):
         histos = self.histograms
         weight=1
-        if (not(isData)):
- 		weight = row.GenWeight
-          #if (row.GenWeight>=0):
-          #  weight=1
-          #else:
-          #  weight=-1
+        if (not(data)):
+	   weight = row.GenWeight * self.correction(row) #apply gen and pu reweighting to MC
         if (fakeRate == True):
-          weight=weight*self.fakeRateMethod(row,isoName)
+          weight=weight*self.fakeRateMethod(row,isoName) #apply fakerate method for given isolation definition
+
+
         histos[name+'/weight'].Fill(weight)
         histos[name+'/GenWeight'].Fill(row.GenWeight)
-        #histos[name+'/Event'].Fill(row.evt,weight)
+        histos[name+'/genHTT'].Fill(row.genHTT)
         histos[name+'/rho'].Fill(row.rho, weight)
         histos[name+'/nvtx'].Fill(row.nvtx, weight)
         histos[name+'/prescale'].Fill(row.doubleMuPrescale, weight)
-        #histos[name+'/jet1Pt'].Fill(row.jet1Pt, weight)
-        #histos[name+'/jet2Pt'].Fill(row.jet2Pt, weight)
-        #histos[name+'/jet2Eta'].Fill(row.jet2Eta, weight)
-        #histos[name+'/jet1Eta'].Fill(row.jet1Eta, weight)
-        #histos[name+'/jet1PULoose '].Fill(row.jet1PULoose , weight)
-        #histos[name+'/jet2PULoose '].Fill(row.jet2PULoose , weight)
-        #histos[name+'/jet1PUTight '].Fill(row.jet1PUTight , weight)
-        #histos[name+'/jet2PUTight '].Fill(row.jet2PUTight , weight)
-        #histos[name+'/jet1PUMVA '].Fill(row.jet1PUMVA , weight)
-        #histos[name+'/jet2PUMVA '].Fill(row.jet2PUMVA , weight)
+
+
+        histos[name+'/jet1Pt'].Fill(row.jet1Pt, weight)
+        histos[name+'/jet2Pt'].Fill(row.jet2Pt, weight)
+        histos[name+'/jet3Pt'].Fill(row.jet3Pt, weight)
+        histos[name+'/jet4Pt'].Fill(row.jet4Pt, weight)
+        histos[name+'/jet5Pt'].Fill(row.jet5Pt, weight)
+        histos[name+'/jet1Eta'].Fill(row.jet1Eta, weight)
+        histos[name+'/jet2Eta'].Fill(row.jet2Eta, weight)
+        histos[name+'/jet3Eta'].Fill(row.jet3Eta, weight)
+        histos[name+'/jet4Eta'].Fill(row.jet4Eta, weight)
+        histos[name+'/jet5Eta'].Fill(row.jet5Eta, weight)
+        histos[name+'/jet1Phi'].Fill(row.jet1Phi, weight)
+        histos[name+'/jet2Phi'].Fill(row.jet2Phi, weight)
+        histos[name+'/jet3Phi'].Fill(row.jet3Phi, weight)
+        histos[name+'/jet4Phi'].Fill(row.jet4Phi, weight)
+        histos[name+'/jet5Phi'].Fill(row.jet5Phi, weight)
 
         histos[name+'/mPt'].Fill(row.mPt, weight)
         histos[name+'/mEta'].Fill(row.mEta, weight)
-        histos[name+'/mMtToPfMet_Ty1'].Fill(row.mMtToPfMet_type1,weight)
+        histos[name+'/mMtToPfMet_type1'].Fill(row.mMtToPfMet_type1,weight)
         histos[name+'/mCharge'].Fill(row.mCharge, weight)
         histos[name+'/tPt'].Fill(row.tPt, weight)
         histos[name+'/tEta'].Fill(row.tEta, weight)
-        histos[name+'/tMtToPfMet_Ty1'].Fill(row.tMtToPfMet_type1,weight)
+        histos[name+'/tMtToPfMet_type1'].Fill(row.tMtToPfMet_type1,weight)
         histos[name+'/tCharge'].Fill(row.tCharge, weight)
 	histos[name+'/tJetPt'].Fill(row.tJetPt, weight)
 
@@ -519,6 +377,9 @@ class AnalyzeLFVMuTau(MegaBase):
 
 	histos[name+'/LT'].Fill(row.LT,weight)
 
+        histos[name+'/collMass_type1_1'].Fill(row.m_t_collinearmass,weight)
+        histos[name+'/collMass_type1_2'].Fill(row.t_m_collinearmass,weight)
+
         histos[name+'/collMass_type1'].Fill(collMass_type1(row),weight)
         histos[name+'/fullMT_type1'].Fill(fullMT(row.type1_pfMetEt,row.mPt,row.tPt,row.type1_pfMetPhi, row.mPhi, row.tPhi),weight)
         histos[name+'/fullPT_type1'].Fill(fullPT(row.type1_pfMetEt,row.mPt,row.tPt,row.type1_pfMetPhi, row.mPhi, row.tPhi),weight) 
@@ -530,7 +391,7 @@ class AnalyzeLFVMuTau(MegaBase):
         histos[name+'/m_t_DR'].Fill(row.m_t_DR,weight)
         histos[name+'/m_t_DPhi'].Fill(row.m_t_DPhi,weight)
         histos[name+'/m_t_SS'].Fill(row.m_t_SS,weight)
-	#histos[name+'/m_t_ToMETDPhi_Ty1'].Fill(row.m_t_ToMETDPhi_type1,weight)
+	histos[name+'/m_t_ToMETDPhi_Ty1'].Fill(row.m_t_ToMETDPhi_Ty1,weight)
 
         histos[name+'/mPixHits'].Fill(row.mPixHits, weight)
         histos[name+'/mJetBtag'].Fill(row.mJetBtag, weight)
@@ -568,41 +429,38 @@ class AnalyzeLFVMuTau(MegaBase):
 
 
 
-
     def presel(self, row):
         if not row.singleIsoMu20Pass:
             return False
         return True
 
-    def isZtt(self,row):
-        if (checkZtt and not row.isZtautau):
+    def selectZtt(self,row):
+        if (ZTauTau and not row.isZtautau):
+            return False
+        if (not ZTauTau and row.isZtautau):
             return False
         return True
 
     def kinematics(self, row):
-        #if row.mPt < 30:
-        #    return False
-        if row.mPt < 25:
-             return False
+        if row.mPt < 30:
+            return False
         if abs(row.mEta) >= 2.1:
             return False
-        if row.tPt<20 :
+        if row.tPt<30 :
             return False
         if abs(row.tEta)>=2.5 :
             return False
         return True
 
     def gg(self,row):
-    #   if row.mPt < 50:
-    #       return False
-    #   if deltaPhi(row.mPhi, row.tPhi) <2.7:
-    #       return False
-    #   if row.mPt < 45:
-    #       return False
-    #   if row.tPt < 35:
-    #       return False
-    #   if row.tMtToPfMet_type1 > 50:
-    #       return False
+       if row.mPt < 45:    
+           return False
+       if deltaPhi(row.mPhi, row.tPhi) <2.7:
+           return False
+       if row.tPt < 35:
+           return False
+       if row.tMtToPfMet_type1 > 50:
+           return False
        if row.jetVeto30!=0:
            return False
        return True
@@ -610,23 +468,27 @@ class AnalyzeLFVMuTau(MegaBase):
     def boost(self,row):
           if row.jetVeto30!=1:
             return False
-        #  if row.mPt < 35:
-        #        return False
-        #  if row.tPt < 40:
-        #        return False
-        #  if row.tMtToPfMet_type1 > 35:
-        #        return False
+          if row.mPt < 35:
+                return False
+          if row.tPt < 40:
+                return False
+          if row.tMtToPfMet_type1 > 50:
+                return False
           return True
 
     def vbf(self,row):
+        if row.tPt < 40:
+                return False
+        if row.tMtToPfMet_type1 > 50:
+                return False
         if row.jetVeto30<2:
             return False
 	if(row.vbfNJets<2):
 	    return False
-#	if(abs(row.vbfDeta)<3.5):
-#	    return False
- #       if row.vbfMass < 600:
-#	    return False
+	if(abs(row.vbfDeta)<3.5):
+	    return False
+        if row.vbfMass < 550:
+	    return False
         if row.vbfJetVeto30 > 0:
             return False
         return True
@@ -663,44 +525,12 @@ class AnalyzeLFVMuTau(MegaBase):
     def obj1_antiiso(self, row):
         return bool(row.mRelPFIsoDBDefault >0.2) 
 
-
-    def obj2_antiiso(self,row):
-        return ( not(row.tByTightCombinedIsolationDeltaBetaCorr3Hits) and row.tByLooseCombinedIsolationDeltaBetaCorr3Hits)
-    def obj2_antimediso(self,row):
-        return ( not(row.tByMediumCombinedIsolationDeltaBetaCorr3Hits) and row.tByLooseCombinedIsolationDeltaBetaCorr3Hits)
-    def obj2_antinewVVTightVLooseiso(self,row):
-        return ( not(row.tByVVTightIsolationMVA3oldDMwLT) and row.tByVLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewVTightVLooseiso(self,row):
-        return ( not(row.tByVTightIsolationMVA3oldDMwLT) and row.tByVLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewTightVLooseiso(self,row):
-        return ( not(row.tByTightIsolationMVA3oldDMwLT) and row.tByVLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewVVTightLooseiso(self,row):
-        return ( not(row.tByVVTightIsolationMVA3oldDMwLT) and row.tByLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewVTightLooseiso(self,row):
-        return ( not(row.tByVTightIsolationMVA3oldDMwLT) and row.tByLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewTightLooseiso(self,row):
-        return ( not(row.tByTightIsolationMVA3oldDMwLT) and row.tByLooseIsolationMVA3oldDMwLT)
-    def obj2_antinewisonewdm(self,row):
-        return ( not(row.tByVVTightIsolationMVA3newDMwLT) and row.tByVLooseIsolationMVA3newDMwLT)
-    
-
     def obj2_looseiso(self, row):
         return row.tByLooseCombinedIsolationDeltaBetaCorr3Hits
 
-    def obj2_newTightiso(self, row):
-        return row.tByTightIsolationMVA3oldDMwLT
-    def obj2_newVTightiso(self, row):
-        return row.tByVTightIsolationMVA3oldDMwLT
-    def obj2_newVVTightiso(self, row):
-        return row.tByVVTightIsolationMVA3oldDMwLT
-    def obj2_newlooseiso(self,row):
-        return row.tByLooseIsolationMVA3oldDMwLT
-    def obj2_newVlooseiso(self,row):
-        return row.tByVLooseIsolationMVA3oldDMwLT
-    def obj2_newisonewdm(self, row):
-        return row.tByVVTightIsolationMVA3newDMwLT
-    def obj2_newlooseisonewdm(self,row):
-        return row.tByVLooseIsolationMVA3newDMwLT
+
+    def obj2_newiso(self, row):
+        return row.tByVVTightIsolationMVA3oldDMwoLT 
 
     #def obj2_newlooseiso(self, row):
     #    return  row.tByLooseIsolationMVA3oldDMwoLT
@@ -710,19 +540,16 @@ class AnalyzeLFVMuTau(MegaBase):
         event =0
         sel=False
         for row in self.tree:
-            #print "event: " + str(row.evt)
             if event!=row.evt:   # This is just to ensure we get the (Mu,Tau) with the highest Pt
                 event=row.evt    # In principle the code saves all the MU+Tau posibilities, if an event has several combinations
                 sel = False      # it will save them all.
-            #    print "setting sel to false"
             if sel==True:
-                #print "sel equals true"
                 continue
 
             if not self.presel(row):
                 continue
-            #if not self.isZtt(row):
-            #    continue
+            if not self.selectZtt(row):
+                continue
             if not self.kinematics(row): 
                 continue
  
@@ -740,355 +567,57 @@ class AnalyzeLFVMuTau(MegaBase):
             if not self.obj2_id (row):
                 continue
 
+            if not self.obj2_looseiso(row):
+                continue
+
             #self.fill_histos(row,'noiso')
 
-            #if not self.obj2_iso(row):
-            #    continue
-            #self.fill_histos(row,'preselection')
-#              self.fill_histos(row,'oldisotight')a
-            if self.oppositesign(row):
-              if self.obj2_iso(row):
-                self.fill_histos(row,'preselection')
-                if self.gg(row):
-                    self.fill_histos(row,'gg')
-  
-                elif self.boost(row):
-                    self.fill_histos(row,'boost')
-  
-                elif self.vbf(row):
-                    self.fill_histos(row,'vbf')
-            if self.oppositesign(row):
-              if self.obj2_mediso(row):
-                self.fill_histos(row,'preselection_mediso')
-                if self.gg(row):
-                    self.fill_histos(row,'gg_mediso')
+            if self.obj2_iso(row) and not self.oppositesign(row):
+              self.fill_histos(row,'preselectionSS',False)
 
-                elif self.boost(row):
-                    self.fill_histos(row,'boost_mediso')
+            if not self.obj2_iso(row) and not self.oppositesign(row):
+              self.fill_histos(row,'notIsoSS',True)
+              self.fill_histos(row,'notIsoNotWeightedSS',False)
 
-                elif self.vbf(row):
-                    self.fill_histos(row,'vbf_mediso')
-              if self.obj2_newTightiso(row):
-                self.fill_histos(row,'preselection_newTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'gg_newTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'boost_newTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'vbf_newTightiso')
-              if self.obj2_newVTightiso(row):
-                self.fill_histos(row,'preselection_newVTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'gg_newVTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'boost_newVTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'vbf_newVTightiso')
-              if self.obj2_newVVTightiso(row):
-                self.fill_histos(row,'preselection_newVVTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'gg_newVVTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'boost_newVVTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'vbf_newVVTightiso')
-#              if self.obj2_newisonewdm(row):
-#                self.fill_histos(row,'preselection_newiso_newdm')
-#                if self.gg(row):
-#                    self.fill_histos(row,'gg_newiso_newdm')
-# 
-#                elif self.boost(row):
-#                    self.fill_histos(row,'boost_newiso_newdm')
-# 
-#                elif self.vbf(row):
-#                    self.fill_histos(row,'vbf_newiso_newdm')
-              if self.obj2_antiiso(row):
-                self.fill_histos(row,'antiiso_preselection', True,'old')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg', True,'old')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost', True,'old')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf', True,'old')
-              if self.obj2_antimediso(row):
-                self.fill_histos(row,'antiiso_preselection_mediso', True,'med')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_mediso', True,'med')
+            if self.obj2_iso(row) and self.oppositesign(row):  
 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_mediso', True,'med')
+              self.fill_histos(row,'preselection',False)
+              if row.jetVeto30==0:
+                self.fill_histos(row,'preselection0Jet',False)
+              if row.jetVeto30==1:
+                self.fill_histos(row,'preselection1Jet',False)
+              if row.jetVeto30==2:
+                self.fill_histos(row,'preselection2Jet',False)
 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_mediso', True,'med')
+              if self.gg(row):
+                  self.fill_histos(row,'gg',False)
 
-              if self.obj2_antinewVVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVVTightVLooseiso', True,'newVVTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newVVTightVLooseiso', True,'newVVTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newVVTightVLooseiso', True,'newVVTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newVVTightVLooseiso', True,'newVVTightVLoose')
-              if self.obj2_antinewVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVTightVLooseiso', True,'newVTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newVTightVLooseiso', True,'newVTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newVTightVLooseiso', True,'newVTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newVTightVLooseiso', True,'newVTightVLoose')
-              if self.obj2_antinewTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newTightVLooseiso', True,'newTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newTightVLooseiso', True,'newTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newTightVLooseiso', True,'newTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newTightVLooseiso', True,'newTightVLoose')
-              if self.obj2_antinewVVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVVTightLooseiso', True,'newVVTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newVVTightLooseiso', True,'newVVTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newVVTightLooseiso', True,'newVVTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newVVTightLooseiso', True,'newVVTightLoose')
-              if self.obj2_antinewVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newVTightLooseiso', True,'newVTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newVTightLooseiso', True,'newVTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newVTightLooseiso', True,'newVTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newVTightLooseiso', True,'newVTightLoose')
-              if self.obj2_antinewTightLooseiso(row):
-                self.fill_histos(row,'antiiso_preselection_newTightLooseiso', True,'newTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_gg_newTightLooseiso', True,'newTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_boost_newTightLooseiso', True,'newTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_vbf_newTightLooseiso', True,'newTightLoose')
-#              if self.obj2_antinewisonewdm(row):
-#                self.fill_histos(row,'antiiso_preselection_newiso_newdm', True,'newDM')
-#                if self.gg(row):
-#                    self.fill_histos(row,'antiiso_gg_newiso_newdm', True,'newDM')
-# 
-#                elif self.boost(row):
-#                    self.fill_histos(row,'antiiso_boost_newiso_newdm', True,'newDM')
-# 
-#                elif self.vbf(row):
-#                    self.fill_histos(row,'antiiso_vbf_newiso_newdm', True,'newDM')
-            elif not self.oppositesign(row):
-              if self.obj2_iso(row):
-                self.fill_histos(row,'sspreselection')
-                if self.gg(row):
-                    self.fill_histos(row,'ssgg')
-  
-                elif self.boost(row):
-                    self.fill_histos(row,'ssboost')
-  
-                elif self.vbf(row):
-                    self.fill_histos(row,'ssvbf')
-              if self.obj2_mediso(row):
-                self.fill_histos(row,'sspreselection_mediso')
-                if self.gg(row):
-                    self.fill_histos(row,'ssgg_mediso')
+              if self.boost(row):
+                  self.fill_histos(row,'boost',False)
 
-                elif self.boost(row):
-                    self.fill_histos(row,'ssboost_mediso')
+              if self.vbf(row):
+                  self.fill_histos(row,'vbf',False)
 
-                elif self.vbf(row):
-                    self.fill_histos(row,'ssvbf_mediso')
-              if self.obj2_newTightiso(row):
-                self.fill_histos(row,'sspreselection_newTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'ssgg_newTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'ssboost_newTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'ssvbf_newTightiso')
-              if self.obj2_newVTightiso(row):
-                self.fill_histos(row,'sspreselection_newVTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'ssgg_newVTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'ssboost_newVTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'ssvbf_newVTightiso')
-              if self.obj2_newVVTightiso(row):
-                self.fill_histos(row,'sspreselection_newVVTightiso')
-                if self.gg(row):
-                    self.fill_histos(row,'ssgg_newVVTightiso')
-                elif self.boost(row):
-                    self.fill_histos(row,'ssboost_newVVTightiso')
-                elif self.vbf(row):
-                    self.fill_histos(row,'ssvbf_newVVTightiso')
-#              if self.obj2_newisonewdm(row):
-#                self.fill_histos(row,'sspreselection_newiso_newdm')
-#                if self.gg(row):
-#                    self.fill_histos(row,'ssgg_newiso_newdm')
-# 
-#                elif self.boost(row):
-#                    self.fill_histos(row,'ssboost_newiso_newdm')
-# 
-#                elif self.vbf(row):
-#                    self.fill_histos(row,'ssvbf_newiso_newdm')
-              if self.obj2_antiiso(row):
-                self.fill_histos(row,'antiiso_sspreselection', True,'old')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg', True,'old')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost', True,'old')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf', True,'old')
-              if self.obj2_antimediso(row):
-                self.fill_histos(row,'antiiso_sspreselection_mediso', True,'med')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_mediso', True,'med')
+            if not self.obj2_iso(row) and self.oppositesign(row):
+              self.fill_histos(row,'notIso',True)
+              self.fill_histos(row,'notIsoNotWeighted',False)
 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_mediso', True,'med')
+              if row.jetVeto30==0:
+                self.fill_histos(row,'notIso0Jet',True)
+              if row.jetVeto30==1:
+                self.fill_histos(row,'notIso1Jet',True)
+              if row.jetVeto30==2:
+                self.fill_histos(row,'notIso2Jet',True)
 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_mediso', True,'med')
-              if self.obj2_antinewVVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVVTightVLooseiso', True,'newVVTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newVVTightVLooseiso', True,'newVVTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newVVTightVLooseiso', True,'newVVTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newVVTightVLooseiso', True,'newVVTightVLoose')
-              if self.obj2_antinewVTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVTightVLooseiso', True,'newVTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newVTightVLooseiso', True,'newVTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newVTightVLooseiso', True,'newVTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newVTightVLooseiso', True,'newVTightVLoose')
-              if self.obj2_antinewTightVLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newTightVLooseiso', True,'newTightVLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newTightVLooseiso', True,'newTightVLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newTightVLooseiso', True,'newTightVLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newTightVLooseiso', True,'newTightVLoose')
-              if self.obj2_antinewVVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVVTightLooseiso', True,'newVVTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newVVTightLooseiso', True,'newVVTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newVVTightLooseiso', True,'newVVTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newVVTightLooseiso', True,'newVVTightLoose')
-              if self.obj2_antinewVTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newVTightLooseiso', True,'newVTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newVTightLooseiso', True,'newVTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newVTightLooseiso', True,'newVTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newVTightLooseiso', True,'newVTightLoose')
-              if self.obj2_antinewTightLooseiso(row):
-                self.fill_histos(row,'antiiso_sspreselection_newTightLooseiso', True,'newTightLoose')
-                if self.gg(row):
-                    self.fill_histos(row,'antiiso_ssgg_newTightLooseiso', True,'newTightLoose')
- 
-                elif self.boost(row):
-                    self.fill_histos(row,'antiiso_ssboost_newTightLooseiso', True,'newTightLoose')
- 
-                elif self.vbf(row):
-                    self.fill_histos(row,'antiiso_ssvbf_newTightLooseiso', True,'newTightLoose')
-#              if self.obj2_antinewisonewdm(row):
-#                self.fill_histos(row,'antiiso_sspreselection_newiso_newdm', True,'newDM')
-#                if self.gg(row):
-#                    self.fill_histos(row,'antiiso_ssgg_newiso_newdm', True,'newDM')
-# 
-#                elif self.boost(row):
-#                    self.fill_histos(row,'antiiso_ssboost_newiso_newdm', True,'newDM')
-# 
-#                elif self.vbf(row):
-#                    self.fill_histos(row,'antiiso_ssvbf_newiso_newdm', True,'newDM')
-# 
-#            elif self.obj2_looseiso(row):
-#
-#              self.fill_histos(row,'oldisoloose')
-#
-#              if self.gg(row):
-#                  self.fill_histos(row,'oldisoloosegg')
-#
-#              if self.boost(row):
-#                  self.fill_histos(row,'oldisolooseboost')
-#
-#              if self.vbf(row):
-#                  self.fill_histos(row,'oldisoloosevbf')
-#
-#
-#            if self.obj2_newiso(row):
-#
-#              self.fill_histos(row,'newisotight')
-#
-#              if self.gg(row):
-#                  self.fill_histos(row,'newisogg')
-#
-#              if self.boost(row):
-#                  self.fill_histos(row,'newisoboost')
-#
-#              if self.vbf(row):
-#                  self.fill_histos(row,'newisovbf')
-#
-#            elif self.obj2_newlooseiso(row):
-#              
-#              self.fill_histos(row,'newisoloose')
-#
-#              if self.gg(row):
-#                  self.fill_histos(row,'newisoloosegg')
-#
-#              if self.boost(row):
-#                  self.fill_histos(row,'newisolooseboost')
-#
-#              if self.vbf(row):
-#                  self.fill_histos(row,'newisoloosevbf')
-#
-#
-#            if self.gg(row):
-#                self.fill_histos(row,'noisogg')
-#
-#            if self.boost(row):
-#                self.fill_histos(row,'noisoboost')
-#
-#            if self.vbf(row):
-#                self.fill_histos(row,'noisovbf')
-#
+              if self.gg(row):
+                  self.fill_histos(row,'ggNotIso',True)
+
+              if self.boost(row):
+                  self.fill_histos(row,'boostNotIso',True)
+
+              if self.vbf(row):
+                  self.fill_histos(row,'vbfNotIso',True)
+
 
             sel=True
 
