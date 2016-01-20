@@ -20,6 +20,7 @@ from math import sqrt, pi
 
 data=bool ('true' in os.environ['isRealData'])
 ZTauTau = bool('true' in os.environ['isZTauTau'])
+systematic = os.environ['systematic']
 
 def deltaPhi(phi1, phi2):
   PHI = abs(phi1-phi2)
@@ -28,9 +29,11 @@ def deltaPhi(phi1, phi2):
   else:
       return 2*pi-PHI
 
-def fullMT(met,mupt,taupt, metphi, muphi, tauphi):
+def fullMT(mupt,taupt , muphi, tauphi, row, sys='none'):
 	mux=mupt*math.cos(muphi)
 	muy=mupt*math.sin(muphi)
+        met = getpfMetEt(row,sys)
+        metphi = getpfMetPhi(row,sys)
         metx=met*math.cos(metphi)
         mety=met*math.sin(metphi)
         taux=taupt*math.cos(tauphi)
@@ -44,7 +47,9 @@ def fullMT(met,mupt,taupt, metphi, muphi, tauphi):
 		full_mt= math.sqrt(full_mt_2)
 	return full_mt
 
-def fullPT(met,mupt,taupt, metphi, muphi, tauphi):
+def fullPT(mupt,taupt, muphi, tauphi, row, sys='none'):
+        met = getpfMetEt(row,sys)
+        metphi = getpfMetPhi(row,sys)
         mux=mupt*math.cos(muphi)
         muy=mupt*math.sin(muphi)
         metx=met*math.cos(metphi)
@@ -59,11 +64,13 @@ def fullPT(met,mupt,taupt, metphi, muphi, tauphi):
                 full_pt= math.sqrt(full_pt_2)
         return full_pt
 
-def collMass_type1(row):
+def collMass_type1(row,sys='none'):
         taupx=row.tPt*math.cos(row.tPhi)
         taupy=row.tPt*math.sin(row.tPhi)
-        metpx = row.type1_pfMetEt*math.cos(row.type1_pfMetPhi)
-        metpy = row.type1_pfMetEt*math.sin(row.type1_pfMetPhi)
+	metE = getpfMetEt(row,sys)
+	metPhi = getpfMetPhi(row,sys)
+        metpx = metE*math.cos(metPhi)
+        metpy = metE*math.sin(metPhi)
         met = sqrt(metpx*metpx+metpy*metpy)
 
         METproj= abs(metpx*taupx+metpy*taupy)/row.tPt
@@ -78,6 +85,119 @@ def collMass_type1(row):
 
         return mass
 
+
+def getmMtToPfMet(row,sys='none'):
+	if (sys=='none'):
+		return row.mMtToPfMet_type1
+        elif (sys=='jesdown'):
+		return row.mMtToPfMet_JetEnDown
+	elif (sys=='jesup'):
+		return row.mMtToPfMet_JetEnUp
+	elif (sys=='uesdown'):
+		return row.mMtToPfMet_UnclusteredEnDown
+	elif (sys=='uesup'):
+		return row.mMtToPfMet_UnclusteredEnUp
+
+def gettMtToPfMet(row,sys='none'):
+        if (sys=='none'):
+                return row.tMtToPfMet_type1
+        elif (sys=='jesdown'):
+                return row.tMtToPfMet_JetEnDown
+        elif (sys=='jesup'):
+                return row.tMtToPfMet_JetEnUp
+        elif (sys=='uesdown'):
+                return row.tMtToPfMet_UnclusteredEnDown
+        elif (sys=='uesup'):
+                return row.tMtToPfMet_UnclusteredEnUp
+
+def getmtcollMass(row,sys='none'):
+        if (sys=='none'):
+                return row.m_t_collinearmass
+        elif (sys=='jesdown'):
+                return row.m_t_collinearmass_JetEnDown
+        elif (sys=='jesup'):
+                return row.m_t_collinearmass_JetEnUp
+        elif (sys=='uesdown'):
+                return row.m_t_collinearmass_UnclusteredEnDown
+        elif (sys=='uesup'):
+                return row.m_t_collinearmass_UnclusteredEnUp
+
+def gettmcollMass(row,sys='none'):
+        if (sys=='none'):
+                return row.t_m_collinearmass
+        elif (sys=='jesdown'):
+                return row.t_m_collinearmass_JetEnDown
+        elif (sys=='jesup'):
+                return row.t_m_collinearmass_JetEnUp
+        elif (sys=='uesdown'):
+                return row.t_m_collinearmass_UnclusteredEnDown
+        elif (sys=='uesup'):
+                return row.t_m_collinearmass_UnclusteredEnUp
+
+def getpfMetEt(row,sys='none'):
+        if (sys=='none'):
+                return row.type1_pfMetEt
+        elif (sys=='jesdown'):
+                return row.type1_pfMet_shiftedPt_JetEnDown
+        elif (sys=='jesup'):
+                return row.type1_pfMet_shiftedPt_JetEnUp
+        elif (sys=='uesdown'):
+                return row.type1_pfMet_shiftedPt_UnclusteredEnDown
+        elif (sys=='uesup'):
+                return row.type1_pfMet_shiftedPt_UnclusteredEnUp
+
+def getpfMetPhi(row,sys='none'):
+        if (sys=='none'):
+                return row.type1_pfMetPhi
+        elif (sys=='jesdown'):
+                return row.type1_pfMet_shiftedPhi_JetEnDown
+        elif (sys=='jesup'):
+                return row.type1_pfMet_shiftedPhi_JetEnUp
+        elif (sys=='uesdown'):
+                return row.type1_pfMet_shiftedPhi_UnclusteredEnDown
+        elif (sys=='uesup'):
+                return row.type1_pfMet_shiftedPhi_UnclusteredEnUp
+
+
+def getjetVeto30(row,sys='none'):
+	if (sys=='none' or sys=='uesdown' or sys=='uesup'):
+		return row.jetVeto30
+	elif (sys=='jesdown'):
+		return row.jetVeto30_JetEnDown
+	elif (sys=='jesup'):
+		return row.jetVeto30_JetEnUp
+
+def getvbfNJets(row,sys='none'):
+	if (sys=='none' or sys == 'uesdown' or sys == 'uesup'):
+		return row.vbfNJets
+        elif (sys=='jesdown'):
+                return row.vbfNJets_JetEnDown
+        elif (sys=='jesup'):
+                return row.vbfNJets_JetEnUp
+
+def getvbfDeta(row,sys='none'):
+        if (sys=='none' or sys == 'uesdown' or sys == 'uesup'):
+                return row.vbfDeta
+        elif (sys=='jesdown'):
+                return row.vbfDeta_JetEnDown
+        elif (sys=='jesup'):
+                return row.vbfDeta_JetEnUp
+
+def getvbfMass(row,sys='none'):
+        if (sys=='none' or sys == 'uesdown' or sys == 'uesup'):
+                return row.vbfMass
+        elif (sys=='jesdown'):
+                return row.vbfMass_JetEnDown
+        elif (sys=='jesup'):
+                return row.vbfMass_JetEnUp
+
+def getvbfJetVeto30(row,sys='none'):
+        if (sys=='none' or sys == 'uesdown' or sys == 'uesup'):
+                return row.vbfJetVeto30
+        elif (sys=='jesdown'):
+                return row.vbfJetVeto30_JetEnDown
+        elif (sys=='jesup'):
+                return row.vbfJetVeto30_JetEnUp
 
 
 def getFakeRateFactor(row, isoName):
@@ -313,11 +433,11 @@ class AnalyzeLFVMuTau(MegaBase):
 
         histos[name+'/mPt'].Fill(row.mPt, weight)
         histos[name+'/mEta'].Fill(row.mEta, weight)
-        histos[name+'/mMtToPfMet_type1'].Fill(row.mMtToPfMet_type1,weight)
+        histos[name+'/mMtToPfMet_type1'].Fill(getmMtToPfMet(row,systematic),weight)
         histos[name+'/mCharge'].Fill(row.mCharge, weight)
         histos[name+'/tPt'].Fill(row.tPt, weight)
         histos[name+'/tEta'].Fill(row.tEta, weight)
-        histos[name+'/tMtToPfMet_type1'].Fill(row.tMtToPfMet_type1,weight)
+        histos[name+'/tMtToPfMet_type1'].Fill(gettMtToPfMet(row),weight)
         histos[name+'/tCharge'].Fill(row.tCharge, weight)
 	histos[name+'/tJetPt'].Fill(row.tJetPt, weight)
 
@@ -377,21 +497,21 @@ class AnalyzeLFVMuTau(MegaBase):
 
 	histos[name+'/LT'].Fill(row.LT,weight)
 
-        histos[name+'/collMass_type1_1'].Fill(row.m_t_collinearmass,weight)
-        histos[name+'/collMass_type1_2'].Fill(row.t_m_collinearmass,weight)
+        histos[name+'/collMass_type1_1'].Fill(getmtcollMass(row,systematic),weight)
+        histos[name+'/collMass_type1_2'].Fill(gettmcollMass(row,systematic),weight)
 
-        histos[name+'/collMass_type1'].Fill(collMass_type1(row),weight)
-        histos[name+'/fullMT_type1'].Fill(fullMT(row.type1_pfMetEt,row.mPt,row.tPt,row.type1_pfMetPhi, row.mPhi, row.tPhi),weight)
-        histos[name+'/fullPT_type1'].Fill(fullPT(row.type1_pfMetEt,row.mPt,row.tPt,row.type1_pfMetPhi, row.mPhi, row.tPhi),weight) 
+        histos[name+'/collMass_type1'].Fill(collMass_type1(row, systematic),weight)
+        histos[name+'/fullMT_type1'].Fill(fullMT(row.mPt,row.tPt, row.mPhi, row.tPhi, row, systematic),weight)
+        histos[name+'/fullPT_type1'].Fill(fullPT(row.mPt,row.tPt, row.mPhi, row.tPhi, row, systematic),weight) 
 
-	histos[name+'/type1_pfMetEt'].Fill(row.type1_pfMetEt,weight)
+	histos[name+'/type1_pfMetEt'].Fill(getpfMetEt(row,systematic),weight)
 
         histos[name+'/m_t_Mass'].Fill(row.m_t_Mass,weight)
         histos[name+'/m_t_Pt'].Fill(row.m_t_Pt,weight)
         histos[name+'/m_t_DR'].Fill(row.m_t_DR,weight)
         histos[name+'/m_t_DPhi'].Fill(row.m_t_DPhi,weight)
         histos[name+'/m_t_SS'].Fill(row.m_t_SS,weight)
-	histos[name+'/m_t_ToMETDPhi_Ty1'].Fill(row.m_t_ToMETDPhi_Ty1,weight)
+	#histos[name+'/m_t_ToMETDPhi_Ty1'].Fill(row.m_t_ToMETDPhi_Ty1,weight)
 
         histos[name+'/mPixHits'].Fill(row.mPixHits, weight)
         histos[name+'/mJetBtag'].Fill(row.mJetBtag, weight)
@@ -400,29 +520,29 @@ class AnalyzeLFVMuTau(MegaBase):
         histos[name+'/muVetoPt15IsoIdVtx'].Fill(row.muVetoPt15IsoIdVtx, weight)
         histos[name+'/tauVetoPt20Loose3HitsVtx'].Fill(row.tauVetoPt20Loose3HitsVtx, weight)
         histos[name+'/eVetoMVAIso'].Fill(row.eVetoMVAIso, weight)
-        histos[name+'/jetVeto30'].Fill(row.jetVeto30, weight)
+        histos[name+'/jetVeto30'].Fill(getjetVeto30(row,systematic), weight)
         #histos[name+'/jetVeto30PUCleanedLoose'].Fill(row.jetVeto30PUCleanedLoose, weight)
         #histos[name+'/jetVeto30PUCleanedTight'].Fill(row.jetVeto30PUCleanedTight, weight)
 
 	histos[name+'/mRelPFIsoDBDefault'].Fill(row.mRelPFIsoDBDefault, weight)
         
 	histos[name+'/mPhiMtPhi'].Fill(deltaPhi(row.mPhi,row.tPhi),weight)
-        histos[name+'/mPhiMETPhiType1'].Fill(deltaPhi(row.mPhi,row.type1_pfMetPhi),weight)
-        histos[name+'/tPhiMETPhiType1'].Fill(deltaPhi(row.tPhi,row.type1_pfMetPhi),weight)
+        histos[name+'/mPhiMETPhiType1'].Fill(deltaPhi(row.mPhi,getpfMetEt(row,systematic)),weight)
+        histos[name+'/tPhiMETPhiType1'].Fill(deltaPhi(row.tPhi,getpfMetEt(row,systematic)),weight)
 	histos[name+'/tDecayMode'].Fill(row.tDecayMode, weight)
-	histos[name+'/vbfJetVeto30'].Fill(row.vbfJetVeto30, weight)
-     	histos[name+'/vbfJetVeto20'].Fill(row.vbfJetVeto20, weight)
-        histos[name+'/vbfMVA'].Fill(row.vbfMVA, weight)
-        histos[name+'/vbfMass'].Fill(row.vbfMass, weight)
-        histos[name+'/vbfDeta'].Fill(row.vbfDeta, weight)
-        histos[name+'/vbfj1eta'].Fill(row.vbfj1eta, weight)
-        histos[name+'/vbfj2eta'].Fill(row.vbfj2eta, weight)
-        histos[name+'/vbfVispt'].Fill(row.vbfVispt, weight)
-        histos[name+'/vbfHrap'].Fill(row.vbfHrap, weight)
-        histos[name+'/vbfDijetrap'].Fill(row.vbfDijetrap, weight)
-        histos[name+'/vbfDphihj'].Fill(row.vbfDphihj, weight)
-        histos[name+'/vbfDphihjnomet'].Fill(row.vbfDphihjnomet, weight)
-        histos[name+'/vbfNJets'].Fill(row.vbfNJets, weight)
+	histos[name+'/vbfJetVeto30'].Fill(getvbfJetVeto30(row,systematic), weight)
+     	#histos[name+'/vbfJetVeto20'].Fill(row.vbfJetVeto20, weight)
+        #histos[name+'/vbfMVA'].Fill(row.vbfMVA, weight)
+        histos[name+'/vbfMass'].Fill(getvbfMass(row,systematic), weight)
+        histos[name+'/vbfDeta'].Fill(getvbfDeta(row,systematic), weight)
+        #histos[name+'/vbfj1eta'].Fill(row.vbfj1eta, weight)
+        #histos[name+'/vbfj2eta'].Fill(row.vbfj2eta, weight)
+        #histos[name+'/vbfVispt'].Fill(row.vbfVispt, weight)
+        #histos[name+'/vbfHrap'].Fill(row.vbfHrap, weight)
+        #histos[name+'/vbfDijetrap'].Fill(row.vbfDijetrap, weight)
+        #histos[name+'/vbfDphihj'].Fill(row.vbfDphihj, weight)
+        #histos[name+'/vbfDphihjnomet'].Fill(row.vbfDphihjnomet, weight)
+        histos[name+'/vbfNJets'].Fill(getvbfNJets(row,systematic), weight)
         #histos[name+'/vbfNJetsPULoose'].Fill(row.vbfNJetsPULoose, weight)
         #histos[name+'/vbfNJetsPUTight'].Fill(row.vbfNJetsPUTight, weight)
 
@@ -430,7 +550,7 @@ class AnalyzeLFVMuTau(MegaBase):
 
 
     def presel(self, row):
-        if not row.singleIsoMu20Pass:
+        if not (row.singleIsoMu20Pass or row.singleIsoTkMu20Pass):
             return False
         return True
 
@@ -459,37 +579,37 @@ class AnalyzeLFVMuTau(MegaBase):
            return False
        if row.tPt < 35:
            return False
-       if row.tMtToPfMet_type1 > 50:
+       if gettMtToPfMet(row,systematic) > 50:
            return False
-       if row.jetVeto30!=0:
+       if getjetVeto30(row,systematic)!=0:
            return False
        return True
 
     def boost(self,row):
-          if row.jetVeto30!=1:
+          if getjetVeto30(row,systematic)!=1:
             return False
           if row.mPt < 35:
                 return False
           if row.tPt < 40:
                 return False
-          if row.tMtToPfMet_type1 > 50:
+          if gettMtToPfMet(row,systematic) > 50:
                 return False
           return True
 
     def vbf(self,row):
         if row.tPt < 40:
                 return False
-        if row.tMtToPfMet_type1 > 50:
+        if gettMtToPfMet(row,systematic) > 50:
                 return False
-        if row.jetVeto30<2:
+        if getjetVeto30(row,systematic)<2:
             return False
-	if(row.vbfNJets<2):
+	if(getvbfNJets(row,systematic)<2):
 	    return False
-	if(abs(row.vbfDeta)<3.5):
+	if(abs(getvbfDeta(row,systematic))<3.5):
 	    return False
-        if row.vbfMass < 550:
+        if getvbfMass(row,systematic) < 550:
 	    return False
-        if row.vbfJetVeto30 > 0:
+        if getvbfJetVeto30(row,systematic) > 0:
             return False
         return True
 
@@ -514,7 +634,7 @@ class AnalyzeLFVMuTau(MegaBase):
     #    return bool(row.mRelPFIsoDBDefault <0.12)
    
     def obj1_iso(self,row):
-         return bool(row.mRelPFIsoDBDefault <0.1)
+         return bool(row.mRelPFIsoDBDefault <0.15)
 
     def obj2_iso(self, row):
         return  row.tByTightCombinedIsolationDeltaBetaCorr3Hits
@@ -582,11 +702,11 @@ class AnalyzeLFVMuTau(MegaBase):
             if self.obj2_iso(row) and self.oppositesign(row):  
 
               self.fill_histos(row,'preselection',False)
-              if row.jetVeto30==0:
+              if getjetVeto30(row,systematic)==0:
                 self.fill_histos(row,'preselection0Jet',False)
-              if row.jetVeto30==1:
+              if getjetVeto30(row,systematic)==1:
                 self.fill_histos(row,'preselection1Jet',False)
-              if row.jetVeto30==2:
+              if getjetVeto30(row,systematic)==2:
                 self.fill_histos(row,'preselection2Jet',False)
 
               if self.gg(row):
@@ -602,11 +722,11 @@ class AnalyzeLFVMuTau(MegaBase):
               self.fill_histos(row,'notIso',True)
               self.fill_histos(row,'notIsoNotWeighted',False)
 
-              if row.jetVeto30==0:
+              if getjetVeto30(row,systematic)==0:
                 self.fill_histos(row,'notIso0Jet',True)
-              if row.jetVeto30==1:
+              if getjetVeto30(row,systematic)==1:
                 self.fill_histos(row,'notIso1Jet',True)
-              if row.jetVeto30==2:
+              if getjetVeto30(row,systematic)==2:
                 self.fill_histos(row,'notIso2Jet',True)
 
               if self.gg(row):

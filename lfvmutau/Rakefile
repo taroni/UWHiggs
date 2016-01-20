@@ -29,7 +29,7 @@ samples = Hash[
   "TTBar" =>  get_sample_names('TT'),
   "WJets" =>  get_sample_names('WJets'),
   "DYJets" =>  get_sample_names('DYJetsToLL_M-50'),
-  "ZTauTauJets" => get_sample_names('ZTauTauJets'),
+  "ZTauTauJets" => get_sample_names('ZTauTau'),
   "SMHiggs" =>  Array['GluGluToHToTauTau_M-125_13TeV-powheg-pythia6','VBF_HToTauTau_M-125_13TeV-powheg-pythia6'],
   "SingleTop" => get_sample_names('ST'),
   #"DiBoson" => Array['WWTo2L2Nu_13TeV-powheg','WZ_TuneCUETP8M1_13TeV-pythia8','ZZ_TuneCUETP8M1_13TeV-pythia8']
@@ -55,10 +55,10 @@ end
 ################################################################################
 
 ##use $PU = false for samples with no pileup
-task :analyzeSpring2015Misc => get_analyzer_results( "AnalyzeLFVMuTau.py",samples['SingleTop']+samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
+task :analyzeSpring2015Misc => get_analyzer_results( "AnalyzeLFVMuTau.py",samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
 task :analyzeSpring2015WJets => get_analyzer_results("AnalyzeLFVMuTau.py",samples['WJets'])
 task :analyzeSpring2015ZJets => get_analyzer_results("AnalyzeLFVMuTau.py",samples['DYJets'])
-task :analyzeSpring2015ZJets => get_analyzer_results("AnalyzeLFVMuTau.py",samples['ZTauTauJets'])
+task :analyzeSpring2015ZTauTauJets => get_analyzer_results("AnalyzeLFVMuTau.py",samples['ZTauTauJets'])
 task :analyzeLFVMuTauData => get_analyzer_results( "AnalyzeLFVMuTau.py",samples['Data2015C']+samples['Data2015D'])
 task :analyzeSpring2015MiscSignal => get_analyzer_results( "AnalyzeLFVMuTauSignal.py",samples['SingleTop']+samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
 task :analyzeSpring2015WJetsSignal => get_analyzer_results("AnalyzeLFVMuTauSignal.py",samples['WJets'])
@@ -69,6 +69,30 @@ task :analyzeLFVMuMuTauData => get_analyzer_results( "AnalyzeLFVMuMuTau.py",samp
 task :analyzeLFVMuMu => get_analyzer_results("AnalyzeLFVMuMu.py", samples['DYJets'])
 task :analyzeLFVMuMuData => get_analyzer_results( "AnalyzeLFVMuMu.py",samples['Data2015C']+samples['Data2015D'])
 
+#systematics
+task :analyzeSpring2015MiscJesUp => get_analyzer_results( "AnalyzeLFVMuTaujesup.py",samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
+task :analyzeSpring2015WJetsJesUp => get_analyzer_results("AnalyzeLFVMuTaujesup.py",samples['WJets'])
+task :analyzeSpring2015ZJetsJesUp => get_analyzer_results("AnalyzeLFVMuTaujesup.py",samples['DYJets'])
+task :analyzeSpring2015ZTauTauJetsJesUp => get_analyzer_results("AnalyzeLFVMuTaujesup.py",samples['ZTauTauJets'])
+task :analyzeLFVMuTauDataJesUp => get_analyzer_results( "AnalyzeLFVMuTaujesup.py",samples['Data2015C']+samples['Data2015D'])
+
+task :analyzeSpring2015MiscJesDown => get_analyzer_results( "AnalyzeLFVMuTaujesdown.py",samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
+task :analyzeSpring2015WJetsJesDown => get_analyzer_results("AnalyzeLFVMuTaujesdown.py",samples['WJets'])
+task :analyzeSpring2015ZJetsJesDown => get_analyzer_results("AnalyzeLFVMuTaujesdown.py",samples['DYJets'])
+task :analyzeSpring2015ZTauTauJetsJesDown => get_analyzer_results("AnalyzeLFVMuTaujesdown.py",samples['ZTauTauJets'])
+task :analyzeLFVMuTauDataJesDown => get_analyzer_results( "AnalyzeLFVMuTaujesdown.py",samples['Data2015C']+samples['Data2015D'])
+
+task :analyzeSpring2015MiscUesUp => get_analyzer_results( "AnalyzeLFVMuTauuesup.py",samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
+task :analyzeSpring2015WJetsUesUp => get_analyzer_results("AnalyzeLFVMuTauuesup.py",samples['WJets'])
+task :analyzeSpring2015ZJetsUesUp => get_analyzer_results("AnalyzeLFVMuTauuesup.py",samples['DYJets'])
+task :analyzeSpring2015ZTauTauJetsUesUp => get_analyzer_results("AnalyzeLFVMuTauuesup.py",samples['ZTauTauJets'])
+task :analyzeLFVMuTauDataUesUp => get_analyzer_results( "AnalyzeLFVMuTauuesup.py",samples['Data2015C']+samples['Data2015D'])
+
+task :analyzeSpring2015MiscUesDown => get_analyzer_results( "AnalyzeLFVMuTauuesdown.py",samples['DiBoson']+samples['TTBar']+samples['HiggsGG']+samples['HiggsVBF'])
+task :analyzeSpring2015WJetsUesDown => get_analyzer_results("AnalyzeLFVMuTauuesdown.py",samples['WJets'])
+task :analyzeSpring2015ZJetsUesDown => get_analyzer_results("AnalyzeLFVMuTauuesdown.py",samples['DYJets'])
+task :analyzeSpring2015ZTauTauJetsUesDown => get_analyzer_results("AnalyzeLFVMuTauuesdown.py",samples['ZTauTauJets'])
+task :analyzeLFVMuTauDataUesDown => get_analyzer_results( "AnalyzeLFVMuTauuesdown.py",samples['Data2015C']+samples['Data2015D'])
 #task :analyzetest2  => get_analyzer_results(  "AnalyzeLFVMuTauLoose.py",samples['signal'])
 #task :analyzetest2Bg  => get_analyzer_results(  "AnalyzeLFVMuTauLoose.py",samples['TTBar']+samples['WJets']+samples['DYJets']+samples['SMHiggs'])
 
