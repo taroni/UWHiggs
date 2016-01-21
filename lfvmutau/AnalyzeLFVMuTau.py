@@ -218,7 +218,7 @@ pu_distributions = glob.glob(os.path.join(
         'inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
 
 pu_corrector = PileupWeight.PileupWeight('Asympt25ns', *pu_distributions)
-id_corrector  = MuonPOGCorrections.make_muon_pog_PFLoose_2015CD()
+id_corrector  = MuonPOGCorrections.make_muon_pog_PFTight_2015CD()
 iso_corrector = MuonPOGCorrections.make_muon_pog_LooseIso_2015CD()
 tr_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu20oIsoTkMu20_2015()
 
@@ -226,7 +226,7 @@ def mc_corrector_2015(row):
   
 	pu = pu_corrector(row.nTruePU)
         muidcorr = id_corrector(row.mPt, abs(row.mEta))
-        muisocorr = iso_corrector('Loose', row.mPt, abs(row.mEta))
+        muisocorr = iso_corrector('Tight', row.mPt, abs(row.mEta))
         mutrcorr = tr_corrector(row.mPt, abs(row.mEta))
 
         return pu*muidcorr*muisocorr*mutrcorr
