@@ -10,7 +10,7 @@ import MuTauTree
 from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 import glob
 import os
-#import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
+import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 #import FinalStateAnalysis.TagAndProbe.H2TauCorrections as H2TauCorrections
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import ROOT
@@ -218,11 +218,18 @@ pu_distributions = glob.glob(os.path.join(
         'inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
 
 pu_corrector = PileupWeight.PileupWeight('Asympt25ns', *pu_distributions)
+id_corrector  = MuonPOGCorrections.make_muon_pog_PFLoose_2015CD()
+iso_corrector = MuonPOGCorrections.make_muon_pog_LooseIso_2015CD()
+tr_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu20oIsoTkMu20_2015()
 
 def mc_corrector_2015(row):
+  
 	pu = pu_corrector(row.nTruePU)
-        
-        return pu
+        muidcorr = id_corrector(row.mPt, abs(row.mEta))
+        muisocorr = iso_corrector('Loose', row.mPt, abs(row.mEta))
+        mutrcorr = tr_corrector(row.mPt, abs(row.mEta))
+
+        return pu*muidcorr*muisocorr*mutrcorr
 
 mc_corrector = mc_corrector_2015
 
@@ -402,7 +409,7 @@ class AnalyzeLFVMuTau(MegaBase):
         histos = self.histograms
         weight=1
         if (not(data)):
-	   weight = row.GenWeight * self.correction(row) #apply gen and pu reweighting to MC
+          weight = row.GenWeight * self.correction(row) #apply gen and pu reweighting to MC
         if (fakeRate == True):
           weight=weight*self.fakeRateMethod(row,isoName) #apply fakerate method for given isolation definition
 
