@@ -219,7 +219,7 @@ pu_distributions = glob.glob(os.path.join(
 
 pu_corrector = PileupWeight.PileupWeight('Asympt25ns', *pu_distributions)
 id_corrector  = MuonPOGCorrections.make_muon_pog_PFTight_2015CD()
-iso_corrector = MuonPOGCorrections.make_muon_pog_LooseIso_2015CD()
+iso_corrector = MuonPOGCorrections.make_muon_pog_TightIso_2015CD()
 tr_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu20oIsoTkMu20_2015()
 
 def mc_corrector_2015(row):
