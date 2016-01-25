@@ -1,6 +1,7 @@
 import os
 import glob
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
+import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 from FinalStateAnalysis.PlotTools.decorators import memo, memo_last
 
@@ -59,7 +60,7 @@ def make_puCorrectorDown(dataset, kind=None):
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
 ##put here the trigger correction as in https://github.com/mverzett/UWHiggs/blob/WH_At_Paper/wh/mcCorrectors.py
-
+"""
 correct_e = HetauCorrection.correct_hamburg_e
 correct_eid13_mva = HetauCorrection.correct_eid13_mva
 correct_eiso13_mva = HetauCorrection.correct_eiso13_mva
@@ -71,6 +72,9 @@ correct_eid_mva = HetauCorrection.scale_eleId_hww
 correct_eReco_mva = HetauCorrection.scale_elereco_hww
 correct_eIso_mva = HetauCorrection.scale_eleIso_hww
 correct_trigger_mva = HetauCorrection.single_ele_mva
+"""
+
+### 
 
 def get_electron_corrections(row,*args):
     'makes corrections to iso and id of electrons'
@@ -182,7 +186,7 @@ def make_shifted_weights(default, shifts, functors):
     def functor(*args, **kwargs):
         shift = ''
         if 'shift' in kwargs:
-            #print shift
+            print "Shift ",shift
             shift = kwargs['shift']
             del kwargs['shift']
 
@@ -196,7 +200,7 @@ def make_shifted_weights(default, shifts, functors):
     #print 'functor', shifts, functor
     return functor
 
-def make_multiple(fcn, indexed=False, shift=0):
+def make_multiple(fcn,mu_id="not_muon_or_not_isocorr", indexed=False, shift=0):
     '''make_multiple(fcn, indexed=True, shift=0) --> functor
     takes as imput a weight correction function of pt and eta
     and returns a functor multiple(row,*args) --> weight
@@ -215,7 +219,10 @@ def make_multiple(fcn, indexed=False, shift=0):
             ) 
             pt     = getattr(row, getVar(arg,'Pt'))
             if pt<30: pt =30 #only fakerate checks allow pt < 30. This is an approximation to not re-run the Tag and Probe
-            fcn_ret = fcn(pt,abseta)
+            if mu_id=="not_muon_or_not_isocorr":
+                fcn_ret = fcn(pt,abseta)
+            else:
+                fcn_ret=fcn(mu_id,pt,abseta)
             if indexed:
                 value, err = fcn_ret
                 if shift == 1:
@@ -231,7 +238,7 @@ def make_multiple(fcn, indexed=False, shift=0):
 
 
 ##put here the trigger correction as in https://github.com/mverzett/UWHiggs/blob/WH_At_Paper/wh/mcCorrectors.py
-
+"""
 correct_e             = make_multiple(HetauCorrection.correct_hamburg_e    )
 correct_eid13_mva     = make_multiple(HetauCorrection.correct_eid13_mva    )
 correct_eid13_p1s_mva = make_multiple(HetauCorrection.correct_eid13_p1s_mva)
@@ -288,7 +295,45 @@ efficiency_trigger_mva_dw = make_multiple(HetauCorrection.single_ele_eff_mva, in
 correct_eEmb     = make_multiple(HetauCorrection.correct_eEmb,indexed=True)
 correct_eEmb_p1s = make_multiple(HetauCorrection.correct_eEmb,indexed=True, shift=1)
 correct_eEmb_m1s = make_multiple(HetauCorrection.correct_eEmb,indexed=True, shift=-1)
+"""
 
+
+correct_muid15_tight_mva= make_multiple(MuonPOGCorrections.make_muon_pog_PFTight_2015CD())
+correct_muiso15_mva = make_multiple(MuonPOGCorrections.make_muon_pog_TightIso_2015CD(),"Tight")
+correct_mutrig15_mva_combined= make_multiple(MuonPOGCorrections.make_muon_pog_IsoMu20oIsoTkMu20_2015())
+
+#correction for muon POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffsRun2
+muid15_tight_correction = make_shifted_weights(
+    correct_muid15_tight_mva,
+    [],
+    []
+)
+#iso tight id tight
+muiso15_correction = make_shifted_weights(
+    correct_muiso15_mva,
+    [],
+    []
+)
+#single muon trigger combined c and d with the lumi weight 
+mutrig15_mva_combined = make_shifted_weights(
+    correct_mutrig15_mva_combined,
+    [],
+    []
+)
+
+"""
+#for dataC
+mutrig15_mva_p2_correction=make_shifted_weights(
+    correct_mutrig15_mva_p2,
+    ['mutrigp1s_2','mutrigm1s_2'],
+    [correct_mutrig15_p1s_mva_p2,correct_mutrig15_m1s_mva_p2]
+)
+#for dataD
+mutrig15_mva_p3_correction = make_shifted_weights(
+    correct_mutrig15_mva_p3,
+    ['mutrigp1s_3','mutrigm1s_3'],
+    [correct_mutrig15_p1s_mva_p3,correct_mutrig15_m1s_mva_p3]
+)
 
 eiso_correction = make_shifted_weights(
     correct_eiso13_mva, 
@@ -307,36 +352,7 @@ eid15_correction = make_shifted_weights(
     ['eidp1s','eidm1s'],
     [correct_eid15_p1s_mva, correct_eid15_m1s_mva]
 )
-#correction for muon POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffsRun2
-muid15_tight_correction = make_shifted_weights(
-    correct_muid15_tight_mva,
-    ['muidtightp1s','muidtightm1s'],
-    [correct_eid15_p1s_mva, correct_eid15_m1s_mva]
-)
-#iso tight id tight
-muiso15_correction = make_shifted_weights(
-    correct_muiso15_mva,
-    ['muisop1s','muisom1s'],
-    [correct_muiso15_p1s_mva,correct_muiso15_m1s_mva]
-)
-#single muon trigger combined c and d with the lumi weight 
-mutrig15_mva_combined = make_shifted_weights(
-    correct_mutrig15_mva_combined,
-    ['mutrigp1s_combined','mutrigm1s_combined'],
-    [correct_mutrig15_p1s_mva_combined,correct_mutrig15_m1s_mva_combined]
-)
-#for dataC
-mutrig15_mva_p2_correction=make_shifted_weights(
-    correct_mutrig15_mva_p2,
-    ['mutrigp1s_2','mutrigm1s_2'],
-    [correct_mutrig15_p1s_mva_p2,correct_mutrig15_m1s_mva_p2]
-)
-#for dataD
-mutrig15_mva_p3_correction = make_shifted_weights(
-    correct_mutrig15_mva_p3,
-    ['mutrigp1s_3','mutrigm1s_3'],
-    [correct_mutrig15_p1s_mva_p3,correct_mutrig15_m1s_mva_p3]
-)
+
 eEmb_correction = make_shifted_weights(
     correct_eEmb,
     ['eEmbp1s','eEmbm1s'],
@@ -355,3 +371,4 @@ trig_efficiency = make_shifted_weights(
     ['trp1s', 'trm1s'],
     [efficiency_trigger_mva_up, efficiency_trigger_mva_dw]
 )
+"""

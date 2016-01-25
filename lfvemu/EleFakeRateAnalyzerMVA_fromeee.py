@@ -6,7 +6,7 @@ import math
 import optimizer
 import glob
 import array
-import mcCorrections
+#import mcCorrections
 import baseSelections as selections
 import FinalStateAnalysis.PlotTools.pytree as pytree
 from FinalStateAnalysis.PlotTools.decorators import  memo_last
@@ -14,7 +14,7 @@ from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 from math import sqrt, pi, sin, cos, acos, sinh
 from cutflowtracker import cut_flow_tracker
 #Makes the cut flow histogram
-cut_flow_step = ['allEvents', 'e1sel', 'e1IDiso', 'e2sel', 'e2IDiso','e3sel','e3IDiso', 'ZMass', 'tauveto', 'eveto', 'eTightIso' ] 
+cut_flow_step = ['allEvents','triggerpass','bjetvetopass', 'e1sel', 'e1IDiso', 'e2sel', 'e2IDiso','e3sel','e3IDiso', 'ZMass', 'tauveto', 'eveto', 'eTightIso' ] 
 
 
 from inspect import currentframe
@@ -152,14 +152,19 @@ class EleFakeRateAnalyzerMVA_fromeee(MegaBase):
         for row in self.tree:
             jn = row.jetVeto30
             if jn > 3 : jn = 3
-            
+            print row.run,row.lumi,row.evt
+            cut_flow_trk.new_row(row.run,row.lumi,row.evt)
+
+            cut_flow_trk.Fill('allEvents')
+
             if not bool(row.doubleEPass) : continue
-                
+            
+            cut_flow_trk.Fill('triggerpass')
+
             if row.bjetCISVVeto30Medium!=0 : continue 
 
-            cut_flow_trk.new_row(row.run,row.lumi,row.evt)
-            cut_flow_trk.Fill('allEvents')
-          
+            cut_flow_trk.Fill('bjetvetopass')
+
             if not selections.eSelection(row, 'e1'): continue
             cut_flow_trk.Fill('e1sel')
             if not selections.lepton_id_iso(row, 'e1', 'eid15Loose_idiso05'): continue

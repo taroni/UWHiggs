@@ -352,9 +352,9 @@ task :fakeeetMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py", samples['s
                                       samples['zjets'] +  samples['dataSingleE'])
 
 
-task :fakemmeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py",samples['diboson'] + samples['dataSingleMu']+ samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
+task :fakemmeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py",samples['diboson'] + samples['dataSingleMu']+samples['dataSingleE']+samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
 
-task :fakeeeeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA_fromeee.py",samples['diboson'] + samples['dataSingleE'] + samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
+task :fakeeeeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA_fromeee.py",samples['diboson'] + samples['dataSingleE'] + samples['dataSingleMu']+samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
 
 task :fakeeemMVA => get_analyzer_results("MuFakeRateAnalyzerMVA_fromeem.py",samples['diboson'] + samples['dataSingleE'] + samples['DY'])
 

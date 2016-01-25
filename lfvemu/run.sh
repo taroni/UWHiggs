@@ -15,7 +15,7 @@ export jobid=$jobid13
 #rake controlplotsMVA
 #rake fakeeet
 #rake fakeeetMVA
-rake  efits
+#rake  efits
 #rake drawTauFakeRate
 #export jobid=$jobidmt
 #rake recoplotsMuTau
@@ -25,6 +25,6 @@ rake  efits
 #rake fakemmmMVA
 #rake fakeeemMVA
 #rake fakeeeeMVA
-#rake fakemmeMVA
+rake fakemmeMVA
 #rake  fits
 #rake efits

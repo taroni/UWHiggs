@@ -13,16 +13,14 @@ else
     export afile=$1
 fi
 
-echo 'FILeee  '$afile
+echo 'Filename:  '$afile
 
 echo "Building cython wrappers from file: $afile"
 
 #rake "make_wrapper[$afile, ee/final/Ntuple, EETree]"
 #rake "make_wrapper[$afile, eet/final/Ntuple, EETauTree]"
-echo "guju"
 
-rake "make_wrapper[$afile, eee/final/Ntuple, EEETree]"
-echo "guja"
+rake "make_wrapper[$afile, emm/final/Ntuple, EMMTree]"
 
 ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 

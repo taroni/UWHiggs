@@ -1,5 +1,5 @@
 #!/bin/bash
-export OVERRIDE_META_TREE_data_EEE='eee/metaInfo'
+export OVERRIDE_META_TREE_data_EMM='emm/metaInfo'
 
 export IGNORE_LUMI_ERRORS=1
 
@@ -13,10 +13,10 @@ export datasrc=/hdfs/store/user/ndev  #$(ls -d /scratch/*/data/$jobid | awk -F$j
 export MEGAPATH=/hdfs/store/user/ndev
 
 ./make_proxies.sh
-rake "meta:getinputs[$jobid, $datasrc,eee/metaInfo,eee/summedWeights]"
-rake "meta:getmeta[inputs/$jobid,eee/metaInfo, 13,eee/summedWeights]"
+rake "meta:getinputs[$jobid, $datasrc,emm/metaInfo,emm/summedWeights]"
+rake "meta:getmeta[inputs/$jobid,emm/metaInfo, 13,emm/summedWeights]"
 #RakeOA "meta:getinputs[$jobid, $datasrc,ee/metaInfo]"
 #rake "meta:getmeta[inputs/$jobid, ee/metaInfo, 13]"
 
-unset OVERRIDE_META_TREE_data_EEE
+unset OVERRIDE_META_TREE_data_EMM
 unset IGNORE_LUMI_ERRORS

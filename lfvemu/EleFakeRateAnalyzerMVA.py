@@ -61,9 +61,9 @@ class EleFakeRateAnalyzerMVA(MegaBase):
         if row.run > 2: #FIXME! add tight ID correction
             return 1.
         return row.GenWeight*\
-               mcCorrections.muiso15_correction(row,'m1','m2')*\
                mcCorrections.muid15_tight_correction(row,'m1','m2')*\
-               mcCorrections.mutrig15_mva_combined(row,'m1','m2')
+               mcCorrections.mutrig15_mva_combined(row,'m1','m2')*\
+               mcCorrections.muiso15_correction(row,'m1','m2')
 
  
         #if bool(row.e1MatchesEle27WP80) and  not bool(row.e2MatchesEle27WP80) : etrig = 'e1'
@@ -167,7 +167,7 @@ class EleFakeRateAnalyzerMVA(MegaBase):
     def fill_histos(self, row, folder='os/tSuperLoose', fakeRate = False):
         weight = self.event_weight(row)
         histos = self.histograms
- 
+        print weight
 
         
 
@@ -217,32 +217,31 @@ class EleFakeRateAnalyzerMVA(MegaBase):
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
 
             cut_flow_trk.Fill('allEvents')
-            if not selections.muSelection(row, 'm1'): continue
+#            if not selections.muSelection(row, 'm1'): continue
             cut_flow_trk.Fill('msel')
-            if not selections.lepton_id_iso(row, 'm1', 'muId_idiso025'): continue
+ #           if not selections.lepton_id_iso(row, 'm1', 'muId_idiso025'): continue
             cut_flow_trk.Fill('m1IDiso')
 
-            if not selections.muSelection(row, 'm2'): continue
+  #          if not selections.muSelection(row, 'm2'): continue
             cut_flow_trk.Fill('m2sel')
-            if not selections.lepton_id_iso(row, 'm2', 'muId_idiso025'): continue
+   #         if not selections.lepton_id_iso(row, 'm2', 'muId_idiso025'): continue
             cut_flow_trk.Fill('m2IDiso')
 
-            if abs(row.m1_m2_Mass-91.2) > 20 : continue
+    #        if abs(row.m1_m2_Mass-91.2) > 20 : continue
             cut_flow_trk.Fill('ZMass')
                        
-            if not selections.eSelection(row, 'e'): continue
+     #       if not selections.eSelection(row, 'e'): continue
             cut_flow_trk.Fill('esel')
-            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_idiso05'): continue 
+      #      if not selections.lepton_id_iso(row, 'e', 'eid15Loose_idiso05'): continue 
             cut_flow_trk.Fill('eIDiso')
-            if abs(row.eEta) > 1.4442 and abs(row.eEta) < 1.566 : continue
+       #     if abs(row.eEta) > 1.4442 and abs(row.eEta) < 1.566 : continue
             cut_flow_trk.Fill('ecalhole')          
-
 
             if row.tauVetoPt20Loose3HitsNewDMVtx : continue 
             cut_flow_trk.Fill('tauveto')          
             if row.muVetoPt5IsoIdVtx : continue
             cut_flow_trk.Fill('muveto')          
-            if row.eVetoMVAIso: continue
+#            if row.eVetoMVAIso: continue
             cut_flow_trk.Fill('eveto')          
 
 
