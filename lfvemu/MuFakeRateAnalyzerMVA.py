@@ -14,7 +14,7 @@ from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 from math import sqrt, pi, sin, cos, acos, sinh
 from cutflowtracker import cut_flow_tracker
 #Makes the cut flow histogram
-cut_flow_step = ['allEvents', 'doubleMuPass', 'bjetveto', 'm1sel', 'm2sel', 'm3sel', 'Zbosmass', 'tTightIso' ]
+cut_flow_step = ['allEvents', 'doubleMuPass', 'bjetveto', 'm1sel', 'm2sel', 'm3sel', 'Zbosmass','tauveto','muveto','eveto', 'mTightIso' ]
 
 from inspect import currentframe
 
@@ -90,6 +90,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         m1m3DPhi=deltaPhi(getattr(row, self.mym1+'Phi'), getattr(row, self.mym3+'Phi'))
         m2m3DPhi=deltaPhi(getattr(row, self.mym2+'Phi'), getattr(row, self.mym3+'Phi'))
         return m1mDPhi if m1m3DPhi < m2m3DPhi else m2m3DPhi
+
 
     def Zbos(self, row):
         m1p=ROOT.TVector3(getattr(row, self.mym1+'Pt')*cos(getattr(row, self.mym1+'Phi')),getattr(row, self.mym1+'Pt')*sin(getattr(row, self.mym1+'Phi')),getattr(row, self.mym1+'Pt')*sinh(getattr(row, self.mym1+'Eta')))
@@ -210,7 +211,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
 
-            if not bool(row.doubleMuPass) : continue
+            if not bool(row.singleMuPass) : continue
                 
             cut_flow_trk.Fill('DoubleMuPass')
 
@@ -257,22 +258,32 @@ class MuFakeRateAnalyzerMVA(MegaBase):
             
             cut_flow_trk.Fill('Zbosmass')
 
-            eleiso = 'mLoose'
+            if row.tauVetoPt20Loose3HitsNewDMVtx : continue 
+            cut_flow_trk.Fill('tauveto')          
+            if row.muVetoPt5IsoIdVtx : continue
+            cut_flow_trk.Fill('muveto')          
+            if row.eVetoMVAIso: continue
+            cut_flow_trk.Fill('eveto')          
+        
+
+
+
+            miso = 'mLoose'
             sign = 'ss' if row.m1_m2_SS else 'os'
-            folder = sign+'/'+eleiso
+            folder = sign+'/'+miso
           
             self.fill_histos(row, folder)
             folder=folder+'/'+str(int(jn))
             self.fill_histos(row, folder)
-#            print "histo filled"
+            print "PASSED"
             if selections.muTSelection(row, self.mym3):
-                eleiso = 'mTight' 
-                folder = sign+'/'+eleiso
+                miso = 'mTight' 
+                folder = sign+'/'+miso
                 self.fill_histos(row,  folder)
-                cut_flow_trk.Fill('tTightIso')
+                cut_flow_trk.Fill('mTightIso')
                 folder=folder+'/'+str(int(jn))
                 self.fill_histos(row, folder)
-                
+                print "PASSED TIGHT"
              
         cut_flow_trk.flush()
                                 
