@@ -22,9 +22,9 @@ export jobid=$jobid13
 #rake drawplots
 #rake genkinEMu
 #rake genkinMuTau
-#rake fakemmmMVA
+rake fakemmmMVA
 #rake fakeeemMVA
 #rake fakeeeeMVA
-rake fakemmeMVA
+#rake fakemmeMVA
 #rake  fits
 #rake efits

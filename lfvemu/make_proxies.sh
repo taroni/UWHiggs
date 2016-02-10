@@ -20,7 +20,8 @@ echo "Building cython wrappers from file: $afile"
 #rake "make_wrapper[$afile, ee/final/Ntuple, EETree]"
 #rake "make_wrapper[$afile, eet/final/Ntuple, EETauTree]"
 
-rake "make_wrapper[$afile, emm/final/Ntuple, EMMTree]"
+#rake "make_wrapper[$afile, emm/final/Ntuple, EMMTree]"
+rake "make_wrapper[$afile, mmm/final/Ntuple, MMMTree]"
 
 ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 

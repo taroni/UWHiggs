@@ -13,8 +13,8 @@ export datasrc=/hdfs/store/user/ndev  #$(ls -d /scratch/*/data/$jobid | awk -F$j
 export MEGAPATH=/hdfs/store/user/ndev
 
 ./make_proxies.sh
-rake "meta:getinputs[$jobid, $datasrc,emm/metaInfo,emm/summedWeights]"
-rake "meta:getmeta[inputs/$jobid,emm/metaInfo, 13,emm/summedWeights]"
+rake "meta:getinputs[$jobid, $datasrc,mmm/metaInfo,mmm/summedWeights]"
+rake "meta:getmeta[inputs/$jobid,mmm/metaInfo, 13,mmm/summedWeights]"
 #RakeOA "meta:getinputs[$jobid, $datasrc,ee/metaInfo]"
 #rake "meta:getmeta[inputs/$jobid, ee/metaInfo, 13]"
 

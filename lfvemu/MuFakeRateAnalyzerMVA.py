@@ -15,7 +15,8 @@ from math import sqrt, pi, sin, cos, acos, sinh
 from cutflowtracker import cut_flow_tracker
 #Makes the cut flow histogram
 cut_flow_step = ['allEvents', 'doubleMuPass', 'bjetveto', 'm1sel', 'm2sel', 'm3sel', 'Zbosmass','tauveto','muveto','eveto', 'mTightIso' ]
-
+import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
+import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 from inspect import currentframe
 
 def get_linenumber():
@@ -34,7 +35,12 @@ def deltaR(phi1, phi2, eta1, eta2):
     if (dphi>pi) : dphi = 2*pi-dphi
     return sqrt(deta*deta + dphi*dphi);
     
-
+pu_distributions = glob.glob(os.path.join('inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
+pu_corrector = PileupWeight.PileupWeight('25ns_matchData', *pu_distributions)
+id_corrector  = MuonPOGCorrections.make_muon_pog_PFTight_2015CD()
+iso_corrector = MuonPOGCorrections.make_muon_pog_TightIso_2015CD()
+tr_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu20oIsoTkMu20_2015()
+        
 class MuFakeRateAnalyzerMVA(MegaBase):
     tree = 'mmm/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
@@ -54,14 +60,29 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         #        self.grid_search[key] = optimizer.grid_search[key]
         #else:
         #    self.grid_search[''] = optimizer.grid_search[optimizer_keys[0]]
- 
+
+    def mc_corrector_2015(self, row):
+        
+        pu = pu_corrector(row.nTruePU)
+        muidcorr1 = id_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta')))
+        muisocorr1 = iso_corrector('Tight', getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta')))
+        muidcorr2 = id_corrector(getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta')))
+        muisocorr2 = iso_corrector('Tight',getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta')))
+        mutrcorr = tr_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta'))) if row.m1Pt>row.m2Pt else  tr_corrector(getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta'))) #match the electron instead
+        #if pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr==0: print row.m1Pt, row.m2Pt, row.m1Eta, row.m2Eta
+        return pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr
+
+    
+
+    def correction(self,row):
+	return self.mc_corrector_2015(row)
+        
     def event_weight(self, row):
+ 
         if row.run > 2: #FIXME! add tight ID correction
             return 1.
-        return row.GenWeight*\
-               mcCorrections.muiso15_correction(row,'m1','m2','m3')*\
-               mcCorrections.muid15_tight_correction(row,'m1','m2','m3')*\
-               mcCorrections.mutrig15_mva_combined(row,'m1','m2','m3')
+        if row.GenWeight*self.correction(row) == 0 : print 'weight==0', row.GenWeight*self.correction(row), row.GenWeight, self.correction(row), row.m1Pt, row.m2Pt, row.m1Eta, row.m2Eta
+        return row.GenWeight*self.correction(row) 
 
 
         #return 1
@@ -120,37 +141,13 @@ class MuFakeRateAnalyzerMVA(MegaBase):
                     
         for f in folder: 
             
-            ##self.book(f,"e1Pt", "e1 p_{T}", 200, 0, 200)
-            ##self.book(f,"e1Phi", "e1 phi",  100, -3.2, 3.2)
-            ##self.book(f,"e1Eta", "e1 eta", 46, -2.3, 2.3)
-            ##
-            ##self.book(f,"e2Pt", "e2 p_{T}", 200, 0, 200)
-            ##self.book(f,"e2Phi", "e2 phi",  100, -3.2, 3.2)
-            ##self.book(f,"e2Eta", "e2 eta", 46, -2.3, 2.3)
 
             self.book(f,"mPt", "m p_{T}", 200, 0, 200)
-            ##self.book(f,"mPhi", "m phi",  100, -3.2, 3.2)
+
             self.book(f,"mEta", "m eta", 46, -2.3, 2.3)
             self.book(f,"mAbsEta", "m abs eta", 23, 0, 2.3)
             self.book(f,"mPt_vs_mAbsEta", "m pt vs m abs eta", 23, 0, 2.3,  20, 0, 200.,  type=ROOT.TH2F)
             self.book(f, "ZMass",  " Inv Z Mass",  32, 0, 320)
-            ##self.book(f, "e1e2Mass",  "e1e2 Inv Mass",  32, 0, 320)
-            ##
-            ##self.book(f, "e3MtToPFMET", "e3 Met MT", 100, 0, 100)
-            ##
-            ##
-            ##self.book(f,"ee3DR", "e e3 DR", 50, 0, 10)
-            ##self.book(f,"ee3DPhi", "e e3 DPhi", 32, 0, 3.2)
-            ##
-            ##self.book(f,"ze3DR", "Z e3 DR", 50, 0, 10)
-            ##self.book(f,"ze3DPhi", "Z e3 DPhi", 32, 0, 3.2)
-            ##self.book(f,"Zpt", "Z p_{T}", 200, 0, 200)
-            ##
-            ##
-            ##
-            ##self.book(f, "type1_pfMetEt", "type1_pfMetEt",200, 0, 200) 
-            ##self.book(f, "jetN_30", "Number of jets, p_{T}>30", 10, -0.5, 9.5)
-            ##self.book(f, "bjetCSVVeto30", "number of bjets", 10, -0.5, 9.5)
 
         for s in sign:
             self.book(s+'/tNoCuts', "CUT_FLOW", "Cut Flow", len(cut_flow_step), 0, len(cut_flow_step))
@@ -165,17 +162,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
     def fill_histos(self, row, folder='os/tSuperLoose', fakeRate = False):
         weight = self.event_weight(row)
         histos = self.histograms
-        print "weight: ", weight
-
-        
-
-        ##histos[folder+'/e1Pt'].Fill( getattr(row, self.mye1+'Pt'), weight)
-        ##histos[folder+'/e1Eta'].Fill(getattr(row, self.mye1+'Eta'), weight)
-        ##histos[folder+'/e1Phi'].Fill(getattr(row, self.mye1+'Phi'), weight) 
-        ##
-        ##histos[folder+'/e2Pt'].Fill( getattr(row, self.mye2+'Pt' ), weight)
-        ##histos[folder+'/e2Eta'].Fill(getattr(row, self.mye2+'Eta'), weight)
-        ##histos[folder+'/e2Phi'].Fill(getattr(row, self.mye2+'Phi'), weight)
+        if weight==0 : print "weight: ", weight
 
         histos[folder+'/mPt'].Fill( getattr(row, self.mym3+'Pt' ), weight)
         histos[folder+'/mEta'].Fill(getattr(row, self.mym3+'Eta'), weight)
@@ -183,20 +170,6 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         histos[folder+'/mAbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), weight)
         histos[folder+'/mPt_vs_mAbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), getattr(row, self.mym3+'Pt'), weight)
         histos[folder+'/ZMass'].Fill(abs(getattr(row, self.mym1+'_'+self.mym2+'_'+'Mass')), weight)
-        ##histos[folder+'/e1e2Mass'].Fill(getattr(row, self.mye1+'_'+self.mye2+'_Mass'), weight)
-        ###histos[folder+'/tMtToPFMET'].Fill(row.tMtToPFMET,weight)
-        ##
-        ## 
-        ##histos[folder+'/type1_pfMetEt'].Fill(row.type1_pfMet_Et)
-        ##histos[folder+'/ee3DR'].Fill(self.ee3DR(row)) 
-        ##histos[folder+'/ee3DPhi'].Fill(self.ee3DPhi(row)) 
-        ##histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight) 
-        ##histos[folder+'/bjetCSVVeto30'].Fill(row.bjetCSVVeto30, weight) 
-        ##
-        ##histos[folder+'/ze3DR'].Fill(deltaR(self.Z(row).Phi(), getattr(row, self.mye3+'Phi'), self.Z(row).Eta(), getattr(row, self.mye3+'Eta')))
-        ##histos[folder+'/ze3DPhi'].Fill(deltaPhi(self.Z(row).Phi(), getattr(row, self.mye3+'Phi')))
-        ##histos[folder+'/Zpt'].Fill(self.Z(row).Pt())
-            
 
     def process(self):
         
@@ -275,7 +248,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
             self.fill_histos(row, folder)
             folder=folder+'/'+str(int(jn))
             self.fill_histos(row, folder)
-            print "PASSED"
+            #print "PASSED"
             if selections.muTSelection(row, self.mym3):
                 miso = 'mTight' 
                 folder = sign+'/'+miso
@@ -283,7 +256,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
                 cut_flow_trk.Fill('mTightIso')
                 folder=folder+'/'+str(int(jn))
                 self.fill_histos(row, folder)
-                print "PASSED TIGHT"
+                #print "PASSED TIGHT"
              
         cut_flow_trk.flush()
                                 
