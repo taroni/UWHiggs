@@ -68,8 +68,8 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         muisocorr1 = iso_corrector('Tight', getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta')))
         muidcorr2 = id_corrector(getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta')))
         muisocorr2 = iso_corrector('Tight',getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta')))
-        mutrcorr = tr_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta'))) if row.m1Pt>row.m2Pt else  tr_corrector(getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta'))) #match the electron instead
-        #if pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr==0: print row.m1Pt, row.m2Pt, row.m1Eta, row.m2Eta
+        mutrcorr = tr_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta'))) if getattr(row, self.mym1+'Pt')>getattr(row, self.mym2+'Pt') else  tr_corrector(getattr(row, self.mym2+'Pt'), abs(getattr(row, self.mym2+'Eta'))) #match the electron instead
+        if pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr==0: print pu, muidcorr1, muisocorr1, muidcorr2, muisocorr2, mutrcorr
         return pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr
 
     
@@ -142,11 +142,11 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         for f in folder: 
             
 
-            self.book(f,"mPt", "m p_{T}", 200, 0, 200)
+            self.book(f,"m3Pt", "m3 p_{T}", 200, 0, 200)
 
-            self.book(f,"mEta", "m eta", 46, -2.3, 2.3)
-            self.book(f,"mAbsEta", "m abs eta", 23, 0, 2.3)
-            self.book(f,"mPt_vs_mAbsEta", "m pt vs m abs eta", 23, 0, 2.3,  20, 0, 200.,  type=ROOT.TH2F)
+            self.book(f,"m3Eta", "m3 eta", 46, -2.3, 2.3)
+            self.book(f,"m3AbsEta", "m3 abs eta", 23, 0, 2.3)
+            self.book(f,"m3Pt_vs_m3AbsEta", "m3 pt vs m3 abs eta", 23, 0, 2.3,  20, 0, 200.,  type=ROOT.TH2F)
             self.book(f, "ZMass",  " Inv Z Mass",  32, 0, 320)
 
         for s in sign:
@@ -164,11 +164,11 @@ class MuFakeRateAnalyzerMVA(MegaBase):
         histos = self.histograms
         if weight==0 : print "weight: ", weight
 
-        histos[folder+'/mPt'].Fill( getattr(row, self.mym3+'Pt' ), weight)
-        histos[folder+'/mEta'].Fill(getattr(row, self.mym3+'Eta'), weight)
+        histos[folder+'/m3Pt'].Fill( getattr(row, self.mym3+'Pt' ), weight)
+        histos[folder+'/m3Eta'].Fill(getattr(row, self.mym3+'Eta'), weight)
         ##histos[folder+'/mPhi'].Fill(getattr(row, self.mym3+'Phi'), weight)
-        histos[folder+'/mAbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), weight)
-        histos[folder+'/mPt_vs_mAbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), getattr(row, self.mym3+'Pt'), weight)
+        histos[folder+'/m3AbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), weight)
+        histos[folder+'/m3Pt_vs_m3AbsEta'].Fill(abs(getattr(row, self.mym3+'Eta')), getattr(row, self.mym3+'Pt'), weight)
         histos[folder+'/ZMass'].Fill(abs(getattr(row, self.mym1+'_'+self.mym2+'_'+'Mass')), weight)
 
     def process(self):
@@ -184,14 +184,14 @@ class MuFakeRateAnalyzerMVA(MegaBase):
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
 
-            if not bool(row.singleMuPass) : continue
+            if not bool(row.singleIsoMu20Pass) and not bool(row.singleIsoTkMu20Pass) : continue
                 
-            cut_flow_trk.Fill('DoubleMuPass')
+            cut_flow_trk.Fill('doubleMuPass')
 
             if row.bjetCISVVeto30Medium!=0 : continue 
           
             cut_flow_trk.Fill('bjetveto')
-                      
+            #print row.m1JetPFCISVBtag, row.m1PixHits
             if not selections.muSelection(row, 'm1'): continue
 
             if not selections.lepton_id_iso(row, 'm1', 'muId_idiso025'): continue
@@ -203,7 +203,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
             if not selections.lepton_id_iso(row, 'm2', 'muId_idiso025'): continue
             cut_flow_trk.Fill('m2sel')
             
-
+            #print row.m3JetPFCISVBtag, row.m3PixHits, row.m3Pt, row.m3AbsEta, row.m3PVDZ, row.m3PFIDTight, row.m3RelPFIsoDBDefault
             if not selections.muSelection(row, 'm3'): continue
             if not selections.lepton_id_iso(row, 'm3', 'muId_idiso025'): continue #very loose loose eid13Tight_mvaLoose
             cut_flow_trk.Fill('m3sel')
@@ -242,7 +242,7 @@ class MuFakeRateAnalyzerMVA(MegaBase):
 
 
             miso = 'mLoose'
-            sign = 'ss' if row.m1_m2_SS else 'os'
+            sign = 'ss' if getattr(row, self.mym1+'_'+ self.mym2+'_SS') else 'os'
             folder = sign+'/'+miso
           
             self.fill_histos(row, folder)

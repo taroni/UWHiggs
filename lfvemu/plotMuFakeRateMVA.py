@@ -29,8 +29,8 @@ print jobid
 mc_samples = [
     #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
-   #  'GluGluHToTauTau_M125_13TeV_powheg_pythia8',
-   # 'GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8',
+    #'GluGluHToTauTau_M125_13TeV_powheg_pythia8',
+    #'GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8',
     #'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8',
     #'VBFHToTauTau_M125_13TeV_powheg_pythia8',
     #'VBF_LFV_HToETau_M125_13TeV_powheg_pythia8',
@@ -64,8 +64,9 @@ def remove_name_entry(dictionary):
 
 blind   = 'blind' not in os.environ or os.environ['blind'] == 'YES'
 print 'blind?', blind
-blind_region=[100, 150] if blind else None
 blind=False
+blind_region=[100, 150] if blind else None
+
 embedded = False
 
 
