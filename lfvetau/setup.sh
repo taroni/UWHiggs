@@ -5,7 +5,7 @@ export IGNORE_LUMI_ERRORS=1
 
 source jobid.sh
 
-./make_proxies.sh
+#./make_proxies.sh
 export datasrc=/hdfs/store/user/taroni/
 export MEGAPATH=/hdfs/store/user/taroni
 #export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
@@ -13,7 +13,7 @@ export MEGAPATH=/hdfs/store/user/taroni
 
 echo $jobid
 export jobid=$jobid13
-rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
+#rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
 rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
 
 #export jobid='LFV_808v1'

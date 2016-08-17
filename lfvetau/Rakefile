@@ -32,13 +32,13 @@ samples = Hash[
                "singlet" => get_sample_names('T_t'),
                "singletbar" => get_sample_names('Tbar_t'), 
                "wjets" => get_sample_names('Wplus'),
-               "wwjets" => get_sample_names('WWJets'),
-               "wzjets" => get_sample_names('WZJets'),
-               "zzjets" => get_sample_names('ZZJets'),
-               "zjets" => get_sample_names('jets_M50'),
+               "wwjets" => get_sample_names('WW_'),
+               "wzjets" => get_sample_names('WZ_'),
+               "zzjets" => get_sample_names('ZZ_'),
+               "zjets" => get_sample_names('DYJetsToLL_'),
                "zjets_skimmedLL" => get_sample_names('jets_M50_skimmedLL'),
                "zjets_skimmedTT" => get_sample_names('jets_M50_skimmedTT'),
-               "diboson" =>get_sample_names('WWJets')+get_sample_names('WZJets')+get_sample_names('ZZJets'),
+               "diboson" =>get_sample_names('WW_')+get_sample_names('WZ_')+get_sample_names('ZZ_'),
                "extra" => Array['T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_t-channel','T_t-channel'],
                "ewk" => Array['Zjets_M50', 
                               'WWJetsTo2L2Nu_TuneZ2_8TeV',
@@ -53,7 +53,7 @@ samples = Hash[
                "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
                "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
                "Zembedded" => get_sample_names('ZetauEmbedded'),
-               "dataSingleE" => get_sample_names('data_SingleElectron_Run2012')
+               "dataSingleE" => get_sample_names('data_SingleElectron_Run2016')
                
 ]
 
@@ -318,6 +318,15 @@ end
 ##     mt
 ################################################################################
 
+task :recoplots => get_analyzer_results("LFVHETauAnalyzer_13TeV.py", samples['dataSingleE']#samples['signalMCgg'] 
+                                       )
+task :fakeeet => get_analyzer_results("EETauAnalyzer.py", samples['dataSingleE'] +
+                                         samples['zjets'] +  
+                                         samples['wwjets']  + samples['zzjets'] + 
+                                         samples['wzjets'] )
+                                         
+
+
 task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] )
 
 
@@ -328,7 +337,6 @@ task :genkinMuTauSIGNAL => get_analyzer_results("LFVHAnalyzeGENMuTau.py", sample
 task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
 
 
-task :recoplots => get_analyzer_results("LFVHETauAnalyzer_13TeV.py", samples['signalMCgg'] )
 
 task :recoplotsMVA => get_analyzer_results("LFVHETauAnalyzerMVA.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + 
                                                                      samples['dataSingleE'] 
@@ -352,16 +360,6 @@ task :controlplotsMVA => get_analyzer_results("EEAnalyzerMVA.py", #samples['sign
                                               samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] +  samples['Zembedded']+ samples['dataSingleE'])
 
 
-task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +
-                                      samples['wwjets']  + samples['zzjets'] + 
-                                      samples['wzjets'] +
-                                      samples['zjets'] +   samples['Zembedded']+samples['dataSingleE'])
-
-task :fakeeetMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py",# samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  + samples['Zembedded'] +
-                                         samples['zjets'] +  
-                                         samples['wwjets']  + samples['zzjets'] + 
-                                         samples['wzjets'] +
-                                         samples['dataSingleE'])
 
 task :fakeeeeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py", #samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +   samples['Zembedded']+
                                          samples['zjets'] +
