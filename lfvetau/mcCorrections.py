@@ -15,18 +15,15 @@ pu_distributionsUp  = {
     'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_up.root'))}
 pu_distributionsDown  = {
     'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_down.root'))}
-mc_pu_tag                  = 'S6' if is7TeV else 'S10'
+mc_pu_tag                  = 'S6' if is7TeV else 'MC_Spring16'
 
 
 def make_puCorrector(dataset, kind=None):
-    'makes PU reweighting according to the pu distribution of the reference data and the MC, MC distribution can be forced'
+    'makes PU reweighting according to the pu distribution of the reference data and the MC, MC distribution can be forced %s'
     if not kind:
         kind = mc_pu_tag
-    weights = []
     if dataset in pu_distributions:# and dataset in pu_distributionsUp and dataset in pu_distributionsDown:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributions[dataset]))
-#        weights = (PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributions[dataset])), PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsUp[dataset])), PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsDown[dataset])))
-#        return weights
+        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'MC_Spring16', *pu_distributions[dataset])
     else:
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
@@ -35,7 +32,7 @@ def make_puCorrectorUp(dataset, kind=None):
     if not kind:
         kind = mc_pu_tag
     if dataset in pu_distributions:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsUp[dataset]))
+        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'MC_Spring16', *(pu_distributionsUp[dataset]))
     else:
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
@@ -44,7 +41,7 @@ def make_puCorrectorDown(dataset, kind=None):
     if not kind:
         kind = mc_pu_tag
     if dataset in pu_distributions:
-        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'S10', *(pu_distributionsDown[dataset]))
+        return PileupWeight.PileupWeight( 'S6' if is7TeV else 'MC_Spring16', *(pu_distributionsDown[dataset]))
     else:
         raise KeyError('dataset not present. Please check the spelling or add it to mcCorrectors.py')
 
@@ -108,4 +105,5 @@ def make_multiple(fcn, indexed=False, shift=0):
 efficiency_trigger_2016    = make_multiple(HetauCorrection.single_ele_2016, indexed=True)
 efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=1)
 efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=-1)
+
 

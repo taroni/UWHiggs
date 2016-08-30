@@ -75,23 +75,26 @@ def merge_functions(fcn_1, fcn_2):
         return ((r1, r2), w)
     return f
 
+pucorrector = mcCorrections.make_puCorrector('singlee', None)
 
 class EETauAnalyzer(MegaBase):
     tree = 'eet/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         logging.debug('EETauAnalyzer constructor')
         self.channel='EET'
-        super(EETauAnalyzer, self).__init__(tree, outfile, **kwargs)
-        self.tree = EETauTree(tree)
-        self.out=outfile
-        self.histograms = {}
-
-        #understand what we are running
         target = os.path.basename(os.environ['megatarget'])
         self.is_data = target.startswith('data_')
         self.is_embedded = ('Embedded' in target)
         self.is_mc = not (self.is_data or self.is_embedded)
+
+        super(EETauAnalyzer, self).__init__(tree, outfile, **kwargs)
+        self.tree = EETauTree(tree)
+        self.out=outfile
+        self.histograms = {}
+        ROOT.TH1.AddDirectory(True)
         
+        #understandes what we are running
+       
         self.histo_locations = {}
         self.hfunc   = {
             'nTruePU' : lambda row, weight: (row.nTruePU,None),
@@ -99,13 +102,22 @@ class EETauAnalyzer(MegaBase):
             'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
         }
         self.trig_weight = mcCorrections.efficiency_trigger_2016 if not self.is_data else 1.
-        
+        self.tauSF={
+            'vloose' : 0.83,
+            'loose'  : 0.84,
+            'medium' : 0.84,
+            'tight'  : 0.83,
+            'vtight' : 0.80
+            }
+
     def event_weight(self, row, sys_shifts):
         if self.is_data:
             return {'' : 1.}
 
         mcweight = self.trig_weight(row, 'e1')
         if row.e2Pt>row.e1Pt :  mcweight = self.trig_weight(row, 'e2')
+        
+        mcweight = mcweight*pucorrector(row.nTruePU)
         weights = {'': mcweight
         } #put the weight here later (mc Correction, trigger eff)
         
@@ -115,27 +127,25 @@ class EETauAnalyzer(MegaBase):
     def begin(self):
         sys_shifts = []
         signs =['os', 'ss']
+        twp =['tVLoose', 'tLoose', 'tMedium', 'tTight', 'tVTight']
         jetN = ['', '0', '1', '2', '3']
         folder=[]
 
-        for tuple_path in itertools.product(signs, jetN):
+        
+        for tuple_path in itertools.product(signs, twp, jetN):
             folder.append(os.path.join(*tuple_path))
             path = list(tuple_path)
-            path.append('selected')
-            folder.append(os.path.join(*path))
-            prefix_path = os.path.join(*tuple_path)
-
-        #print folder 
+            
         #self.book('os/', "h_collmass_pfmet" , "h_collmass_pfmet",  32, 0, 320)
         #self.book('os/', "e1_e2_Mass",  "h_vismass",  32, 0, 320)
                 
         for f in folder:
-            #print f
             self.book(f,"weight", "weight", 100, 0, 10)
 
             self.book(f,"tPt", "tau p_{T}", 40, 0, 200)             
             self.book(f,"tPhi", "tau phi", 26, -3.25, 3.25)
-            self.book(f,"tEta", "tau eta",  10, -2.5, 2.5)
+            self.book(f,"tEta", "tau eta",  50, -2.5, 2.5)
+            self.book(f,"tAbsEta", "tau abs(eta)",  25, 0, 2.5)
             self.book(f,"tDecayMode", "tau decay mode", 12, -0.5, 11.5) 
             
             self.book(f,"e1Pt", "e1 p_{T}", 40, 0, 200)
@@ -159,7 +169,6 @@ class EETauAnalyzer(MegaBase):
             if location not in self.histo_locations:
                 self.histo_locations[location] = {name : value}
             else:
-                #print 'location and name', location, name
                 self.histo_locations[location][name] = value
       
         self.book('', "CUT_FLOW", "Cut Flow", len(cut_flow_step), 0, len(cut_flow_step))
@@ -239,7 +248,6 @@ class EETauAnalyzer(MegaBase):
                 logging.info('Removing duplicate of event: %d %d %d' % evt_id)
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
-            #print row.run,row.lumi,row.evt
             cut_flow_trk.Fill('allEvents')
             
             ##if self.is_data:
@@ -251,12 +259,11 @@ class EETauAnalyzer(MegaBase):
             cut_flow_trk.Fill('e2sel')
             if not selections.tauSelection(row, 't'): continue
             cut_flow_trk.Fill('tsel')
-            #print 'tau decay mode', row.tDecayModeFinding, row.tDecayMode, row.tDecayModeFindingNewDMs
             if abs(91.19 - row.e1_e2_Mass) > 20 : continue 
             
             if not row.tAgainstElectronTightMVA6: continue
             if not row.tAgainstMuonLoose3 : continue
-            if not row.tByLooseIsolationMVArun2v1DBoldDMwLT : continue
+            if not row.tByVLooseIsolationMVArun2v1DBoldDMwLT : continue
             cut_flow_trk.Fill('tdisc')
             logging.debug('object selection passed')
             #e ID/ISO
@@ -276,8 +283,11 @@ class EETauAnalyzer(MegaBase):
 
             sign = 'ss' if row.e1_e2_SS else 'os'
                 
+            isTauLoose  = bool(row.tByLooseIsolationMVArun2v1DBoldDMwLT)
+            isTauMedium = bool(row.tByMediumIsolationMVArun2v1DBoldDMwLT)
+            isTauTight  = bool(row.tByTightIsolationMVArun2v1DBoldDMwLT)
+            isTauVTight = bool(row.tByVTightIsolationMVArun2v1DBoldDMwLT)
             
-            isTauTight = bool(row.tByTightIsolationMVArun2v1DBoldDMwLT)
             #            isETight = bool(selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso01'))
             
             passes_full_selection = False
@@ -286,25 +296,39 @@ class EETauAnalyzer(MegaBase):
             cut_flow_trk.Fill('vetoes')
             logging.debug('Passed Vetoes')
             
-            folder = sign
+            folder = sign+'/tVLoose'
 
 
                 
             #starting to set up the optimizer
             #tau pt cut
             selection_categories = []
-            selection_categories.extend([folder])
-            folder = sign + '/' + str(int(jets))
-            selection_categories.extend([folder])
+            selection_categories.append((self.tauSF['vloose'],folder))
+            folder = sign + '/tVLoose/' + str(int(jets))
+            selection_categories.append((self.tauSF['vloose'],folder))
 
+            if isTauLoose :
+                folder = sign+'/tLoose'
+                selection_categories.append((self.tauSF['loose'],folder))
+                folder = sign+ '/tLoose/' + str(int(jets))
+                selection_categories.append((self.tauSF['loose'],folder))
+            if isTauMedium :
+                folder = sign+'/tMedium'
+                selection_categories.append((self.tauSF['medium'],folder))
+                folder = sign+ '/tMedium/' + str(int(jets))
+                selection_categories.append((self.tauSF['medium'],folder))
             if isTauTight :
-                folder = sign+'/selected'
-                selection_categories.extend([folder])
-                
-                folder = sign+ '/' + str(int(jets))+'/selected'
-                selection_categories.extend([folder])
+                folder = sign+'/tTight'
+                selection_categories.append((self.tauSF['tight'],folder))
+                folder = sign+ '/tTight/' + str(int(jets))
+                selection_categories.append((self.tauSF['tight'],folder))
+            if isTauVTight :
+                folder = sign+'/tVTight'
+                selection_categories.append((self.tauSF['vtight'],folder))
+                folder = sign+ '/tVTight/' + str(int(jets))
+                selection_categories.append((self.tauSF['vtight'],folder))
             
-            for selection in selection_categories:
+            for tSF,selection in selection_categories:
                 
                 dirname = selection
                 if sign=='os': cut_flow_trk.Fill('sign')
@@ -312,6 +336,7 @@ class EETauAnalyzer(MegaBase):
                 if dirname[-1] == '/':
                     dirname = dirname[:-1]
                 weight_to_use=weight_map['']
+                if row.isZtautau or row.isWtaunu or row.isGtautau: weight_to_use=weight_to_use*tSF
                 self.fill_histos(dirname, row, weight_to_use)
         cut_flow_trk.flush() 
             
