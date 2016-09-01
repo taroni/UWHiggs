@@ -3,6 +3,7 @@ import glob
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 from FinalStateAnalysis.PlotTools.decorators import memo, memo_last
+import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 
 @memo
 def getVar(name, var):
@@ -107,3 +108,6 @@ efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, inde
 efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=-1)
 
 
+electronID_WP90_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP90')
+electronIso_0p15_2016 =  make_multiple(HetauCorrection.iso0p15_ele_2016, indexed=True)
+electronIso_0p10_2016 =  make_multiple(HetauCorrection.iso0p10_ele_2016, indexed=True)
