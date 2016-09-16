@@ -11,11 +11,17 @@ def getVar(name, var):
 
 is7TeV = bool('7TeV' in os.environ['jobid'])
 pu_distributions  = {
-    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu.root'))}
+    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu.root')),
+    'singlem'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleMuon*pu.root'))
+}
 pu_distributionsUp  = {
-    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_up.root'))}
+    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_up.root')),
+    'singlem'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleMuon*pu_up.root'))
+    }
 pu_distributionsDown  = {
-    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_down.root'))}
+    'singlee'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleElectron*pu_down.root')),
+    'singlem'  : glob.glob(os.path.join( 'inputs', os.environ['jobid'], 'data_SingleMuon*pu_down.root'))
+    }
 mc_pu_tag                  = 'S6' if is7TeV else 'MC_Spring16'
 
 
@@ -102,6 +108,8 @@ def make_multiple(fcn, indexed=False, shift=0):
                 ret   *= fcn_ret
         return ret
     return multiple
+
+efficiency_trigger_mc_2016    = make_multiple(HetauCorrection.single_muon_2016, indexed=True)
 
 efficiency_trigger_2016    = make_multiple(HetauCorrection.single_ele_2016, indexed=True)
 efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=1)
