@@ -35,7 +35,7 @@ samples = Hash[
                "wwjets" => get_sample_names('WW_'),
                "wzjets" => get_sample_names('WZ_'),
                "zzjets" => get_sample_names('ZZ_'),
-               "zjets" => get_sample_names('DYJetsToLL_'),
+               "zjets" => get_sample_names('DYJetsToLL_M-50_TuneCUETP8M1'),
                "zjets_skimmedLL" => get_sample_names('jets_M50_skimmedLL'),
                "zjets_skimmedTT" => get_sample_names('jets_M50_skimmedTT'),
                "diboson" =>get_sample_names('WW_')+get_sample_names('WZ_')+get_sample_names('ZZ_'),
@@ -53,7 +53,8 @@ samples = Hash[
                "ggHiggsTo2Taus" => get_sample_names('GluGluToHToTauTau_M-125_8TeV-powheg-pythia6'),
                "vbfHiggsTo2Taus" => get_sample_names('VBF_HToTauTau_M-125_8TeV-powheg-pythia6'),
                "Zembedded" => get_sample_names('ZetauEmbedded'),
-               "dataSingleE" => get_sample_names('data_SingleElectron_Run2016')
+               "dataSingleE" => get_sample_names('data_SingleElectron_Run2016'),
+               "dataSingleM" => get_sample_names('data_SingleMuon_Run2016')
                
 ]
 
@@ -683,6 +684,12 @@ task :recoplots => get_analyzer_results("LFVHETauAnalyzer_13TeV.py", samples['da
                                        )
 task :fakeeet => get_analyzer_results("EETauAnalyzer.py",
                                       samples['dataSingleE'] +
+                                      samples['zjets'] +  
+                                      samples['wwjets']  + samples['zzjets'] + 
+                                      samples['wzjets'] )
+
+task :fakemmt => get_analyzer_results("MMTauAnalyser.py",
+                                      samples['dataSingleM'] +
                                       samples['zjets'] +  
                                       samples['wwjets']  + samples['zzjets'] + 
                                       samples['wzjets'] )

@@ -13,11 +13,10 @@ def splitEid(label):
 #OBJECT SELECTION
 def muSelection(row, name):
     if getattr( row, getVar(name,'Pt')) < 30:       return False
-    if getattr( row, getVar(name,'AbsEta')) > 2.1:  return False
+    if getattr( row, getVar(name,'AbsEta')) > 2.3:  return False
     if not getattr( row, getVar(name,'PixHits')):   return False
-    if getattr( row, getVar(name,'JetCSVBtag')) > 0.8: return False
-    #if getattr( row, getVar(name,'JetBtag')) > 3.3: return False #was 3.3 
-    if abs(getattr( row, getVar(name,'DZ'))) > 0.2: return False
+    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
+    if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
     return True
 
 def eSelection(row, name):
@@ -89,12 +88,14 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         LEPTON_ID = getattr(row, getVar(name, 'PFIDTight'))
     if not LEPTON_ID:
         return False
-    RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDB'))
+    RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
     AbsEta       = getattr(row, getVar(name, 'AbsEta'))
     if isolabel == 'idiso01':
         return bool( RelPFIsoDB < 0.10 )
     if isolabel == 'idiso02':
         return bool( RelPFIsoDB < 0.20 )
+    if isolabel == 'idiso025':
+        return bool( RelPFIsoDB < 0.25 )
     if isolabel == 'idiso05':
         return bool( RelPFIsoDB < 0.5 )
         

@@ -4,6 +4,7 @@ import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 from FinalStateAnalysis.PlotTools.decorators import memo, memo_last
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
+import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 
 @memo
 def getVar(name, var):
@@ -109,7 +110,6 @@ def make_multiple(fcn, indexed=False, shift=0):
         return ret
     return multiple
 
-efficiency_trigger_mc_2016    = make_multiple(HetauCorrection.single_muon_2016, indexed=True)
 
 efficiency_trigger_2016    = make_multiple(HetauCorrection.single_ele_2016, indexed=True)
 efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=1)
@@ -119,3 +119,8 @@ efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, inde
 electronID_WP90_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP90')
 electronIso_0p15_2016 =  make_multiple(HetauCorrection.iso0p15_ele_2016, indexed=True)
 electronIso_0p10_2016 =  make_multiple(HetauCorrection.iso0p10_ele_2016, indexed=True)
+
+muonID_tight = MuonPOGCorrections.make_muon_pog_PFTight_2016BCD()
+muonIso_loose = MuonPOGCorrections.make_muon_pog_LooseIso_2016BCD()
+muonTracking = MuonPOGCorrections.mu_trackingEta_2016
+efficiency_trigger_mu_2016    = MuonPOGCorrections.make_muon_pog_IsoMu22oIsoTkMu22_2016BCD()

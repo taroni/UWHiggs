@@ -13,9 +13,10 @@ export MEGAPATH=/hdfs/store/user/taroni
 
 echo $jobid
 export jobid=$jobid13
-#rake "meta:getinputs[$jobid, $datasrc,eet/metaInfo, eet/summedWeights]"
-#rake "meta:getmeta[inputs/$jobid, eet/metaInfo, 13, eet/summedWeights]"
+rake "meta:getinputs[$jobid, $datasrc,eet/metaInfo, eet/summedWeights]"
+rake "meta:getmeta[inputs/$jobid, eet/metaInfo, 13, eet/summedWeights]"
 
+export jobid='LFV_sep16_v2'
 rake "meta:getinputs[$jobid, $datasrc,mmt/metaInfo, mmt/summedWeights]"
 rake "meta:getmeta[inputs/$jobid, mmt/metaInfo, 13, mmt/summedWeights]"
 

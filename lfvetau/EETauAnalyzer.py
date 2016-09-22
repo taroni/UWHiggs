@@ -358,7 +358,7 @@ class EETauAnalyzer(MegaBase):
                 selection_categories.append((self.tauSF['vtight'],folder))
             
             for tSF,selection in selection_categories:
-                
+                lock = evt_id
                 dirname = selection
                 if sign=='os': cut_flow_trk.Fill('sign')
                 
