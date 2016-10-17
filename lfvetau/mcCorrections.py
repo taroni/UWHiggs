@@ -117,6 +117,7 @@ efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, inde
 
 
 electronID_WP90_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP90')
+electronID_WP80_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP80')
 electronIso_0p15_2016 =  make_multiple(HetauCorrection.iso0p15_ele_2016, indexed=True)
 electronIso_0p10_2016 =  make_multiple(HetauCorrection.iso0p10_ele_2016, indexed=True)
 

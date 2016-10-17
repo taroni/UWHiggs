@@ -14,27 +14,29 @@ def splitEid(label):
 def muSelection(row, name):
     if getattr( row, getVar(name,'Pt')) < 30:       return False
     if getattr( row, getVar(name,'AbsEta')) > 2.3:  return False
-    if not getattr( row, getVar(name,'PixHits')):   return False
+    if getattr( row, getVar(name,'PixHits')) < 0:   return False
     if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
+    #if abs(getattr(row, getVar(name, 'PVDXY'))) > 0.045: return False
     return True
 
 def eSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
     ept = getattr( row, getVar(name,'Pt')) ##put here ees_minus when available 
     if ept:
-        if ept < 24 : return False 
+        if ept < 25 : return False 
     else:
-        if getattr( row, getVar(name,'Pt')) < 24:   return False #was 20
+        if getattr( row, getVar(name,'Pt')) < 25:   return False #was 20
 
-    if eAbsEta > 2.1:      return False
+    if getattr(row, getVar(name, 'AbsEta')) > 2.1:      return False
     if getattr( row, getVar(name,'MissingHits')):       return False
     if not  getattr( row, getVar(name,'PassesConversionVeto')):     return False
 #    if getattr( row, getVar(name,'HasConversion')):     return False
-    if eAbsEta > 1.4442 and eAbsEta < 1.566: return False
+    if getattr(row,getVar(name,'AbsEta')) > 1.4442 and getattr(row,getVar(name,'AbsEta')) < 1.566: return False
     if not getattr( row, getVar(name,'ChargeIdTight')): return False
-    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
+    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
+    if abs(getattr( row, getVar(name,'PVDXY'))) > 0.045:     return False
     return True
 
 def eLowPtSelection(row, name):
@@ -84,20 +86,41 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
     isolabel, eidlabel = splitEid(label) #memoizes to be faster!
     if name[0] == 'e':
         LEPTON_ID = electronIds[eidlabel](row, name)
+    elif name[0]=='m':
+        #definition of good global muon
+        goodGlob = True
+        if not getattr(row, getVar(name,'IsGlobal')): goodGlob = False
+        if not getattr(row, getVar(name, 'NormalizedChi2')) < 3: goodGlob = False
+        if not getattr(row, getVar(name,'Chi2LocalPosition')) < 12: goodGlob = False
+        if not getattr(row, getVar(name,'TrkKink')) < 20: goodGlob = False
+        
+        #definition of ICHEP Medium Muon
+        LEPTON_ID =True
+        if not getattr(row, getVar(name,'PFIDLoose')): LEPTON_ID =False
+        if not getattr(row, getVar(name,'ValidFraction')) > 0.49 : LEPTON_ID = False
+        if not bool((goodGlob == True and getattr(row, getVar(name,'SegmentCompatibility')) > 0.303) or (getattr(row, getVar(name,'SegmentCompatibility')) > 0.451)) : LEPTON_ID =False
+        
     else:
         LEPTON_ID = getattr(row, getVar(name, 'PFIDTight'))
     if not LEPTON_ID:
         return False
-    RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
+    if name[0] == 'e':
+        RelPFIsoDB   = getattr(row, getVar(name, 'IsoDB03'))
+    else:
+        RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
     AbsEta       = getattr(row, getVar(name, 'AbsEta'))
     if isolabel == 'idiso01':
         return bool( RelPFIsoDB < 0.10 )
+    if isolabel == 'idiso015':
+        return bool( RelPFIsoDB < 0.15 )
     if isolabel == 'idiso02':
         return bool( RelPFIsoDB < 0.20 )
     if isolabel == 'idiso025':
         return bool( RelPFIsoDB < 0.25 )
     if isolabel == 'idiso05':
         return bool( RelPFIsoDB < 0.5 )
+    if isolabel == 'idiso1':
+        return bool (RelPFIsoDB < 1.0 ) 
         
         
 

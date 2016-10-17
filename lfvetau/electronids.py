@@ -10,17 +10,17 @@ def summer_2016_eid_WP80(row, name):
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
     if pT < 10    and abseta < 0.8:
-        return ( mva_output > -0.253 )
+        return ( mva_output > 0.287435 )
     elif pT < 10  and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.081 )
+        return ( mva_output > 0.221846 )
     elif pT < 10  and abseta > 1.479:
-        return ( mva_output > -0.081 )
+        return ( mva_output > -0.303263 )
     elif pT > 10  and abseta < 0.8:
-        return ( mva_output > 0.965 )
+        return ( mva_output > 0.967083 )
     elif pT > 10  and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.917 )
+        return ( mva_output > 0.929117 )
     elif pT > 10  and abseta > 1.479:
-        return ( mva_output > 0.683 )
+        return ( mva_output > 0.726311 )
     return False
 
 def summer_2016_eid_WP90(row, name):

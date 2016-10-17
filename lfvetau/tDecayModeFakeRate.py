@@ -15,9 +15,10 @@ canvas=ROOT.TCanvas()
 canvas.Draw()
 for name in files:
     myfile = ROOT.TFile.Open(name, "READ")
+    myfile.ls()
     num=myfile.Get("numerator")
     den=myfile.Get("denominator")
-
+    
     fakerate=num.Clone()
     fakerate.Divide(den)
 
@@ -46,6 +47,7 @@ for name in files:
         
     canvas.SaveAs(name.replace("corrected_inputs.root", "png"))
     canvas.SaveAs(name.replace("corrected_inputs.root", "pdf"))
+    #canvas.SaveAs(name.replace("corrected_inputs.root", "root"))
 
     myfile.Close()
     

@@ -77,10 +77,16 @@ end
 
 $frfit_dir = "results/#{$jobid}/fakerate_fits"
 directory $frfit_dir
+$mmfrfit_dir = "results/#{$jobid}/mmfakerate_fits"
+directory $mmfrfit_dir
+$mmfrfit_dirMC = "results/#{$jobid}/mmfakerate_fits_MC"
+directory $mmfrfit_dirMC
 $frfit_dirMC = "results/#{$jobid}/fakerate_fits_MC"
 directory $frfit_dirMC
 $efrfit_dir = "results/#{$jobid}/efakerate_fits"
 directory $efrfit_dir
+$mmefrfit_dir = "results/#{$jobid}/mmefakerate_fits"
+directory $mmefrfit_dir
 $efrfit_dirMC = "results/#{$jobid}/efakerate_fits_MC"
 directory $efrfit_dirMC
 exponential = "scale*TMath::Exp(x*decay)+offset"
@@ -93,9 +99,9 @@ landau_vars =  "scale[0.5, 0, 15],mu[5, 0, 30],sigma[1.9, 0.1, 20],offset[1e-2, 
 pol0 = "const"
 pol0_vars = "const[ 0.5, 0, 1]"
 pol1 = "p0+p1*x"
-pol1_vars = "p0[ 0.5, 0, 1], p1[ -0.1, -1, 1]"
+pol1_vars = "p0[ 0.5, 0, 1], p1[ 0.01, -0.1, 0.1]"
 pol2 = "p0+p1*x+p2*x*x"
-pol2_vars = "p0[ 0.05, 0, 1], p1[ -0.005, -1, 1], p2[ 0.005, 0, 1]"
+pol2_vars = "p0[ 0.01, 0, 1], p1[ 0.001, -1, 1], p2[ 0.005, 0, 1]"
 
 erf = "scale*TMath::Erf((x-shift)*steep)+offset"
 erf_vars =  "scale[0.1, 0, 10],shift[1., 0.8, 1.2],steep[100.], offset[1e-2, 0, 0.5]"
@@ -109,14 +115,46 @@ erf_vars =  "scale[0.1, 0, 10],shift[1., 0.8, 1.2],steep[100.], offset[1e-2, 0, 
 $fr_binning = "0,30,40,50,70,100,150,200"
 #$fr_binning = "30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200"
 $fr_analyzer = "EETauAnalyzer" 
-$efr_analyzer = "EleFakeRateAnalyzerMVA"
+$mmfr_analyzer = "MMTauAnalyser" 
+$efr_analyzer = "EEEAnalyzer"
+$mmefr_analyzer = "MMEAnalyzer"
 fr_fits      = Hash.new
+mmfr_fits      = Hash.new
 efr_fits      = Hash.new
+mmefr_fits   = Hash.new
 # Fake rate fit configurations
 
 #mysamples = [ "zjets_skimmedLL", "zjets_skimmedTT"]
 #for s in mysamples
 
+fr_fits["t_os_tSSuperLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                          "analyzer" => $fr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+fr_fits["t_os_tSuperLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                          "analyzer" => $fr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
 fr_fits["t_os_tVLoose_tTight_tPt"] = Hash[ 
                                           "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                           "analyzer" => $fr_analyzer,
@@ -173,87 +211,198 @@ fr_fits["t_os_tLoose_tVTight_tPt"] = Hash[
                                           "min"=>"0",
                                         "max"=>"1"
                                          ]
-##fr_fits["t_os_tMedium_tVTight_tPt"] = Hash[ 
-##                                          "samples" => Array["diboson",  "dataSingleE"],#, "zjets_skimmedLL"],
-##                                          "analyzer" => $fr_analyzer,
-##                                        #"function" => exponential,
-##                                          #"variables" => exponential_vars,
-##                                          "function" => pol0, 
-##                                          "variables"=>pol0_vars, 
-##                                          #"rebin" => 1,
-##                                          "rebin" => $fr_binning,
-##                                          "range" => "30 200",
-##                                          "title" => "#tau p_{T} (GeV)",
-##                                          "min"=>"0",
-##                                        "max"=>"1"
-##                                         ]
-##fr_fits["t_os_tMedium_tTight_tPt"] = Hash[ 
-##                                          "samples" => Array["diboson",  "dataSingleE"],#, "zjets_skimmedLL"],
-##                                          "analyzer" => $fr_analyzer,
-##                                        #"function" => exponential,
-##                                          #"variables" => exponential_vars,
-##                                          "function" => pol0, 
-##                                          "variables"=>pol0_vars, 
-##                                          #"rebin" => 1,
-##                                          "rebin" => $fr_binning,
-##                                          "range" => "30 200",
-##                                          "title" => "#tau p_{T} (GeV)",
-##                                          "min"=>"0",
-##                                        "max"=>"1"
-##                                         ]
-##fr_fits["t_os_tTight_tVTight_tPt"] = Hash[ 
-##                                          "samples" => Array["diboson",  "dataSingleE"],#, "zjets_skimmedLL"],
-##                                          "analyzer" => $fr_analyzer,
-##                                        #"function" => exponential,
-##                                          #"variables" => exponential_vars,
-##                                          "function" => pol0, 
-##                                          "variables"=>pol0_vars, 
-##                                          #"rebin" => 1,
-##                                          "rebin" => $fr_binning,
-##                                          "range" => "30 200",
-##                                          "title" => "#tau p_{T} (GeV)",
-##                                          "min"=>"0",
-##                                        "max"=>"1"
-##                                         ]
-efr_fits["e_os_eLoose_eTight_e3Pt"] = Hash[ 
-                                          "samples" => Array["diboson",  "dataSingleE"],
-                                          "analyzer" => $efr_analyzer,
+mmfr_fits["t_os_tSSuperLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
                                         #"function" => exponential,
                                           #"variables" => exponential_vars,
                                           "function" => pol0, 
                                           "variables"=>pol0_vars, 
                                           #"rebin" => 1,
-                                          "rebin" => "30,50,70,100,150,200",#$fr_binning,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmfr_fits["t_os_tSuperLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmfr_fits["t_os_tVLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmfr_fits["t_os_tVLoose_tVTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmfr_fits["t_os_tLoose_tTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmfr_fits["t_os_tLoose_tVTight_tPt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmfr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "#tau p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+efr_fits["e_os_eSuperLoose_eTight_e3Pt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                          "analyzer" => $efr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
                                           "range" => "30 200",
                                           "title" => "e p_{T} (GeV)",
                                           "min"=>"0",
-                                        "max"=>"1.2"
+                                        "max"=>"1"
                                          ]
-
-##fr_fits["t_os_tVLoose_tLoose_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol2,
-##                                              "variables" => pol2_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tVLoose_tMedium_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol2,
-##                                              "variables" => pol2_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
+efr_fits["e_os_eVLoose_eTight_e3Pt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                          "analyzer" => $efr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+efr_fits["e_os_eLoose_eTight_e3Pt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                          "analyzer" => $efr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmefr_fits["e_os_eSuperLoose_eTight_ePt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmefr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmefr_fits["e_os_eVLoose_eTight_ePt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmefr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+mmefr_fits["e_os_eLoose_eTight_ePt"] = Hash[ 
+                                          "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                          "analyzer" => $mmefr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol1, 
+                                          "variables"=>pol1_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "30 200",
+                                          "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+fr_fits["t_os_tSSuperLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $fr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1."
+                                           ]
+fr_fits["t_os_tSuperLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $fr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
 fr_fits["t_os_tVLoose_tTight_tEta"] = Hash[ 
                                               "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                               "analyzer" => $fr_analyzer,
@@ -279,18 +428,6 @@ fr_fits["t_os_tVLoose_tVTight_tEta"] = Hash[
                                               "min"=>"0",
                                               "max"=>"1"
                                            ]
-##fr_fits["t_os_tLoose_tMedium_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol2,
-##                                              "variables" => pol2_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
 fr_fits["t_os_tLoose_tTight_tEta"] = Hash[ 
                                               "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                               "analyzer" => $fr_analyzer,
@@ -315,66 +452,30 @@ fr_fits["t_os_tLoose_tVTight_tEta"] = Hash[
                                               "min"=>"0",
                                               "max"=>"1"
                                            ]
-##fr_fits["t_os_tMedium_tTight_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol2,
-##                                              "variables" => pol2_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tMedium_tVTight_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol2,
-##                                              "variables" => pol2_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tTight_tVTight_tEta"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol1,
-##                                              "variables" => pol1_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "-2.3 2.3",
-##                                              "title" => "#tau #eta",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tVLoose_tLoose_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tVLoose_tMedium_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
+fr_fits["t_os_tSSuperLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $fr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+fr_fits["t_os_tSuperLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $fr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
 fr_fits["t_os_tVLoose_tTight_tDecayMode"] = Hash[ 
                                               "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                               "analyzer" => $fr_analyzer,
@@ -399,18 +500,6 @@ fr_fits["t_os_tVLoose_tVTight_tDecayMode"] = Hash[
                                               "min"=>"0",
                                               "max"=>"1"
                                            ]
-##fr_fits["t_os_tLoose_tMedium_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
 fr_fits["t_os_tLoose_tTight_tDecayMode"] = Hash[ 
                                               "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                               "analyzer" => $fr_analyzer,
@@ -435,65 +524,242 @@ fr_fits["t_os_tLoose_tVTight_tDecayMode"] = Hash[
                                               "min"=>"0",
                                               "max"=>"1"
                                            ]
-##fr_fits["t_os_tMedium_tTight_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tMedium_tVTight_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-##fr_fits["t_os_tTight_tVTight_tDecayMode"] = Hash[ 
-##                                              "samples" => Array["diboson",  "dataSingleE"],
-##                                              "analyzer" => $fr_analyzer,
-##                                              "function" => pol0,
-##                                              "variables" => pol0_vars,
-##                                              "rebin" => 1,
-##                                              #"range" => "0 2.3",
-##                                              "range" => "0 11",
-##                                              "title" => "#tau decay mode",
-##                                              "min"=>"0",
-##                                              "max"=>"1"
-##                                           ]
-
-
+efr_fits["e_os_eSuperLoose_eTight_e3Eta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $efr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 3,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+efr_fits["e_os_eVLoose_eTight_e3Eta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
+                                              "analyzer" => $efr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 3,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
 efr_fits["e_os_eLoose_eTight_e3Eta"] = Hash[ 
-                                              "samples" => Array["diboson",  "dataSingleE"],#, "zjets_skimmedLL"],
+                                              "samples" => Array["diboson",  "dataSingleE", "zjets"],
                                               "analyzer" => $efr_analyzer,
                                               "function" => pol0,
                                               "variables" => pol0_vars,
-                                              "rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
-                                              "range" => "0 2.3",
-                                              #"range" => "-2.3 2.3",
+                                              "rebin" => 6,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
                                               "title" => "e #eta",
                                               "min"=>"0",
-                                              "max"=>"1.2"
+                                              "max"=>"1"
+                                           ]
+mmefr_fits["e_os_eSuperLoose_eTight_eEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmefr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 6,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmefr_fits["e_os_eVLoose_eTight_eEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmefr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 6,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmefr_fits["e_os_eLoose_eTight_eEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmefr_analyzer,
+                                              "function" => pol1,
+                                              "variables" => pol1_vars,
+                                              "rebin" => 6,
+                                              #"rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.1 2.1",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
                                            ]
 
+mmfr_fits["t_os_tVLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tSSuperLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tSuperLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+                                           
+mmfr_fits["t_os_tVLoose_tVTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tLoose_tTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tLoose_tVTight_tEta"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol2,
+                                              "variables" => pol2_vars,
+                                              "rebin" => 5,
+                                              #"range" => "0 2.3",
+                                              "range" => "-2.3 2.3",
+                                              "title" => "#tau #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tSSuperLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tSuperLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tVLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tVLoose_tVTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tLoose_tTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+mmfr_fits["t_os_tLoose_tVTight_tDecayMode"] = Hash[ 
+                                              "samples" => Array["diboson",  "dataSingleM", "zjets"],
+                                              "analyzer" => $mmfr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => 1,
+                                              #"range" => "0 2.3",
+                                              "range" => "0 11",
+                                              "title" => "#tau decay mode",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
 
 
   
 task :fits => []
 task :fitsMC => []
+task :mmfits => []
+task :mmfitsMC => []
+task :mmfitsDM => []
 
 task :efitsMC => []
 task :efits => []
+task :mmefits => []
 
 efr_fits.each do |fit, fit_info|
   fit_configuration = fit.split("_")
@@ -540,6 +806,29 @@ fr_fits.each do |fit, fit_info|
  
  task :fitsMC => fit_output
 end
+
+mmfr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+  
+  subsample_inputs = samples['zjets']
+  fit_output = $mmfrfit_dirMC + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+
+  file fit_output => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py'] do |t|
+    sh "mkdir -p #{$mmfrfit_dirMC}"
+    sh "fit_efficiency_chi2.py  #{fit_output} '#{num_path}' '#{denom_path}' \'#{pol0}\' \'#{pol0_vars}\' #{subsample_input_list} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error --rebin #{fit_info['rebin']} "
+    puts ""
+  end
+ 
+ task :mmfitsMC => fit_output
+end
   
 fr_fits.each do |fit, fit_info|
   fit_configuration = fit.split("_")
@@ -582,6 +871,49 @@ fr_fits.each do |fit, fit_info|
   
 end
 #end
+mmfr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    if sample !='zjets'
+      subsample_inputs += samples[sample]
+
+    end
+  end
+    
+  fit_output = $mmfrfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+  file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+    sh "mkdir -p #{$mmfrfit_dir}"
+    sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+    unless var=='tDecayMode' 
+      sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
+    end
+    puts ""
+      
+  end
+      
+  task :mmfits => fit_output
+  
+end
+
+
 fr_fits.each do |fit, fit_info|
   fit_configuration = fit.split("_")
   sign = fit_configuration[1]
@@ -621,6 +953,11 @@ fr_fits.each do |fit, fit_info|
   
     file fit_output => corrected_file do |t|
       fit_output=$frfit_dir + "/#{fit}_#{i}.root"
+      #if "#{i}"=="tDM1" then
+      #  fit_info['function']=pol0
+      #  fit_info['variables']=pol0_vars
+      #  print "#{i}"
+      #end
       unless var=='tDecayMode' 
         sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
       end
@@ -634,6 +971,57 @@ fr_fits.each do |fit, fit_info|
   
 end
 
+mmfr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    if sample !='zjets'
+      subsample_inputs += samples[sample]
+    end
+  end
+    
+  fit_output = $mmfrfit_dir + "_tDM/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  tDMlist = ['tDM0', 'tDM1', 'tDM10']
+  
+                                 
+
+  tDMlist.each do |i|
+    fit_output=$mmfrfit_dir + "/#{fit}_#{i}.root"
+    
+    # Path to histograms in root files
+    denom_path = Array[sign, denom, i, var].join("/")
+    num_path = Array[sign, num, i, var].join("/")
+  
+    corrected_file = fit_output.sub(".root", ".corrected_inputs.root")
+    
+    file corrected_file =>  subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+      sh "mkdir -p #{$mmfrfit_dir} "
+      sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+    end
+  
+    file fit_output => corrected_file do |t|
+      fit_output=$mmfrfit_dir + "/#{fit}_#{i}.root"
+      unless var=='tDecayMode' 
+        sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
+      end
+      puts ""
+      
+    end
+    task :mmfitsDM => fit_output
+  end
+      
+
+  
+end
 
 efr_fits.each do |fit, fit_info|
   fit_configuration = fit.split("_")
@@ -671,6 +1059,42 @@ efr_fits.each do |fit, fit_info|
   task :efits => fit_output
   
 end
+mmefr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    subsample_inputs += samples[sample]
+  end
+  fit_output = $mmefrfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+  #file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+  file corrected_file do |t|
+    sh "mkdir -p #{$mmefrfit_dir}"
+    sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+    sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
+    puts ""
+  end
+  
+    
+  task :mmefits => fit_output
+  
+end
 
 
 
@@ -687,8 +1111,19 @@ task :fakeeet => get_analyzer_results("EETauAnalyzer.py",
                                       samples['zjets'] +  
                                       samples['wwjets']  + samples['zzjets'] + 
                                       samples['wzjets'] )
+task :fakeeee => get_analyzer_results("EEEAnalyzer.py",
+                                      samples['dataSingleE'] +
+                                      samples['zjets'] +  
+                                      samples['wwjets']  + samples['zzjets'] + 
+                                      samples['wzjets'] )
 
 task :fakemmt => get_analyzer_results("MMTauAnalyser.py",
+                                      samples['dataSingleM'] +
+                                      samples['zjets'] +  
+                                      samples['wwjets']  + samples['zzjets'] + 
+                                      samples['wzjets'] )
+
+task :fakemme => get_analyzer_results("MMEAnalyzer.py",
                                       samples['dataSingleM'] +
                                       samples['zjets'] +  
                                       samples['wwjets']  + samples['zzjets'] + 

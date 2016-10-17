@@ -1,4 +1,4 @@
-from MMTauTree import MMTauTree
+from MMETree import MMETree
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
@@ -78,18 +78,18 @@ def merge_functions(fcn_1, fcn_2):
 
 pucorrector = mcCorrections.make_puCorrector('singlem', None)
 
-class MMTauAnalyser(MegaBase):
-    tree = 'mmt/final/Ntuple'
+class MMEAnalyzer(MegaBase):
+    tree = 'emm/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
-        logging.debug('MMTauAnalyser constructor')
-        self.channel='MMT'
+        logging.debug('MMEAnalyzer constructor')
+        self.channel='MME'
         target = os.path.basename(os.environ['megatarget'])
         self.is_data = target.startswith('data_')
         self.is_embedded = ('Embedded' in target)
         self.is_mc = not (self.is_data or self.is_embedded)
 
-        super(MMTauAnalyser, self).__init__(tree, outfile, **kwargs)
-        self.tree = MMTauTree(tree)
+        super(MMEAnalyzer, self).__init__(tree, outfile, **kwargs)
+        self.tree = MMETree(tree)
         self.out=outfile
         self.histograms = {}
         ROOT.TH1.AddDirectory(True)
@@ -136,7 +136,7 @@ class MMTauAnalyser(MegaBase):
     def begin(self):
         sys_shifts = []
         signs =['os', 'ss']
-        twp =['tSSuperLoose', 'tSuperLoose','tVLoose', 'tLoose', 'tMedium', 'tTight', 'tVTight']
+        twp =[ 'eSuperLoose','eVLoose', 'eLoose','eTight']
         jetN = ['', '0', '1', '2', '3']
         tDM = ['', 'tDM0', 'tDM1', 'tDM10']
         folder=[]
@@ -152,11 +152,11 @@ class MMTauAnalyser(MegaBase):
         for f in folder:
             self.book(f,"weight", "weight", 100, 0, 10)
 
-            self.book(f,"tPt", "tau p_{T}", 40, 0, 200)             
-            self.book(f,"tPhi", "tau phi", 26, -3.25, 3.25)
-            self.book(f,"tEta", "tau eta",  50, -2.5, 2.5)
-            self.book(f,"tAbsEta", "tau abs(eta)",  25, 0, 2.5)
-            self.book(f,"tDecayMode", "tau decay mode", 12, -0.5, 11.5) 
+            self.book(f,"ePt", "e p_{T}", 40, 0, 200)             
+            self.book(f,"ePhi", "e phi", 26, -3.25, 3.25)
+            self.book(f,"eEta", "e eta",  42, -2.1, 2.1)
+            self.book(f,"eAbsEta", "e abs(eta)",  25, 0, 2.5)
+ 
             
             self.book(f,"m1Pt", "m1 p_{T}", 40, 0, 200)
             self.book(f,"m1Phi", "m1 phi",  26, -3.2, 3.2)
@@ -268,18 +268,13 @@ class MMTauAnalyser(MegaBase):
             cut_flow_trk.Fill('m2sel')
             cut_flow_trk.Fill('msel')
             #print 'm2selection'
-            if not selections.tauSelection(row, 't'): continue
+            if not selections.eSelection(row, 'e'): continue
             cut_flow_trk.Fill('tsel')
             #print 'tau selection'
             if abs(91.19 - row.m1_m2_Mass) > 20 : continue
             #print 'Z selection'
             
-            if not row.tAgainstElectronTightMVA6: continue
-            if not row.tAgainstMuonLoose3 : continue
-            if not row.tByIsolationMVArun2v1DBoldDMwLTraw > -0.5 : continue
-            #if not row.tByVLooseIsolationMVArun2v1DBoldDMwLT : continue
-            print 'tauDiscriminants passed'
-            
+               
             cut_flow_trk.Fill('tdisc')
             logging.debug('object selection passed')
             #e ID/ISO
@@ -298,14 +293,11 @@ class MMTauAnalyser(MegaBase):
             jets = min(row.jetVeto30, 3)
 
             sign = 'ss' if row.m1_m2_SS else 'os'
-
-            isTauSuperLoose= bool (row.tByIsolationMVArun2v1DBoldDMwLTraw > 0 ) 
-            isTauVLoose = bool(row.tByVLooseIsolationMVArun2v1DBoldDMwLT)
-            isTauLoose  = bool(row.tByLooseIsolationMVArun2v1DBoldDMwLT)
-            isTauMedium = bool(row.tByMediumIsolationMVArun2v1DBoldDMwLT)
-            isTauTight  = bool(row.tByTightIsolationMVArun2v1DBoldDMwLT)
-            isTauVTight = bool(row.tByVTightIsolationMVArun2v1DBoldDMwLT)
-            
+            if not selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso1'): continue
+            isEVLoose = selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso05')
+            isELoose = selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso025')
+            isETight = selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso015')
+          
             #            isETight = bool(selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso01'))
             
             passes_full_selection = False
@@ -315,76 +307,29 @@ class MMTauAnalyser(MegaBase):
             cut_flow_trk.Fill('vetoes')
             logging.debug('Passed Vetoes')
             selection_categories = []
+            folder = sign+'/eSuperLoose'
+            selection_categories.append(folder)
+            folder = sign + '/eSuperLoose/' + str(int(jets))
+            selection_categories.append(folder)
+      
+                
+            if isEVLoose :
+                folder = sign+'/eVLoose'
+                selection_categories.append(folder)
+                folder = sign+ '/eVLoose/' + str(int(jets))
+                selection_categories.append(folder)
+            if isELoose :
+                folder = sign+'/eLoose'
+                selection_categories.append(folder)
+                folder = sign+ '/eLoose/' + str(int(jets))
+                selection_categories.append(folder)
+            if isETight :
+                folder = sign+'/eTight'
+                selection_categories.append(folder)
+                folder = sign+ '/eTight/' + str(int(jets))
+                selection_categories.append(folder)
             
-            folder = sign+'/tSSuperLoose'
-            selection_categories.append((self.tauSF['vloose'],folder))
-            folder = sign+ '/tSSuperLoose/tDM' + str(int(row.tDecayMode))
-            selection_categories.append((self.tauSF['vloose'],folder))
-            folder = sign + '/tSSuperLoose/' + str(int(jets))
-            selection_categories.append((self.tauSF['vloose'],folder))
-            folder = sign+ '/tSSuperLoose/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-            selection_categories.append((self.tauSF['vloose'],folder))
-            if isTauSuperLoose:
-                folder = sign+'/tSuperLoose'
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign+ '/tSuperLoose/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign + '/tSuperLoose/' + str(int(jets))
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign+ '/tSuperLoose/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vloose'],folder))
-
-            if isTauVLoose:
-                folder = sign+'/tVLoose'                
-                #starting to set up the optimizer
-                #tau pt cut
-
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign+ '/tVLoose/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign + '/tVLoose/' + str(int(jets))
-                selection_categories.append((self.tauSF['vloose'],folder))
-                folder = sign+ '/tVLoose/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vloose'],folder))
-
-            if isTauLoose :
-                folder = sign+'/tLoose'
-                selection_categories.append((self.tauSF['loose'],folder))
-                folder = sign+ '/tLoose/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['loose'],folder))
-                folder = sign+ '/tLoose/' + str(int(jets))
-                selection_categories.append((self.tauSF['loose'],folder))
-                folder = sign+ '/tLoose/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['loose'],folder))
-            if isTauMedium :
-                folder = sign+'/tMedium'
-                selection_categories.append((self.tauSF['medium'],folder))
-                folder = sign+ '/tMedium/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['medium'],folder))
-                folder = sign+ '/tMedium/' + str(int(jets))
-                selection_categories.append((self.tauSF['medium'],folder))
-                folder = sign+ '/tMedium/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['medium'],folder))
-            if isTauTight :
-                folder = sign+'/tTight'
-                selection_categories.append((self.tauSF['tight'],folder))
-                folder = sign+ '/tTight/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['tight'],folder))
-                folder = sign+ '/tTight/' + str(int(jets))
-                selection_categories.append((self.tauSF['tight'],folder))
-                folder = sign+ '/tTight/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['tight'],folder))
-            if isTauVTight :
-                folder = sign+'/tVTight'
-                selection_categories.append((self.tauSF['vtight'],folder))
-                folder = sign+ '/tVTight/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vtight'],folder))
-                folder = sign+ '/tVTight/' + str(int(jets))
-                selection_categories.append((self.tauSF['vtight'],folder))
-                folder = sign+ '/tVTight/' + str(int(jets)) + '/tDM' + str(int(row.tDecayMode))
-                selection_categories.append((self.tauSF['vtight'],folder))
-            
-            for tSF,selection in selection_categories:
+            for selection in selection_categories:
                 lock = evt_id
                 dirname = selection
                 if sign=='os': cut_flow_trk.Fill('sign')
@@ -392,7 +337,7 @@ class MMTauAnalyser(MegaBase):
                 if dirname[-1] == '/':
                     dirname = dirname[:-1]
                 weight_to_use=weight_map['']
-                if row.isZtautau or row.isWtaunu or row.isGtautau: weight_to_use=weight_to_use*tSF
+                #if row.isZtautau or row.isWtaunu or row.isGtautau: weight_to_use=weight_to_use*tSF
                 self.fill_histos(dirname, row, weight_to_use)
         cut_flow_trk.flush() 
             

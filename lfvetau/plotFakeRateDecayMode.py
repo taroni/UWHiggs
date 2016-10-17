@@ -15,7 +15,8 @@ for name in os.listdir(dirpath):
     if '_canvas.root' not in name: continue
     if os.path.isfile(os.path.join(dirpath, name)):
         files.append(os.path.join(dirpath, name))
-
+        print name
+        
 canvas=ROOT.TCanvas()
 canvas.Draw()
 
@@ -128,6 +129,8 @@ for name in files:
     
     canvas.SaveAs(name.replace("_tDM0_canvas.root", "_comparisonDM.png"))
     canvas.SaveAs(name.replace("_tDM0_canvas.root", "_comparisonDM.pdf"))
+    canvas.SaveAs(name.replace("_tDM0_canvas.root", "_comparisonDM.root"))
+    
 
     myfile0.Close()
     myfile1.Close()

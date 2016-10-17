@@ -21,11 +21,11 @@ echo "Building cython wrappers from file: $afile"
 #ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
 #echo "Building cython wrappers from file: $afile"
-#rake "make_wrapper[$afile, eet/final/Ntuple, EETauTree]"
-#ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
+rake "make_wrapper[$afile, eet/final/Ntuple, EETauTree]"
+ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
-#rake "make_wrapper[$afile, eee/final/Ntuple, EEETree]"
-#ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
+rake "make_wrapper[$afile, eee/final/Ntuple, EEETree]"
+ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
 
 export jobid='LFV_sep16_v2'
@@ -38,8 +38,8 @@ else
 fi
 
 echo "Building cython wrappers from file: $afile"
-rake "make_wrapper[$afile, mmt/final/Ntuple, MMTauTree]"
-ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
+#rake "make_wrapper[$afile, mmt/final/Ntuple, MMTauTree]"
+#ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
 #rake "make_wrapper[$afile, emm/final/Ntuple, MMETree]"
 #ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
