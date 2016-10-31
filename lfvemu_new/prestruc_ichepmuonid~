@@ -1,0 +1,6 @@
+cp -r results/SM*/LFVHEMuAnalyzerMVA_cecilentuple .
+cp move.sh LFVHEMuAnalyzerMVA_cecilentuple/
+cd LFVHEMuAnalyzerMVA_cecilentuple/
+source move.sh
+rm move.sh
+cd -

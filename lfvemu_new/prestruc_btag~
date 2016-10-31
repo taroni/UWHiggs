@@ -1,0 +1,6 @@
+cp -r results/SM*/LFVHEMuAnalyzerMVA_ichepmuonid .
+cp move.sh LFVHEMuAnalyzerMVA_ichepmuonid/
+cd LFVHEMuAnalyzerMVA_ichepmuonid/
+source move.sh
+rm move.sh
+cd -

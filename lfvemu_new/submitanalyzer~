@@ -1,0 +1,9 @@
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_8/src/UWHiggs/lfvemu)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen.log &
+sleep 10s

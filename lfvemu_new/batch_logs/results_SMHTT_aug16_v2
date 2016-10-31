@@ -1,0 +1,46 @@
+INFO:__main__:Processing inputs/SMHTT_aug16_v2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt using LFVHEMuAnalyzerMVA_eiso.py, the output file will be results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_eiso/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
+INFO:__main__:Generating submit scripts in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8
+INFO:FinalStateAnalysis.PlotTools.MegaPath:Checking inputs file inputs/SMHTT_aug16_v2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt exists...
+INFO:__main__:Running over 738 files in 74 jobs
+Generating submit files in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/analyze...
+..........................................................................
+Submit DAG file /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag has been created but not submitted.
+Jobs for Analyze are created in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/analyze
+Using HADD method to merge files
+Increasing vsize limit from 3000 MB to 6000 MB
+Generating submit files in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MergeLayer0...
+........
+Submit DAG file /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag has been created but not submitted.
+Jobs for MergeLayer0 are created in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MergeLayer0
+Using HADD method to merge files
+Increasing vsize limit from 3000 MB to 6000 MB
+Generating submit files in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/FinalMerged...
+.
+Submitting job(s).
+1 job(s) submitted to cluster 2191167.
+
+-----------------------------------------------------------------------
+File for submitting this DAG to Condor           : /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.condor.sub
+Log of DAGMan debugging messages                 : /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.dagman.out
+Log of Condor library output                     : /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.lib.out
+Log of Condor library error messages             : /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.lib.err
+Log of the life of condor_dagman itself          : /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.dagman.log
+
+-----------------------------------------------------------------------
+You can monitor your workflow's progess by watching /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.dagman.out
+A summary of the status of all of the jobs in your workflow will be
+written to the following file every 60 seconds:
+  /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag.status
+
+Your jobs should show up in ~6 minutes
+at the NEW job monitoring web page :
+    http://www.hep.wisc.edu/cms/comp/jobs/
+Jobs for FinalMerged are created in /nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/FinalMerged
+INFO:__main__:Waiting for job to complete
+INFO:__main__:/nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag: STATUS_SUBMITTED stats: [33mSTATUS_SUBMITTED[0m(15) [34mSTATUS_NOT_READY[0m(9) [36mSTATUS_READY[0m(59)
+INFO:__main__:/nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag: STATUS_SUBMITTED stats: [33mSTATUS_SUBMITTED[0m(15) [34mSTATUS_NOT_READY[0m(9) [36mSTATUS_READY[0m(59)
+INFO:__main__:/nfs_scratch/ndev/tmpFZdyt4LFVHEMuAnalyzerMVA_eiso-DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/job.dag: STATUS_SUBMITTED stats: [33mSTATUS_SUBMITTED[0m(15) [34mSTATUS_NOT_READY[0m(9) [36mSTATUS_READY[0m(59)
+Traceback (most recent call last):
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/FinalStateAnalysis//PlotTools/scripts/mega-farmout", line 190, in <module>
+    time.sleep(10)
+KeyboardInterrupt

@@ -1,0 +1,7 @@
+
+cp -r results/LFV_808v1/div_2j_LFVHEMuAnalyzerMVA .
+cp move.sh div_2j_LFVHEMuAnalyzerMVA/
+cd div_2j_LFVHEMuAnalyzerMVA
+source move.sh
+rm move.sh
+cd -

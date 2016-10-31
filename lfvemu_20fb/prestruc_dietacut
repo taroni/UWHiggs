@@ -1,0 +1,6 @@
+cp -r results/SM*/LFVHEMuAnalyzerMVA_dietacut .
+cp move.sh LFVHEMuAnalyzerMVA_dietacut/
+cd LFVHEMuAnalyzerMVA_dietacut/
+source move.sh
+rm move.sh
+cd -

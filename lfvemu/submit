@@ -1,0 +1,37 @@
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/UWHiggs/lfvemu)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_closer.py inputs/SMHTT_aug16_v2/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_closer_DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_closer.py inputs/SMHTT_aug16_v2/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_closer_WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuEE_012Jets_13TeV-madgraph.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_closer.py inputs/SMHTT_aug16_v2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_closer_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuEE_012Jets_13TeV-madgraph.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_closer.py inputs/SMHTT_aug16_v2/WGstarToLNuEE_012Jets_13TeV-madgraph.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuEE_012Jets_13TeV-madgraph.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_closer_WGstarToLNuEE_012Jets_13TeV-madgraph.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_closer.py inputs/SMHTT_aug16_v2/WGstarToLNuMuMu_012Jets_13TeV-madgraph.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_closer/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_closer_WGstarToLNuMuMu_012Jets_13TeV-madgraph.log &
+sleep 10s

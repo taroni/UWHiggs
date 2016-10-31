@@ -1,0 +1,90 @@
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015C_05Oct2015_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/data_SingleMuon_Run2015C_05Oct2015_25ns.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015C_05Oct2015_25ns.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_data_SingleMuon_Run2015C_05Oct2015_25ns.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015D_05Oct2015_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/data_SingleMuon_Run2015D_05Oct2015_25ns.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015D_05Oct2015_25ns.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_data_SingleMuon_Run2015D_05Oct2015_25ns.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015D_PromptReco-v4_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/data_SingleMuon_Run2015D_PromptReco-v4_25ns.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/data_SingleMuon_Run2015D_PromptReco-v4_25ns.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_data_SingleMuon_Run2015D_PromptReco-v4_25ns.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_GluGlu_LFV_HToMuTau_M125_13TeV_powheg_pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/VBF_LFV_HToMuTau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/VBF_LFV_HToMuTau_M125_13TeV_powheg_pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/VBF_LFV_HToMuTau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_VBF_LFV_HToMuTau_M125_13TeV_powheg_pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WW_TuneCUETP8M1_13TeV-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/WW_TuneCUETP8M1_13TeV-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WW_TuneCUETP8M1_13TeV-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_WW_TuneCUETP8M1_13TeV-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WZ_TuneCUETP8M1_13TeV-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/WZ_TuneCUETP8M1_13TeV-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WZ_TuneCUETP8M1_13TeV-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_WZ_TuneCUETP8M1_13TeV-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/ZZ_TuneCUETP8M1_13TeV-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/ZZ_TuneCUETP8M1_13TeV-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/ZZ_TuneCUETP8M1_13TeV-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_ZZ_TuneCUETP8M1_13TeV-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/GluGluHToTauTau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/GluGluHToTauTau_M125_13TeV_powheg_pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/GluGluHToTauTau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_GluGluHToTauTau_M125_13TeV_powheg_pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/VBFHToTauTau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/MiniAODSIMv2-Spring15-25ns_LFV_October13/VBFHToTauTau_M125_13TeV_powheg_pythia8.txt results/MiniAODSIMv2-Spring15-25ns_LFV_October13/LFVHEMuAnalyzerMVA/VBFHToTauTau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_MiniAODSIMv2-Spring15-25ns_LFV_October13_LFVHEMuAnalyzerMVA_VBFHToTauTau_M125_13TeV_powheg_pythia8.log &
+sleep 10s

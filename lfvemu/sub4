@@ -1,0 +1,35 @@
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuEE_012Jets_13TeV-madgraph.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuEE_012Jets_13TeV-madgraph.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/WGstarToLNuEE_012Jets_13TeV-madgraph.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuEE_012Jets_13TeV-madgraph.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_WGstarToLNuEE_012Jets_13TeV-madgraph.log &
+sleep 10s
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/WGstarToLNuMuMu_012Jets_13TeV-madgraph.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/WGstarToLNuMuMu_012Jets_13TeV-madgraph.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_WGstarToLNuMuMu_012Jets_13TeV-madgraph.log &
+sleep 10s
+mkdir -p `dirname results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA.py inputs/LFV_808v1/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.txt results/LFV_808v1/LFVHEMuAnalyzerMVA/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root --verbose >& batch_logs/results_LFV_808v1_LFVHEMuAnalyzerMVA_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.log &
+sleep 10s

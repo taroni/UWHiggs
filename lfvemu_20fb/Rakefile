@@ -1,0 +1,513 @@
+# Get common recipes
+recipes = ENV['fsa'] + '/PlotTools/rake/recipes.rake'
+import recipes
+
+require ENV['CMSSW_BASE'] + '/src/FinalStateAnalysis/PlotTools/rake/tools.rb'
+require 'pathname'
+
+$jobid = ENV['jobid']
+$blind = ENV['blind']
+# Figure out what run period we are in
+$period = '13TeV'
+PU = ENV['PU']
+#if $jobid.include? '8TeV'
+#  $period = '8TeV'
+#end
+
+
+################################################################################
+## Sample names ################################################################
+################################################################################
+#
+# Get sample names containing a substring
+def get_sample_names(substring)
+  inputs = Dir.glob("inputs/#{$jobid}/*.txt").select {|x| x.include? substring}
+  inputs = inputs.map{|x| File.basename(x).sub(".txt", "")}
+  return inputs
+end
+
+samples = Hash[
+               "ttbar" => get_sample_names('TT'),
+               "singlet" => get_sample_names('T_t'),
+               "singletbar" => get_sample_names('Tbar_t'), 
+	       "wg"=>get_sample_names('WG'), 
+	       "suneath" => get_sample_names('W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph'),
+               "wjets" => get_sample_names('W1JetsToLNu_TuneCUETP8M1_13TeV-madgraph')+get_sample_names('W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph')+get_sample_names('W3JetsToLNu_TuneCUETP8M1_13TeV-madgraph')+get_sample_names('W4JetsToLNu_TuneCUETP8M1_13TeV-madgraph')+get_sample_names('WJetsToLNu_TuneCUETP8M1_13TeV-madgraph'),
+#               "wjets" => get_sample_names('WJetsToLNu_TuneCUETP8M1_13TeV-madgraph'),
+               "wwjets" => get_sample_names('WWJets'),
+               "wzjets" => get_sample_names('WZJets'),
+               "zzjets" => get_sample_names('ZZJets'),
+               "zjets" => get_sample_names('jets_M50'),
+               "zjets_skimmedLL" => get_sample_names('jets_M50_skimmedLL'),
+               "zjets_skimmedTT" => get_sample_names('jets_M50_skimmedTT'),
+               "diboson" =>get_sample_names('WW')+get_sample_names('WZ')+get_sample_names('ZZ'),
+               "extra" => Array['T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_t-channel','T_t-channel'],
+               "ewk" => Array['Zjets_M50', 
+                              'WWJetsTo2L2Nu_TuneZ2_8TeV',
+                              'TTJets_FullLeptMGDecays_8TeV-madgraph-tauola','TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola'], 
+               # Maria's version
+               "DY" => get_sample_names('DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8')+get_sample_names('DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8')+get_sample_names('DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8')+get_sample_names('DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8')+get_sample_names('DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'),
+   
+	       "DYinclus" => get_sample_names('DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'),
+
+	       "DYlowmass"=>get_sample_names('DYJetsToLL_M-10'),
+               "signalMCgg" => get_sample_names('GluGlu_LFV_HToETau_M'),
+               "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M'),
+               "signalMCMuTaugg" => get_sample_names('GluGlu_LFV_HToMuTau_M'),
+               "signalMCMuTauvbf" => get_sample_names('VBF_LFV_HToMuTau_M'),
+               "ggHiggsTo2Taus" => get_sample_names('GluGluHToTauTau_M'),
+               "vbfHiggsTo2Taus" => get_sample_names('VBFHToTauTau_M'),
+               "Zembedded" => get_sample_names('ZetauEmbedded'),
+               "dataSingleE" => get_sample_names('data_SingleElectron_Run2015'),
+               "dataSingleMu" => get_sample_names('data_SingleMuon_Run2016'),
+               "data"=>get_sample_names(' data_SingleMuon_Run2016D'),
+               "dataD"=>get_sample_names('data_SingleMuon_Run2016D'),
+               "dataC"=>get_sample_names('data_SingleMuon_Run2016C'),
+               "dataB"=>get_sample_names('data_SingleMuon_Run2016B')
+	                      
+]
+
+
+
+# Function to get the .root files for an analyzer and samples
+def get_analyzer_results(analyzer, the_samples)
+  output = Array.new
+  analyzer_base = analyzer.sub('.py', '')
+  the_samples.each do |sample|
+    output << "results/#{$jobid}/#{analyzer_base}/#{sample}.root"
+  end
+  return output
+end
+def get_plotter_results(analyzer)
+  output = Array.new
+  analyzer_base = analyzer.sub('.py', '')
+end
+
+
+$frfit_dir = "results/#{$jobid}/fakerate_fits"
+directory $frfit_dir
+$frfit_dirMC = "results/#{$jobid}/fakerate_fits_MC"
+directory $frfit_dirMC
+$efrfit_dir = "results/#{$jobid}/efakerate_fits"
+directory $efrfit_dir
+$efrfit_dirMC = "results/#{$jobid}/efakerate_fits_MC"
+directory $efrfit_dirMC
+exponential = "scale*TMath::Exp(x*decay)+offset"
+exponential_vars =  "scale[4., 0, 10],decay[-1e-2, -1, -1e-4],offset[1e-2, 0, 0.5]"
+exponentialpol1 = "scale*TMath::Exp(x*decay)+offset+slope*x"
+exponentialpol1_vars =  "scale[4., 0, 10],decay[-1e-2, -1, -1e-4],offset[1e-2, 0, 0.5],slope[1e-1, 1, 1]"
+landau = "scale*TMath::Landau(x,mu,sigma,0)+offset"
+landau_vars =  "scale[0.5, 0, 15],mu[5, 0, 30],sigma[1.9, 0.1, 20],offset[1e-2, 0, 0.5]"
+
+pol0 = "p0"
+pol0_vars = "p0[ 0.5, 0, 1]"
+pol1 = "p0+p1*x"
+pol1_vars = "p0[ 0.5, 0, 1], p1[ -0.1, -1, 1]"
+pol2 = "p0+p1*x+p2*x*x"
+pol2_vars = "p0[ 0.05, 0, 1], p1[ -0.005, -1, 1], p2[ 0.005, 0, 1]"
+
+erf = "scale*TMath::Erf((x-shift)*steep)+offset"
+erf_vars =  "scale[0.1, 0, 10],shift[1., 0.8, 1.2],steep[100.], offset[1e-2, 0, 0.5]"
+
+
+#$fr_sample = "\"wzjets\", \"wwjets\", \"zzjets\", \"datasingleE\""
+#$fr_sample = "dataSingleE"
+
+#$fr_binning =  "30,35,40,45,50,55,60,70,80,90,100,120,140,160,180,200"
+$fr_binning = "10,20,40,80,120,200"
+#$fr_binning = "0,30,40,50,60,70,80,100,120,150,200"
+#$fr_binning = "30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200"
+$fr_analyzer = "MuFakeRateAnalyzerMVA" #was TauFakeRateAnalyzer
+$efr_analyzer = "EleFakeRateAnalyzerMVA_fromeee"
+fr_fits      = Hash.new
+efr_fits      = Hash.new
+
+# Fake rate fit configurations
+
+#mysamples = [ "zjets_skimmedLL", "zjets_skimmedTT"]
+#for s in mysamples
+
+fr_fits["m_os_mLoose_mTight_m3Pt"] = Hash[ 
+                                          "samples" => Array["diboson","data"],#  "dataSingleMu", "dataSingleE"],#, "zjets_skimmedLL"],
+                                          "analyzer" => $fr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => $fr_binning,
+                                          "range" => "0 200",
+                                         "title" => "#mu p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1"
+                                         ]
+efr_fits["e_os_eLoose_eTight_ePt"] = Hash[ 
+                                          "samples" => Array[  "diboson","data"],
+                                          "analyzer" => $efr_analyzer,
+                                        #"function" => exponential,
+                                          #"variables" => exponential_vars,
+                                          "function" => pol0, 
+                                          "variables"=>pol0_vars, 
+                                          #"rebin" => 1,
+                                          "rebin" => "10,30,50,70,100,150,200",
+                                          "range" => "30 200",
+                                         "title" => "e p_{T} (GeV)",
+                                          "min"=>"0",
+                                        "max"=>"1.2"
+                                         ]
+
+fr_fits["m_os_mLoose_mTight_m3AbsEta"] = Hash[ 
+                                              "samples" => Array["diboson","data"],#  "dataSingleMu","dataSingleE"],#, "zjets_skimmedLL"],
+                                              "analyzer" => $fr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+#                                              "rebin" => 1,
+                                              "rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              "range" => "0 2.3",
+                                              #"range" => "-2.3 2.3",
+                                              "title" => "#mu #eta",
+                                              "min"=>"0",
+                                              "max"=>"1"
+                                           ]
+
+
+efr_fits["e_os_eLoose_eTight_eAbsEta"] = Hash[ 
+                                              "samples" => Array[ "diboson","data"],#, "zjets_skimmedLL"],
+                                              "analyzer" => $efr_analyzer,
+                                              "function" => pol0,
+                                              "variables" => pol0_vars,
+                                              "rebin" => "0.,0.4,0.8,1.2,1.6,2.0,2.3",#4,
+                                              "range" => "0 2.3",
+                                              #"range" => "-2.3 2.3",
+                                              "title" => "e #eta",
+                                              "min"=>"0",
+                                              "max"=>"1.2"
+                                           ]
+
+
+
+  
+task :fits => []
+task :fitsMC => []
+
+task :efitsMC => []
+
+task :efits => []
+
+##fr_fits.each do |fit, fit_info|
+##  fit_configuration = fit.split("_")
+##  sign = fit_configuration[1]
+##  denom = fit_configuration[2]
+##  num = fit_configuration[3]
+##  var = fit_configuration[4]
+##  
+##  subsample_inputs = samples['zjets_skimmedLL']
+##  fit_output = $frfit_dirMC + "/#{fit}.root"
+##  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+##  subsample_input_list = subsamples_inputs_result_list.join(" ")
+##  denom_path = Array[sign, denom,var].join("/")
+##  num_path = Array[sign, num, var].join("/")
+##
+##  file fit_output => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py'] do |t|
+##    sh "mkdir -p #{$frfit_dirMC}"
+##    sh "fit_efficiency_chi2.py  #{fit_output} '#{num_path}' '#{denom_path}' \'#{pol0}\' \'#{pol0_vars}\' #{subsample_input_list} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error --rebin #{fit_info['rebin']} "
+##    puts ""
+##  end
+## 
+##  task :fits_MC => fit_output
+##  
+##end
+##
+
+efr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+  
+  subsample_inputs = samples['zjets_skimmedLL']
+  fit_output = $efrfit_dirMC + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+
+  file fit_output => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py'] do |t|
+    sh "mkdir -p #{$efrfit_dirMC}"
+    sh "fit_efficiency_chi2.py  #{fit_output} '#{num_path}' '#{denom_path}' \'#{pol0}\' \'#{pol0_vars}\' #{subsample_input_list} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error --rebin #{fit_info['rebin']} "
+    puts ""
+  end
+ 
+ task :efits_MC => fit_output
+end
+  
+fr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+     subsample_inputs += samples[sample]
+  end
+    
+  fit_output = $frfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  # subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/TauFakeRateAnalyzerMVA_eTight/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+#  file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+  file corrected_file do |t|
+   sh "mkdir -p #{$frfit_dir}"
+   sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+#    sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error --noFit"
+    puts ""
+  end
+  
+  #    file fit_output do  |t|
+  #      sh "mkdir -p #{$frfit_dir}"
+  #      sh "fit_efficiency_chi2.py --rebin #{fit_info['rebin']} #{fit_output} #{num_path} #{denom_path}  \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{subsample_input_list} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\'"
+  #      puts ""
+  #    end
+    
+  task :fits => fit_output
+  
+end
+#end
+
+efr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    subsample_inputs += samples[sample]
+  end
+  fit_output = $efrfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+#  file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+  file corrected_file do |t|
+    sh "mkdir -p #{$efrfit_dir}"
+    sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+#    sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error --noFit"
+    puts ""
+  end
+  
+    
+  task :efits => fit_output
+  
+end
+
+################################################################################
+## Recipes to analyze the GG channel of the LFV HToMuTau analysis
+##  targets:
+##     mt
+################################################################################
+
+task :genkin => get_analyzer_results("LFVHAnalyzeGEN.py",samples['signalMCgg']+samples['signalMCvbf'])
+
+
+task :genkinMuTau => get_analyzer_results("LFVHAnalyzeGENMuTau.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
+
+task :genkinMuTauSIGNAL => get_analyzer_results("LFVHAnalyzeGENMuTau.py", samples['signalMCMuTaugg'])
+
+task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
+
+
+task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'])# + samples['dataSingleE'] )
+
+task :recoplotsMVA => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['dataB'])
+task :recoplotsMVA_C => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['dataC'])
+task :recoplotsMVA_D => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['dataD'])
+#task :recoplotsMVA => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['ttbar'])
+
+#task :recoplotsMVA2 => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['wjets'])
+task :recoplotsMVA2 => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY'])
+task :recoplotsMVA3 =>get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets'])
+task :recoplotsMVA4 =>get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['wg']+samples['singlet'])
+
+task :divrecoplotsMVA => get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['dataB'])
+task :divrecoplotsMVA_C => get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['dataC'])
+task :divrecoplotsMVA_D => get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['dataD'])
+
+task :divrecoplotsMVA2 => get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY'])
+task :divrecoplotsMVA3 =>get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets'])
+task :divrecoplotsMVA4 =>get_analyzer_results("div_2j_LFVHEMuAnalyzerMVA.py",samples['wg']+samples['singlet'])
+
+
+task:stitched =>get_analyzer_results("stitched.py",samples['DY'])
+
+task:inclus =>get_analyzer_results("inclus.py",samples['DYinclus'])
+
+task :emuOptimData => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['dataB']+samples['dataC']+samples['dataD'])
+task :emuOptimMC => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :emuOptimWG => get_analyzer_results("LFVHEMuAnalyzerMVA_optim_WG.py",samples['wg'])
+
+task :runreco => get_analyzer_results("LFVHEMuAnalyzerMVA600",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet'])
+
+
+task :runreco2 => get_analyzer_results("LFVHEMuAnalyzerMVA600",samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run500 => get_analyzer_results("LFVHEMuAnalyzerMVA500",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runcecilntuple => get_analyzer_results("LFVHEMuAnalyzerMVA_cecilentuple",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runmutrk => get_analyzer_results("LFVHEMuAnalyzerMVA_mutrk",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runbtag => get_analyzer_results("LFVHEMuAnalyzerMVA_btag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runfake => get_analyzer_results("LFVHEMuAnalyzerMVA_fakerate",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runWP80 => get_analyzer_results("LFVHEMuAnalyzerMVA_WP80",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runpostbdt => get_analyzer_results("LFVHEMuAnalyzerMVA_postBDT",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :rundietacut => get_analyzer_results("LFVHEMuAnalyzerMVA_dietacut",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runcloser => get_analyzer_results("LFVHEMuAnalyzerMVA_closer",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runeiso => get_analyzer_results("LFVHEMuAnalyzerMVA_eiso",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runnup => get_analyzer_results("LFVHEMuAnalyzerMVA_NUP",samples['DY']+samples['wjets']+samples['DYlowmass'])
+
+#task :runeiso => get_analyzer_results("LFVHEMuAnalyzerMVA_eiso",samples['DYlowmass'])
+
+
+
+task :runWG => get_analyzer_results("LFVHEMuAnalyzerMVA_WG",samples['wg'])
+
+task :runBDTtreemaker => get_analyzer_results("LFVHEMuAnalyzerMVA_makeBDTtrees",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet'])
+
+task :runBDTtreemakervbfunchanged => get_analyzer_results("LFVHEMuAnalyzerMVA_makeBDTtreesvbfunchanged",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet'])
+
+task :runnewisovar => get_analyzer_results("LFVHEMuAnalyzerMVA_newisovar",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runhttbtag => get_analyzer_results("LFVHEMuAnalyzerMVA_httbtag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runichep => get_analyzer_results("LFVHEMuAnalyzerMVA_ichepmuonid",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runchargeidtight => get_analyzer_results("LFVHEMuAnalyzerMVA_chargeidtight",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runpieri => get_analyzer_results("LFVHEMuAnalyzerMVA_pieri",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runridnegweights => get_analyzer_results("LFVHEMuAnalyzerMVA_ridnegweights",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runpostbdtwithpt => get_analyzer_results("LFVHEMuAnalyzerMVA_postBDTwithpt",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :rundepth3withpt => get_analyzer_results("LFVHEMuAnalyzerMVA_postBDTwithpt_depth3",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :bdtwg => get_analyzer_results("LFVHEMuAnalyzerMVA_BDT_WG",samples['wg'])
+
+task :rundepth3 => get_analyzer_results("LFVHEMuAnalyzerMVA_postBDT_depth3",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run400 => get_analyzer_results("LFVHEMuAnalyzerMVA400",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run300 => get_analyzer_results("LFVHEMuAnalyzerMVA300",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run200 => get_analyzer_results("LFVHEMuAnalyzerMVA200",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run800 => get_analyzer_results("LFVHEMuAnalyzerMVA800",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['singlet'])
+
+task :run8002 => get_analyzer_results("LFVHEMuAnalyzerMVA800",samples['wjets']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run700 => get_analyzer_results("LFVHEMuAnalyzerMVA700",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['singlet'])
+
+task :run7002 => get_analyzer_results("LFVHEMuAnalyzerMVA700",samples['wjets']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run900 => get_analyzer_results("LFVHEMuAnalyzerMVA900",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :run1000 => get_analyzer_results("LFVHEMuAnalyzerMVA1000",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :emuOptim2 => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY'])
+
+task :emuOptim3 => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
+
+#task :emuOptim => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['ttbar'])
+
+task :reco2 => get_analyzer_results("LFVHEMuAnalyzerMVA2.py",samples['DY'])
+
+
+
+task :recoplotsMuTau => get_analyzer_results("LFVHMuTauAnalyzer.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] )
+
+task :controlplots => get_analyzer_results("EEAnalyzer.py",samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'] + samples['dataSingleE'])
+
+task :controlplotsMVA => get_analyzer_results("EEAnalyzerMVA.py", samples['DY'])
+
+
+task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +
+                                      samples['wwjets']  + samples['zzjets'] + 
+                                      samples['wzjets'] +
+                                      samples['zjets'] +  samples['dataSingleE'])
+
+task :fakeeetMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +
+                                      samples['wwjets']  + samples['zzjets'] + 
+                                      samples['wzjets'] +
+                                      samples['zjets'] +  samples['dataSingleE'])
+
+
+task :fakemmeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA.py",samples['diboson'] + samples['dataSingleMu']+samples['dataSingleE']+samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
+
+task :fakeeeeMVA => get_analyzer_results("EleFakeRateAnalyzerMVA_fromeee.py",samples['diboson'] + samples['dataSingleE'] + samples['dataSingleMu']+samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
+
+task :fakeeemMVA => get_analyzer_results("MuFakeRateAnalyzerMVA_fromeem.py",samples['diboson'] + samples['dataSingleE'] + samples['DY'])
+
+task :fakemmmMVA => get_analyzer_results("MuFakeRateAnalyzerMVA.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['wjets']  +   samples['Zembedded']+
+                                         #samples['zjets'] +
+                                         samples['diboson'] +
+                                         samples['dataSingleMu']+
+                                         samples['DY']
+                                         )
+task :zmm => get_analyzer_results("Z_pk_njet_mm.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +   samples['Zembedded']+
+                                         #samples['zjets'] +
+                                         samples['diboson'] +
+                                         samples['dataSingleMu']+
+                                         samples['DY']
+                                         )
+
+task :test => get_analyzer_results("test_pk_njet_mm.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +   samples['Zembedded']+
+                                         #samples['zjets'] +
+                                         samples['diboson'] +
+                                         samples['dataSingleMu']+
+                                         samples['DY']
+                                         )
+
+
+$etdir = "plots/#{$jobid}/LFVHETauAnalyzer/et/"
+directory $etdir 
+file  "#{$emtdir}/plot#{$period}.root" do |t|
+  sh "echo $jobid"
+  sh "python myNewPlotterReco.py" 
+  
+end
+
+
+task :drawTauFakeRate => get_plotter_results("plotTauFakeRate.py")
+
+task :drawplots => "#{$emtdir}/plot#{$period}.root"
+

@@ -1,0 +1,6 @@
+cp -r results/LFV_808v1/LFVHEMuAnalyzerMVA700 .
+cp move.sh LFVHEMuAnalyzerMVA700/
+cd LFVHEMuAnalyzerMVA700
+source move.sh
+rm move.sh
+cd -

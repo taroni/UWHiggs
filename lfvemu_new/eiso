@@ -1,0 +1,10 @@
+
+mkdir -p `dirname results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_eiso/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root`
+#using farmout:1
+#dry run:1
+
+export megatarget=results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_eiso/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_eiso.py inputs/SMHTT_aug16_v2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt results/SMHTT_aug16_v2/LFVHEMuAnalyzerMVA_eiso/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root --verbose >& batch_logs/results_SMHTT_aug16_v2_LFVHEMuAnalyzerMVA_eiso_DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.log &
+sleep 10s
+
