@@ -3,15 +3,17 @@ export OVERRIDE_META_TREE_data_EM='em/metaInfo'
 
 export IGNORE_LUMI_ERRORS=1
 
-source jobid.sh
+#source jobid.sh
 #jobid13='LFV_8013v1'
-export jobid=$jobid13
+#export jobid=$jobid13
 
+export jobid13=Oct30
+export jobid=Oct30
 echo $jobid
 #export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
 #export EMGAPATH=/hdfs/store/user/$USER
-export datasrc=/hdfs/store/user/caillol  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
-export MEGAPATH=/hdfs/store/user/caillol
+export datasrc=/hdfs/store/user/ndev  #$(ls -d /scratch/*/data/$jobid | awk -F$jobid '{print $1}')
+export MEGAPATH=/hdfs/store/user/ndev
 
 
 #./make_proxies.sh

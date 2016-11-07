@@ -8,13 +8,13 @@ mv VBF_LFV_HToMuTau_M125_13TeV_powheg_pythia8.root LFVVBF125.root
 
 hadd -f Dibosons.root WW_TuneCUETP8M1_13TeV-pythia8.root WZ_TuneCUETP8M1_13TeV-pythia8.root ZZ_TuneCUETP8M1_13TeV-pythia8.root 
 
-hadd -f DY.root DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+hadd -f DY.root DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
 
 hadd -f WJETSMC.root WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
 
 hadd -f  data_obs.root   data_SingleMuon_Run2016B*.root  data_SingleMuon_Run2016C*.root  data_SingleMuon_Run2016D*.root
 
-hadd -f WG.root WGstarToLNuEE_012Jets_13TeV-madgraph.root WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root WGstarToLNuMuMu_012Jets_13TeV-madgraph.root
+hadd -f WG.root WGstarToLNuEE_012Jets_13TeV-madgraph.root WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root  WGstarToLNuMuMu_012Jets_13TeV-madgraph.root
 
 hadd -f T.root ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1.root
 

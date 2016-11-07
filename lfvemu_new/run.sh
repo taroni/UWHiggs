@@ -4,7 +4,7 @@
 set -o nounset
 set -o errexit
 
-export MEGAPATH=/hdfs/store/user/caillol/
+export MEGAPATH=/hdfs/store/user/ndev/
 source jobid.sh
 export jobid=$jobid13
 
@@ -21,7 +21,7 @@ export jobid=$jobid13
 #rake recoplotsMVA
 #rake stitched
 #rake reco2
-rake runnup
+rake runDY
 ##rake drawplots
 #rake genkinEMu
 #rake genkinMuTau

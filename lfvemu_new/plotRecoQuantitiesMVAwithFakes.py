@@ -49,6 +49,7 @@ mc_samples = [
     'DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'FAKES',
     'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
@@ -56,14 +57,14 @@ mc_samples = [
     'W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     'GluGluHToTauTau_M125_13TeV_powheg_pythia8',
-    'TT_TuneCUETP8M1_13TeV-powheg-pythia8-evtgen', 
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8', 
     'VBFHToTauTau_M125_13TeV_powheg_pythia8',
     'WW_TuneCUETP8M1_13TeV-pythia8',
     'WZ_TuneCUETP8M1_13TeV-pythia8',
     'ZZ_TuneCUETP8M1_13TeV-pythia8',
     'WGstarToLNuMuMu_012Jets_13TeV-madgraph',
     'WGstarToLNuEE_012Jets_13TeV-madgraph',
-    'WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1',
     'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1'
     
@@ -79,10 +80,10 @@ blind_region=[100, 150] if blind else None
 
 embedded = False
 print jobid
-files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA/*.root' % (jobid))
+files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA_btag/*.root' % (jobid))
 #print "files",files
-outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA/' % (jobid)
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded)
+outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA_btag/' % (jobid)
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="allfakes/os/.*ass*")
 EWKDiboson = views.StyleView(
     views.SumView( 
         *[ plotter.get_view(regex) for regex in 
@@ -148,8 +149,8 @@ new_mc_samples = []
 
 
 #print new_sigsamples 
-new_mc_samples.extend(['DYLL','Fakes','TT','WGamma','SingleT','EWKDiboson', 'SMH',])
-
+#new_mc_samples.extend(['DYLL','TT','SingleT','EWKDiboson', 'SMH','Wplus'])
+new_mc_samples.extend(['EWKDiboson','SMH','WGamma','SingleT','TT','Wplus','DYLL'])
 
 
 #rebins = [5, 5, 2, 5, 5, 2, 1, 5, 5, 2, 1]
@@ -169,7 +170,8 @@ if not args.no_plots:
    signs = ['os','ss']
    jets = ['0',
       '1',
-      '2'
+      '21',
+      '22'
    ]
    processtype = ['gg']
    threshold = []
@@ -182,29 +184,29 @@ if not args.no_plots:
    ]
        
    histo_info = [
-      ('h_collmass_pfmet', 'M_{coll}(emu) (GeV)', 1)
- #     ('mPt', 'p_{T}(mu) (GeV)', 4), 
- #     ('mEta', 'eta(mu)', 2),  
- #     ('mPhi', 'phi(mu)', 4), 
- #     ('ePt', 'p_{T}(e) (GeV)', 4), 
- #     ('eEta', 'eta(e)', 2),  
- #     ('ePhi', 'phi(e)', 4), 
- #     ('em_DeltaPhi', 'emu Deltaphi', 2), 
- #     ('em_DeltaR', 'emu Delta R', 2),
- #     ('h_vismass', 'M_{vis} (GeV)', 1),
- #     ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
- #     ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
- #     ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
- #     ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
- #     ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
- #      ('mPFMETDeltaPhi_vs_ePFMETDeltaPhi','mPFMETDeltaPhi_vs_ePFMETDeltaPhi',1)
+      ('h_collmass_pfmet', 'M_{coll}(emu) (GeV)', 1),
+      ('mPt', 'p_{T}(mu) (GeV)', 4), 
+      ('mEta', 'eta(mu)', 2),  
+      ('mPhi', 'phi(mu)', 4), 
+      ('ePt', 'p_{T}(e) (GeV)', 4), 
+      ('eEta', 'eta(e)', 2),  
+      ('ePhi', 'phi(e)', 4), 
+      ('em_DeltaPhi', 'emu Deltaphi', 2), 
+      ('em_DeltaR', 'emu Delta R', 2),
+      ('h_vismass', 'M_{vis} (GeV)', 1),
+      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
+      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+#      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
+# #      ('mPFMETDeltaPhi_vs_ePFMETDeltaPhi','mPFMETDeltaPhi_vs_ePFMETDeltaPhi',1)
    #   ('type1_pfMetEt', 'pfMet', 1)      
    ]
    
    logging.debug("Starting plotting")
    
 
-   for regions in ['subtracted']:
+   for regions in ['allfakes']:
        for sign,  njet in itertools.product(signs,  jets):
            path = os.path.join(regions,sign,'gg',njet)
 #          print path
@@ -225,9 +227,11 @@ if not args.no_plots:
            for var, xlabel, rebin in histo_info:
                logging.debug("Plotting %s/%s" % (path, var) )
                plotter.pad.SetLogy(False)
-               print var
-               if int(njet)==2: 
+ #              print var
+               if int(njet)==1 or int(njet)==21 or int(njet)==22: 
                  rebin = rebin*2
+               if int(njet)==22:
+                   rebin=rebin*2
              
                plotter.plot_mc_vs_data_witherrors(path, var, njet,rebin, xlabel,
                                                     leftside=False, xrange=(0.,300.), show_ratio=True, ratio_range=1., 
@@ -238,9 +242,12 @@ if not args.no_plots:
          # plotter.set_subdir(os.path.join('embedded', path+'/selected'))if embedded else plotter.set_subdir(path+'/selected')
        
            for var, xlabel, rebin in histo_info:
-               if int(njet)==2:
+               if int(njet)==1 or int(njet)==21 or int(njet)==22:
                    rebin = rebin*2
-               print var
+               if int(njet)==22:
+                   rebin=rebin*2
+
+#               print var
                logging.debug("Plotting %s/%s" % (path, var) )
                plotter.pad.SetLogy(False)
                plotter.plot_mc_vs_data_witherrors(path+'/selected/nosys', var, njet,rebin, xlabel,

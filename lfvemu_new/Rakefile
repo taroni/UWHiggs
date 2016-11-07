@@ -379,9 +379,13 @@ task :runcecilntuple => get_analyzer_results("LFVHEMuAnalyzerMVA_cecilentuple",s
 
 task :runmutrk => get_analyzer_results("LFVHEMuAnalyzerMVA_mutrk",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
 
-task :runbtag => get_analyzer_results("LFVHEMuAnalyzerMVA_btag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+task :runbtag => get_analyzer_results("LFVHEMuAnalyzerMVA_btag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
 
-task :runfake => get_analyzer_results("LFVHEMuAnalyzerMVA_fakerate",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
+task :runDY => get_analyzer_results("LFVHEMuAnalyzerMVA_DYweight",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DYinclus']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
+
+
+
+task :runfake => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakes",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
 
 task :runWP80 => get_analyzer_results("LFVHEMuAnalyzerMVA_WP80",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD'])
 
@@ -393,13 +397,19 @@ task :runcloser => get_analyzer_results("LFVHEMuAnalyzerMVA_closer",samples['sig
 
 task :runeiso => get_analyzer_results("LFVHEMuAnalyzerMVA_eiso",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
 
+task :runfakes => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakes",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runfakesnew => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakesnew",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+#task :runfakes => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakes",samples['DY']+samples['wjets'])
+
 task :runnup => get_analyzer_results("LFVHEMuAnalyzerMVA_NUP",samples['DY']+samples['wjets']+samples['DYlowmass'])
 
 #task :runeiso => get_analyzer_results("LFVHEMuAnalyzerMVA_eiso",samples['DYlowmass'])
 
 
 
-task :runWG => get_analyzer_results("LFVHEMuAnalyzerMVA_WG",samples['wg'])
+task :runWG => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakesWG",samples['wg'])
 
 task :runBDTtreemaker => get_analyzer_results("LFVHEMuAnalyzerMVA_makeBDTtrees",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet'])
 

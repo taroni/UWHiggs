@@ -18,11 +18,10 @@ export jobid=$jobid13
 #rake  efits
 #rake drawTauFakeRate
 #export jobid=$jobidmt
-rake recoplotsMVA2
+#rake recoplotsMVA
 #rake stitched
-#rake inclus
 #rake reco2
-#rake  emuOptim2
+rake runbtag
 ##rake drawplots
 #rake genkinEMu
 #rake genkinMuTau

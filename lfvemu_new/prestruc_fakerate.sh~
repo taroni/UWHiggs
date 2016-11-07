@@ -1,0 +1,6 @@
+cp -r results/SM*/LFVHEMuAnalyzerMVA_withfakes .
+cp move.sh LFVHEMuAnalyzerMVA_withfakes/
+cd LFVHEMuAnalyzerMVA_withfakes/
+source move.sh
+rm move.sh
+cd -

@@ -1,6 +1,6 @@
-cp -r results/SM*/LFVHEMuAnalyzerMVA_pieri .
-cp move.sh LFVHEMuAnalyzerMVA_pieri/
-cd LFVHEMuAnalyzerMVA_pieri/
+cp -r results/Oc*/LFVHEMuAnalyzerMVA_btag .
+cp move.sh LFVHEMuAnalyzerMVA_btag/
+cd LFVHEMuAnalyzerMVA_btag/
 source move.sh
 rm move.sh
 cd -

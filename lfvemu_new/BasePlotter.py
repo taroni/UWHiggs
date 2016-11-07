@@ -119,7 +119,7 @@ def find_fill_range(histo):
     return first, last
 
 class BasePlotter(Plotter):
-    def __init__ (self,  files, outputdir, blind_region=None, forceLumi=-1, use_embedded=False,noData=False): 
+    def __init__ (self,  files, outputdir, blind_region=None, forceLumi=-1, use_embedded=False,noData=False,blind_path="os/.*ass*"): 
         cwd = os.getcwd()
         self.period = '13TeV'
         self.sqrts  = 13
@@ -137,7 +137,8 @@ class BasePlotter(Plotter):
         blinder=None
         if self.blind_region:
             # Don't look at the SS all pass region
-            blinder = lambda x: BlindView(x, "os/.*ass*",blind_in_range(*self.blind_region))
+#            blinder = lambda x: BlindView(x, "allfakes/os/.*ass*",blind_in_range(*self.blind_region))
+            blinder = lambda x: BlindView(x, blind_path,blind_in_range(*self.blind_region))
         print files
         super(BasePlotter, self).__init__(files, lumifiles, outputdir, blinder, forceLumi=forceLumi)
 

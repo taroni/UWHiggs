@@ -67,7 +67,7 @@ mc_samples = [
     'ZZ_TuneCUETP8M1_13TeV-pythia8',
     'WGstarToLNuMuMu_012Jets_13TeV-madgraph',
     'WGstarToLNuEE_012Jets_13TeV-madgraph',
-    'WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1',
     'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1'
     
@@ -83,10 +83,10 @@ blind_region=[100, 150] if blind else None
 
 embedded = False
 print jobid
-files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA_eiso/*.root' % (jobid))
+files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA_btag/*.root' % (jobid))
 #print "files",files
-outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA_eiso/' % (jobid)
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded)
+outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA_btag/' % (jobid)
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="os/.*ass*")
 EWKDiboson = views.StyleView(
     views.SumView( 
         *[ plotter.get_view(regex) for regex in 
@@ -190,14 +190,14 @@ if not args.no_plots:
       ('eEta', 'eta(e)', 2),  
       ('ePhi', 'phi(e)', 4), 
       ('em_DeltaPhi', 'emu Deltaphi', 2), 
-#      ('em_DeltaR', 'emu Delta R', 2),
-#      ('h_vismass', 'M_{vis} (GeV)', 1),
-#      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
-#      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-#      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-#      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
-#      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
-##      ('scaledmPt', 'p_{T}(mu)/M_{coll}(emu)', 2), 
+      ('em_DeltaR', 'emu Delta R', 2),
+      ('h_vismass', 'M_{vis} (GeV)', 1),
+      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
+      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
+###      ('scaledmPt', 'p_{T}(mu)/M_{coll}(emu)', 2), 
 ##      ('scaledePt', 'p_{T}(e)/M_{coll}(emu)', 2)
 ##      ('mPFMETDeltaPhi_vs_ePFMETDeltaPhi','mPFMETDeltaPhi_vs_ePFMETDeltaPhi',1)
    #   ('type1_pfMetEt', 'pfMet', 1)      
