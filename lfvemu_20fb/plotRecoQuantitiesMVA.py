@@ -65,9 +65,10 @@ mc_samples = [
     'WW_TuneCUETP8M1_13TeV-pythia8',
     'WZ_TuneCUETP8M1_13TeV-pythia8',
     'ZZ_TuneCUETP8M1_13TeV-pythia8',
+    'QCD',
     'WGstarToLNuMuMu_012Jets_13TeV-madgraph',
     'WGstarToLNuEE_012Jets_13TeV-madgraph',
-    'WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
+    'WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1',
     'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1'
     
@@ -83,14 +84,14 @@ blind_region=[100, 150] if blind else None
 
 embedded = False
 print jobid
-files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA_eiso/*.root' % (jobid))
+files=  glob.glob('results/%s/LFVHEMuAnalyzerMVA_esffixed/*.root' % (jobid))
 #print "files",files
-outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA_eiso/' % (jobid)
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded)
+outputdir = 'plots/%s/lfvemu/LFVHEMuAnalyzerMVA_esffixed/' % (jobid)
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="os/.*ass*")
 EWKDiboson = views.StyleView(
     views.SumView( 
         *[ plotter.get_view(regex) for regex in 
-          filter(lambda x : x.startswith('WW') or x.startswith('WZ') or x.startswith('ZZ') or x.startswith('WG'), mc_samples )]
+          filter(lambda x : x.startswith('WW') or x.startswith('WZ') or x.startswith('ZZ'), mc_samples )]
     ), **remove_name_entry(data_styles['WW*'])
 )
 
@@ -110,6 +111,14 @@ WGamma = views.StyleView(
     ), **remove_name_entry(data_styles['WG*'])
 )
 
+QCD = views.StyleView(
+    views.SumView( 
+        *[ plotter.get_view(regex) for regex in 
+          filter(lambda x : x.startswith('QCD') , mc_samples )]
+    ), **remove_name_entry(data_styles['FAKES*'])
+)
+
+
 SingleT = views.StyleView(
     views.SumView( 
         *[ plotter.get_view(regex) for regex in 
@@ -124,12 +133,8 @@ DYLL = views.StyleView(
           filter(lambda x : x.startswith('DYJets') or x.startswith('DY1Jets') or x.startswith('DY2Jets') or x.startswith('DY3Jets') or x.startswith('DY4Jets'), mc_samples )]
     ), **remove_name_entry(data_styles['DYJets*'])
 )
-#
-#Wplus = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('WJets'),mc_samples)]), **remove_name_entry(data_styles['WJets*']))
-#DYLL = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.startswith('DYJets'),mc_samples)]), **remove_name_entry(data_styles['DYJets*']))
-#DYLL = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('skimmedLL'), mc_samples )]), **remove_name_entry(data_styles['DY']))
-#DYTT = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x :  x.endswith('jets_M50_skimmedTT'), mc_samples )]), **remove_name_entry(data_styles['Z*jets*TT']))
-#singleT = views.StyleView(views.SumView(  *[ plotter.get_view(regex) for regex in  filter(lambda x : x.startswith('T_') or x.startswith('Tbar_'), mc_samples)]), **remove_name_entry(data_styles['T*_t*']))
+
+
 SMH = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x : 'HToTauTau' in x , mc_samples)]), **remove_name_entry(data_styles['*HToTauTau*']))
 TT = views.StyleView(views.SumView( *[ plotter.get_view(regex) for regex in filter(lambda x : x.startswith('TT_'), mc_samples)]), **remove_name_entry(data_styles['TT*']))
 
@@ -138,8 +143,7 @@ plotter.views['EWKDiboson']={'view' : EWKDiboson }
 plotter.views['Wplus']={'view' : Wplus }
 plotter.views['DYLL']={'view' : DYLL }
 plotter.views['TT']={'view' : TT }
-#plotter.views['DYTT']={'view' : DYTT }
-#plotter.views['singleT']={'view' : singleT }
+plotter.views['QCD']={'view' : QCD }
 plotter.views['SMH']={'view' : SMH }
 plotter.views['WGamma']={'view' : WGamma }
 plotter.views['SingleT']={'view' :SingleT }
@@ -150,7 +154,7 @@ new_mc_samples = []
 
 
 #print new_sigsamples 
-new_mc_samples.extend(['DYLL', 'Wplus','TT','EWKDiboson','SMH','WGamma','SingleT'])
+new_mc_samples.extend(['EWKDiboson','SMH','WGamma','SingleT','TT','Wplus','DYLL','QCD'])
 #new_mc_samples.extend(['EWKDiboson','DYLL', 'DYTT'])
 #new_mc_samples.extend(['EWKDiboson'])
 
@@ -169,7 +173,7 @@ plotter.mc_samples = new_mc_samples
 
 print "break 1"
 if not args.no_plots:
-   signs = ['os','ss']
+   signs = ['os']#,'ss']
    jets = ['0','1','21','22']
    processtype = ['gg']
    threshold = []
@@ -187,18 +191,18 @@ if not args.no_plots:
       ('mEta', 'eta(mu)', 2),  
       ('mPhi', 'phi(mu)', 4), 
       ('ePt', 'p_{T}(e) (GeV)', 4), 
-      ('eEta', 'eta(e)', 2),  
+#      ('eEta', 'eta(e)', 2),  
       ('ePhi', 'phi(e)', 4), 
-#      ('em_DeltaPhi', 'emu Deltaphi', 2), 
-#      ('em_DeltaR', 'emu Delta R', 2),
-#      ('h_vismass', 'M_{vis} (GeV)', 1),
-#      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
-#      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-#      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-#      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
-#      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
-##      ('scaledmPt', 'p_{T}(mu)/M_{coll}(emu)', 2), 
-#      ('scaledePt', 'p_{T}(e)/M_{coll}(emu)', 2)
+      ('em_DeltaPhi', 'emu Deltaphi', 2), 
+      ('em_DeltaR', 'emu Delta R', 2),
+      ('h_vismass', 'M_{vis} (GeV)', 1),
+      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
+      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
+###      ('scaledmPt', 'p_{T}(mu)/M_{coll}(emu)', 2), 
+##      ('scaledePt', 'p_{T}(e)/M_{coll}(emu)', 2)
 ##      ('mPFMETDeltaPhi_vs_ePFMETDeltaPhi','mPFMETDeltaPhi_vs_ePFMETDeltaPhi',1)
    #   ('type1_pfMetEt', 'pfMet', 1)      
    ]
@@ -243,12 +247,12 @@ if not args.no_plots:
           
           plotter.save(path+"/selected/"+var,dotroot=False)
 
-   for var, xlabel, rebin in histo_info1:
-       plotter.plot_mc_vs_data_witherrors('os', var, njet,rebin, xlabel,
-                                          leftside=False, xrange=(0.,300.), show_ratio=True, ratio_range=1.,
-                                          sort=True,br=50)
-       plotter.save("os/gg/"+var,dotroot=False)
- 
+#   for var, xlabel, rebin in histo_info1:
+#       plotter.plot_mc_vs_data_witherrors('os', var, njet,rebin, xlabel,
+#                                          leftside=False, xrange=(0.,300.), show_ratio=True, ratio_range=1.,
+#                                          sort=True,br=50)
+#       plotter.save("os/gg/"+var,dotroot=False)
+# 
 print "break 2"
 
 #make shapes for limit setting

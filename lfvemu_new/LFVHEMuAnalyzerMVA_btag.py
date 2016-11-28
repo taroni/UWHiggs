@@ -206,7 +206,7 @@ class LFVHEMuAnalyzerMVA_btag(MegaBase):
             
                 self.book(f,"ePt", "e p_{T}", 200, 0, 200)
                 self.book(f,"ePhi", "e phi",  100, -3.2, 3.2)
-                self.book(f,"eEta", "e eta", 50, 0, 5)
+                self.book(f,"eEta", "e eta", 50, -2.5, 2.5)
             
                 self.book(f, "em_DeltaPhi", "e-mu DeltaPhi" , 50, 0, 3.2)
                 self.book(f, "em_DeltaR", "e-mu DeltaR" , 100, -7, 7)
@@ -417,16 +417,16 @@ class LFVHEMuAnalyzerMVA_btag(MegaBase):
                 histos[subfolder+'/eEta'].Fill(row.eEta, subweight)
                 histos[subfolder+'/ePhi'].Fill(row.ePhi, subweight)
                 histos[subfolder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), subweight)
-                histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
-                histos[folder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
-                histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
-                histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
-                histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
-                histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
- #               histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
-                histos[folder+'/vbfMass'].Fill(row.vbfMass, subweight)
-                histos[folder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
-                histos[folder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
+                histos[subfolder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
+                histos[subfolder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
+                histos[subfolder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
+                histos[subfolder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
+                histos[subfolder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
+                histos[subfolder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
+ #               histos[subfolder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
+                histos[subfolder+'/vbfMass'].Fill(row.vbfMass, subweight)
+                histos[subfolder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
+                histos[subfolder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
         """
             for n, l in enumerate(elooseList) :
                 frweight = weight*fr_weights[n]
@@ -570,7 +570,7 @@ class LFVHEMuAnalyzerMVA_btag(MegaBase):
             cut_flow_trk.Fill('elooseiso')
 
             #take care of ecal gap
-            if row.eEta > 1.4442 and row.eEta < 1.566 : continue             
+            if row.eAbsEta > 1.4442 and row.eAbsEta < 1.566 : continue             
 
             cut_flow_trk.Fill('ecalgap')
 
@@ -582,12 +582,8 @@ class LFVHEMuAnalyzerMVA_btag(MegaBase):
                 continue
             if nbtagged>0:
                 if nbtagged==1:
-                    if row.jb1pt<-900 or row.jb1hadronflavor<-30:
-                        print row.jb1pt,row.jb1hadronflavor
                     btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990) else 0
                 if nbtagged==2:
-                    if row.jb2pt<-900 or row.jb2hadronflavor<-30:
-                        print row.jb2pt,row.jb2hadronflavor
                     btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990 and row.jb2pt>-990 and row.jb2hadronflavor>-990) else 0
 #                print "btagweight,nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor"," ",btagweight," ",nbtagged," ",row.jb1pt," ",row.jb1hadronflavor," ",row.jb2pt," ",row.jb2hadronflavor
 

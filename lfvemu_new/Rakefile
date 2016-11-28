@@ -53,6 +53,8 @@ samples = Hash[
 	       "DYlowmass"=>get_sample_names('DYJetsToLL_M-10'),
                "signalMCgg" => get_sample_names('GluGlu_LFV_HToETau_M'),
                "signalMCvbf" => get_sample_names('VBF_LFV_HToETau_M'),
+               "signalMCggEtau" => get_sample_names('GluGlu_LFV_HToETau_M'),
+               "signalMCvbfEtau" => get_sample_names('VBF_LFV_HToETau_M'),
                "signalMCMuTaugg" => get_sample_names('GluGlu_LFV_HToMuTau_M'),
                "signalMCMuTauvbf" => get_sample_names('VBF_LFV_HToMuTau_M'),
                "ggHiggsTo2Taus" => get_sample_names('GluGluHToTauTau_M'),
@@ -63,7 +65,9 @@ samples = Hash[
                "data"=>get_sample_names(' data_SingleMuon_Run2016D'),
                "dataD"=>get_sample_names('data_SingleMuon_Run2016D'),
                "dataC"=>get_sample_names('data_SingleMuon_Run2016C'),
-               "dataB"=>get_sample_names('data_SingleMuon_Run2016B')
+               "dataB"=>get_sample_names('data_SingleMuon_Run2016B'),
+               "dataE"=>get_sample_names('data_SingleMuon_Run2016E'),
+               "dataF"=>get_sample_names('data_SingleMuon_Run2016F')
 	                      
 ]
 
@@ -338,7 +342,7 @@ task :genkinMuTauSIGNAL => get_analyzer_results("LFVHAnalyzeGENMuTau.py", sample
 task :genkinEMu => get_analyzer_results("LFVHAnalyzeGENEMu.py", samples['signalMCMuTaugg'] + samples['signalMCMuTauvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'])
 
 
-task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'])# + samples['dataSingleE'] )
+#task :recoplots => get_analyzer_results("LFVHETauAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets'] + samples['wwjets'] + samples['wzjets'] + samples['zzjets'] + samples['zjets'])# + samples['dataSingleE'] )
 
 task :recoplotsMVA => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['dataB'])
 task :recoplotsMVA_C => get_analyzer_results("LFVHEMuAnalyzerMVA.py",samples['dataC'])
@@ -381,6 +385,16 @@ task :runmutrk => get_analyzer_results("LFVHEMuAnalyzerMVA_mutrk",samples['signa
 
 task :runbtag => get_analyzer_results("LFVHEMuAnalyzerMVA_btag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
 
+#task :runesf => get_analyzer_results("LFVHEMuAnalyzerMVA_esffixed",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass'])
+task :runesf => get_analyzer_results("LFVHEMuAnalyzerMVA_esffixed",samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runvert => get_analyzer_results("LFVHEMuAnalyzerMVA_vertices",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass'])
+
+task :runremveto => get_analyzer_results("LFVHEMuAnalyzerMVA_remveto",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
+
+
+task :runhighpt => get_analyzer_results("LFVHEMuAnalyzerMVA_highpt",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
+
 task :runDY => get_analyzer_results("LFVHEMuAnalyzerMVA_DYweight",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DYinclus']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['DYlowmass'])
 
 
@@ -397,7 +411,11 @@ task :runcloser => get_analyzer_results("LFVHEMuAnalyzerMVA_closer",samples['sig
 
 task :runeiso => get_analyzer_results("LFVHEMuAnalyzerMVA_eiso",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
 
-task :runfakes => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakes",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+
+#task :runfakes => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakes",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
+
+task :runfakes => get_analyzer_results("LFVHEMuAnalyzerMVA_fakeRateFromMC",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
 
 task :runfakesnew => get_analyzer_results("LFVHEMuAnalyzerMVA_withfakesnew",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wg']+samples['wjets']+samples['singlet']+samples['DYlowmass']+samples['dataB']+samples['dataC']+samples['dataD'])
 
@@ -457,7 +475,7 @@ task :emuOptim2 => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['s
 
 task :emuOptim3 => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['wjets']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus'])
 
-#task :emuOptim => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['ttbar'])
+task :emuOptim => get_analyzer_results("LFVHEMuAnalyzerMVA_optim.py",samples['ttbar'])
 
 task :reco2 => get_analyzer_results("LFVHEMuAnalyzerMVA2.py",samples['DY'])
 
@@ -470,10 +488,7 @@ task :controlplots => get_analyzer_results("EEAnalyzer.py",samples['signalMCgg']
 task :controlplotsMVA => get_analyzer_results("EEAnalyzerMVA.py", samples['DY'])
 
 
-task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +
-                                      samples['wwjets']  + samples['zzjets'] + 
-                                      samples['wzjets'] +
-                                      samples['zjets'] +  samples['dataSingleE'])
+task :fakeeet => get_analyzer_results("TauFakeRateAnalyzer.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +                                      samples['wwjets']  + samples['zzjets'] +                                       samples['wzjets'] +                                      samples['zjets'] +  samples['dataSingleE'])
 
 task :fakeeetMVA => get_analyzer_results("TauFakeRateAnalyzerMVA.py", samples['signalMCgg'] + samples['signalMCvbf'] + samples['ggHiggsTo2Taus'] + samples['vbfHiggsTo2Taus'] + samples['ttbar'] + samples['singlet'] + samples['singletbar'] + samples['wjets']  +
                                       samples['wwjets']  + samples['zzjets'] + 

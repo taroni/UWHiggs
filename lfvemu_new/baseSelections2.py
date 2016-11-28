@@ -15,7 +15,7 @@ def muSelection(row, name):
     if getattr( row, getVar(name,'Pt')) < 25:       return False
     if getattr( row, getVar(name,'AbsEta')) > 2.4:  return False
     if not getattr( row, getVar(name,'PixHits')):   return False
-    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
+  #  if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
     return True
 
@@ -26,7 +26,7 @@ def eSelection(row, name):
     if getattr( row, getVar(name,'AbsEta')) > 2.4:      #as in H->tau_etau_h # was 2.3
         #print "2"
         return False #was 20
-    if getattr( row, getVar(name,'MissingHits')):       
+    if getattr( row, getVar(name,'MissingHits'))>1:       
         #print "3"
         return False #was 20
     if not getattr( row, getVar(name,'PassesConversionVeto')):     
@@ -36,9 +36,9 @@ def eSelection(row, name):
 #    if not getattr( row, getVar(name,'ChargeIdLoose')): 
         #print "5"
         return False #was 20
-    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  
+#    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  
         #print "6"
-        return False #was 20
+ #       return False #was 20
     ###if getattr( row, getVar(name,'JetBtag')) > 3.3:     
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     
         #print "7"
@@ -95,6 +95,8 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         return bool( RelPFIsoDB < 0.25 ) 
     if isolabel == 'etauiso1':
         return bool( RelPFIsoDB < 1.0 ) 
+    if isolabel == 'etauiso1000':
+        return bool( RelPFIsoDB < 1000.0 ) 
     if isolabel == 'etauiso012' or isolabel == 'mutauiso012': 
         return bool( RelPFIsoDB < 0.12 ) 
     if isolabel == 'etauiso01' or isolabel == 'mutauiso01': 

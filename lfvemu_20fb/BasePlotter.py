@@ -119,7 +119,7 @@ def find_fill_range(histo):
     return first, last
 
 class BasePlotter(Plotter):
-    def __init__ (self,  files, outputdir, blind_region=None, forceLumi=-1, use_embedded=False,noData=False): 
+    def __init__ (self,  files, outputdir, blind_region=None, forceLumi=-1, use_embedded=False,noData=False,blind_path="os/.*ass*"): 
         cwd = os.getcwd()
         self.period = '13TeV'
         self.sqrts  = 13
@@ -137,7 +137,8 @@ class BasePlotter(Plotter):
         blinder=None
         if self.blind_region:
             # Don't look at the SS all pass region
-            blinder = lambda x: BlindView(x, "os/.*ass*",blind_in_range(*self.blind_region))
+#            blinder = lambda x: BlindView(x, "allfakes/os/.*ass*",blind_in_range(*self.blind_region))
+            blinder = lambda x: BlindView(x, blind_path,blind_in_range(*self.blind_region))
         print files
         super(BasePlotter, self).__init__(files, lumifiles, outputdir, blinder, forceLumi=forceLumi)
 
@@ -1662,7 +1663,7 @@ class BasePlotter(Plotter):
             data = data_view.Get(variable)
             data.Draw('same')
             self.keep.append(data)
-            mc_stack.SetMinimum(0)
+            mc_stack.SetMinimum(0.00001)
             # Make sure we can see everything
             if data.GetMaximum() > mc_stack.GetMaximum():
                 mc_stack.SetMaximum(1.2*data.GetMaximum())
@@ -1674,6 +1675,9 @@ class BasePlotter(Plotter):
         self.add_cms_blurb(13)
         if show_ratio and drawData:
             self.add_ratio_plot(data, mc_stack, category,xrange, ratio_range=1.0)
+
+
+
 
  
 
@@ -1700,3 +1704,82 @@ class BasePlotter(Plotter):
         self.keep.append(mc_stack)
         #Draw Signal MC
         self.add_cms_blurb(13)
+    def plot_mc_vs_data_new(self, folder, variable, category,rebin=1, xaxis='',
+                        leftside=True, xrange=None, preprocess=None,
+                        show_ratio=False, ratio_range=0.2, sort=False,drawData=True,br=1):
+        ''' Compare Monte Carlo to data '''
+        path = os.path.join(folder,variable)
+        mc_stack_view = self.make_stack(rebin, preprocess, folder, sort)
+        mc_stack = mc_stack_view.Get(variable)
+        mc_stack.SetTitle("")
+        mc_stack.Draw()
+        mc_stack.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+        mc_stack.Draw()
+        mc_err = mc_stack.GetStack().Last().Clone();
+        mc_err.Sumw2()
+        mc_err.SetMarkerStyle(0)
+
+        mc_err.SetLineColor(0)
+        mc_err.SetFillStyle(1001)
+        mc_err.SetFillColorAlpha(920+2,0.35)
+        mc_err.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+        mc_err.Draw('pe2 same')
+        mc_stack.GetHistogram().GetXaxis().SetTitle(xaxis)
+        mc_stack.GetHistogram().GetYaxis().SetTitle("Events /"+str(mc_stack.GetHistogram().GetBinWidth(5))+" GeV")
+        mc_stack.GetHistogram().GetXaxis().SetTitleFont(22)
+        mc_stack.GetHistogram().GetYaxis().SetTitleFont(22)
+        mc_stack.GetHistogram().GetXaxis().SetTitleSize(0.045)
+        mc_stack.GetHistogram().GetYaxis().SetTitleSize(0.05)
+        mc_stack.GetHistogram().GetYaxis().SetTitleOffset(0.9)
+
+#        if xrange:
+ #           mc_stack.Draw()
+  #          mc_err.Draw('pe2 same')
+        self.keep.append(mc_stack)
+        #Draw Signal MC
+        signals = [
+            'LFVVBF125',
+            'LFVGG125'
+            ]
+        sig = []
+        for name in signals:
+            sig_view = self.get_view(name)
+            if preprocess:
+                sig_view = preprocess(sig_view)
+            sig_view = RebinView(sig_view, rebin)
+#            if not plot_data:
+            sig_view = views.ScaleView(sig_view, br)
+
+            histogram = sig_view.Get(path)
+            histogram.Draw('same')
+            self.keep.append(histogram)
+            sig.append(histogram)
+        for lfvh in sig:
+                if lfvh.GetMaximum() > mc_stack.GetMaximum():
+                    mc_stack.SetMaximum(1.2*lfvh.GetMaximum())
+
+        # Draw data
+        if drawData: 
+            data_view = self.get_view('data')
+            if preprocess:
+                data_view = preprocess( data_view )
+            data_view = self.get_wild_dir(
+                self.rebin_view(data_view, rebin),
+                folder
+                )
+            data = data_view.Get(variable)
+            data.Draw('same')
+            self.keep.append(data)
+            mc_stack.SetMinimum(0)
+            # Make sure we can see everything
+            if data.GetMaximum() > mc_stack.GetMaximum():
+                mc_stack.SetMaximum(1.2*data.GetMaximum())
+        # Add legend
+        if drawData:        
+            self.add_legend([data, sig[0],sig[1],mc_stack], leftside, entries=len(mc_stack.GetHists())+3)
+        else:
+            self.add_legend([sig[0],sig[1],mc_stack], leftside, entries=len(mc_stack.GetHists())+3)
+        self.add_cms_blurb(13)
+        if show_ratio and drawData:
+            self.add_ratio_plot(data, mc_stack, variable,category,xrange, ratio_range=1.0)
+
