@@ -2,6 +2,7 @@ from FinalStateAnalysis.PlotTools.decorators import memo
 from FinalStateAnalysis.Utilities.struct import struct
 from electronids import electronIds
 
+
 @memo
 def getVar(name, var):
     return name+var
@@ -12,10 +13,10 @@ def splitEid(label):
 
 #OBJECT SELECTION
 def muSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 30:       return False
-    if getattr( row, getVar(name,'AbsEta')) > 2.3:  return False
-    if getattr( row, getVar(name,'PixHits')) < 0:   return False
-    if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8: return False
+    if getattr( row, getVar(name,'Pt')) < 20:       return False
+    if abs(getattr( row, getVar(name,'Eta'))) > 2.4:  return False
+    if getattr( row, getVar(name,'PixHits')) < 1:   return False
+    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.89: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
     #if abs(getattr(row, getVar(name, 'PVDXY'))) > 0.045: return False
     return True
@@ -24,17 +25,17 @@ def eSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
     ept = getattr( row, getVar(name,'Pt')) ##put here ees_minus when available 
     if ept:
-        if ept < 25 : return False 
+        if ept < 10 : return False 
     else:
-        if getattr( row, getVar(name,'Pt')) < 25:   return False #was 20
+        if getattr( row, getVar(name,'Pt')) < 10:   return False #was 20
 
-    if getattr(row, getVar(name, 'AbsEta')) > 2.1:      return False
-    if getattr( row, getVar(name,'MissingHits')):       return False
+    if getattr(row, getVar(name, 'AbsEta')) > 2.5:      return False
+    if getattr( row, getVar(name,'MissingHits'))>0:       return False
     if not  getattr( row, getVar(name,'PassesConversionVeto')):     return False
 #    if getattr( row, getVar(name,'HasConversion')):     return False
     if getattr(row,getVar(name,'AbsEta')) > 1.4442 and getattr(row,getVar(name,'AbsEta')) < 1.566: return False
     if not getattr( row, getVar(name,'ChargeIdTight')): return False
-    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.8:  return False
+    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.89: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
     if abs(getattr( row, getVar(name,'PVDXY'))) > 0.045:     return False
     return True
@@ -104,10 +105,7 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         LEPTON_ID = getattr(row, getVar(name, 'PFIDTight'))
     if not LEPTON_ID:
         return False
-    if name[0] == 'e':
-        RelPFIsoDB   = getattr(row, getVar(name, 'IsoDB03'))
-    else:
-        RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDBDefault'))
+    RelPFIsoDB   = getattr(row, getVar(name, 'IsoDB03'))
     AbsEta       = getattr(row, getVar(name, 'AbsEta'))
     if isolabel == 'idiso01':
         return bool( RelPFIsoDB < 0.10 )

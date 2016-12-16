@@ -58,7 +58,12 @@ for name in files:
     ##        #print i, xval[i]-fakeref.GetErrorX(i), yval[i]
     ##        h0.SetPointError(i, fakeref.GetErrorX(i),fakeref.GetErrorX(i), fakeref.GetErrorY(i),fakeref.GetErrorY(i))
 
-    if 'Pt' in name: h0.RemovePoint(0)
+    #if 'Pt' in name: h0.RemovePoint(0)
+    if 'Pt' in name:
+        print title
+        for  i in range(0, fakeref.GetN()):
+            print  '%.0f - %.0f &  %.4f & +%.4f & -%.4f \\\\\hline' %(xval[i]-fakeref.GetErrorX(i),xval[i]+fakeref.GetErrorX(i), yval[i], fakeref.GetErrorYhigh(i),fakeref.GetErrorYlow(i))
+            
     h0.SetFillColor(16)
     h0.SetTitle(title)   
     h0.Draw("APE")
@@ -66,4 +71,5 @@ for name in files:
     h0.SetMaximum(1.1)
 
     canvas.SaveAs(name.replace(".root", ".pdf"))
+    canvas.SaveAs(name.replace(".root", ".png"))
                   

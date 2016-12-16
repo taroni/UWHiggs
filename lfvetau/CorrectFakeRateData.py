@@ -37,13 +37,15 @@ if __name__ == "__main__":
     from FinalStateAnalysis.MetaData.data_views import data_views
 
     files = []
+    print args.files
     for pattern in args.files:
         files.extend(glob.glob(pattern))
-
+        
     log.info("Loading data from %i files", len(files))
 
     lumifiles = []
     for pattern in args.lumifiles:
+        
         lumifiles.extend(glob.glob(pattern))
 
     the_views = data_views(files, lumifiles)
@@ -56,8 +58,15 @@ if __name__ == "__main__":
     def rebin_view(x):
         ''' Make a view which rebins histograms '''
         binning = None
-        binning = eval(args.rebin)
+        if ' ' in args.rebin:
+            binning = tuple(eval(x) for x in args.rebin.split(' '))
+        else:
+            binning = eval(args.rebin)
         return RebinView(x, binning)
+
+        #binning = None
+        #binning = eval(args.rebin)
+        #return RebinView(x, binning)
 
     def round_to_ints(x):
         new = x.Clone()
@@ -109,9 +118,12 @@ if __name__ == "__main__":
     wz_view = get_view('WZ*')
     ww_view = get_view('WW*')
     zz_view = get_view('ZZ*')
+    #tt_view = get_view('TT*')
 
     data = rebin_view(the_views['data']['view'])
     
+#    corrected_view = int_view(
+#        SubtractionView(data, wz_view, ww_view, zz_view, tt_view, restrict_positive=True))
     corrected_view = int_view(
         SubtractionView(data, wz_view, ww_view, zz_view, restrict_positive=True))
 
@@ -120,6 +132,7 @@ if __name__ == "__main__":
     output.cd()
 
     log.debug('getting from corrected view')
+    print args.numerator
     corr_numerator = corrected_view.Get(args.numerator)
     corr_denominator = corrected_view.Get(args.denom)
 
@@ -136,6 +149,7 @@ if __name__ == "__main__":
     wz_integral = wz_view.Get(args.numerator).Integral()
     ww_integral = ww_view.Get(args.numerator).Integral()
     zz_integral = zz_view.Get(args.numerator).Integral()
+#    tt_integral = tt_view.Get(args.numerator).Integral()
    # z_integral = zjets_view.Get(args.numerator).Integral()
 
     log.info("Numerator integrals data: %.2f WW: %.2f WZ: %.2f, ZZ: %.2f. Corrected numerator: %.2f",
@@ -170,8 +184,11 @@ if __name__ == "__main__":
     ww_view    = get_view('WW*')
     wz_view    = get_view('WZ*')
     zz_view    = get_view('ZZ*')
+    #tt_view    = get_view('TT*')
     data       = the_views['data']['view']
     
+#    corrected_view = int_view(
+#        SubtractionView(data, ww_view,wz_view, zz_view, tt_view, restrict_positive=True))
     corrected_view = int_view(
         SubtractionView(data, ww_view,wz_view, zz_view, restrict_positive=True))
 

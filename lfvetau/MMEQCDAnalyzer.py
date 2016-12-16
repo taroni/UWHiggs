@@ -70,25 +70,12 @@ def merge_functions(fcn_1, fcn_2):
         return ((r1, r2), w)
     return f
 
-def ePtdiff (pt, oldpt):
-    if oldpt!=-999:
-        return pt-oldpt
-    else:
-        return -999.
-def eIsodiff (iso, oldiso):
-    if oldiso!=-999.:
-        return iso-oldiso
-    else:
-        return -999.
-    
 pucorrector = mcCorrections.make_puCorrector('singlem', None)
 
-        
-
-class MMEAnalyzer(MegaBase):
+class MMEQCDAnalyzer(MegaBase):
     tree = 'emm/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
-        logging.debug('MMEAnalyzer constructor')
+        logging.debug('MMEQCDAnalyzer constructor')
         self.channel='MME'
         target = os.path.basename(os.environ['megatarget'])
         self.is_data = target.startswith('data_')
@@ -96,20 +83,18 @@ class MMEAnalyzer(MegaBase):
         self.is_mc = not (self.is_data or self.is_embedded)
         self.is_DY = bool('JetsToLL_M-50' in target)
         self.is_W = bool('JetsToLNu' in target)
-        
-        super(MMEAnalyzer, self).__init__(tree, outfile, **kwargs)
+
+        super(MMEQCDAnalyzer, self).__init__(tree, outfile, **kwargs)
         self.tree = MMETree(tree)
         self.out=outfile
         self.histograms = {}
         ROOT.TH1.AddDirectory(True)
-
+        
         self.histo_locations = {}
         self.hfunc   = {
-            #'ePtduplicate': lambda ePtdiff, weight: (, weight) if oldept!=-999. else (-999., weight),
-            #'eIsoduplicate': lambda row, weight: (row.eIsoDB03-oldeiso, weight) if oldeiso!=-999. else (-999., weight)
             #'nTruePU' : lambda row, weight: (row.nTruePU,None),
-            #'weight'  : lambda row, weight: (weight,None) if weight is not None else (1.,None),
-            #'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
+            'weight'  : lambda row, weight: (weight,None) if weight is not None else (1.,None),
+            'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
         }
         self.trig_weight  = mcCorrections.efficiency_trigger_mu_2016 if not self.is_data else 1.
         self.mid_weight = mcCorrections.muonID_tight if not self.is_data else 1.
@@ -119,8 +104,8 @@ class MMEAnalyzer(MegaBase):
         self.eleIso_weight = mcCorrections.electronIso_0p10_2016 
         self.eleidLoose_weight = mcCorrections.electronID_WP90_2016
         self.eleIsoLoose_weight = mcCorrections.electronIso_0p15_2016 
-        self.DYreweight = mcCorrections.DYreweight
  
+
         self.tauSF={
             'vloose' : 0.83,
             'loose'  : 0.84,
@@ -143,18 +128,15 @@ class MMEAnalyzer(MegaBase):
             3 : 0.053607569,
             4 : 0.058531731
             }
-        
     def event_weight(self, row, sys_shifts):
         nbtagged=row.bjetCISVVeto30Medium
         if nbtagged>2:
             nbtagged=2
         if self.is_data:
             if nbtagged>0 :
-                return {'' : 0.,
-                        'eVTight' : 0.}
+                return {'' : 0.}
             else:
-                return {'' : 1.,
-                        'eVTight' : 1.}
+                return {'' : 1.}
 
         mcweight = self.trig_weight(row.m1Pt, row.m1AbsEta)
         if row.m2Pt>row.m1Pt :  mcweight = self.trig_weight(row.m2Pt, row.m2AbsEta)
@@ -168,11 +150,9 @@ class MMEAnalyzer(MegaBase):
 
         eisoweight = self.eleIso_weight(row,'e')
         eidweight =  self.eleid_weight(row.eEta,row.ePt)
-
+     
         eisoloosew = self.eleIsoLoose_weight(row,'e')
         eidloosew = self.eleidLoose_weight(row.eEta,row.ePt)
-
-        dyweight = self.DYreweight(row.genMass, row.genpT) 
 
         #print 'tracking weight', m1Trkweight, m2Trkweight
         btagweight = 1. 
@@ -181,23 +161,20 @@ class MMEAnalyzer(MegaBase):
         
         mcweight =  mcweight*pucorrector(row.nTruePU)*m1idweight*m2idweight*m1isoweight*m2isoweight*m1Trkweight*m2Trkweight*btagweight*eisoloosew
 
+        mcweight_tight = mcweight*eisoweight/eisoloosew
 
-        #print 'DY weight', dyweight, mcweight, mcweight*dyweight
+
         if self.is_DY:
-            #mcweight = mcweight*dyweight
             if row.numGenJets < 5:
-                mcweight = mcweight*self.ZTTLweight[row.numGenJets]*dyweight
+                mcweight = mcweight*self.ZTTLweight[row.numGenJets]
             else:
-                mcweight = mcweight*self.ZTTLweight[0]*dyweight
-            if dyweight > 1.5 : 
-                print  row.evt, row.run, row.lumi, row.m1Pt, row.m2Pt, row.ePt, mcweight, dyweight, mcweight/dyweight
+                mcweight = mcweight*self.ZTTLweight[0]
+                
         if self.is_W:
             if row.numGenJets < 5:
                 mcweight = mcweight*self.Wweight[row.numGenJets]
             else:
                 mcweight = mcweight*self.Wweight[0]
-
-        mcweight_tight = mcweight*eisoweight/eisoloosew
         
         weights = {'': mcweight,
                    'eVTight' : mcweight_tight
@@ -209,15 +186,13 @@ class MMEAnalyzer(MegaBase):
     def begin(self):
         sys_shifts = []
         signs =['os', 'ss']
-        twp =[ 'isduplicate', 'eSSuperLoose','eSuperLoose','eVLoose', 'eLoose','eTight','eVTight']
+        twp =[ 'eSSuperLoose','eSuperLoose','eVLoose', 'eLoose','eTight','eVTight']
         jetN = ['', '0', '1', '2', '3']
         tDM = ['', 'tDM0', 'tDM1', 'tDM10']
-        region = ['','eB', 'eE']
-        met = ['', 'Met30']
         folder=[]
 
         
-        for tuple_path in itertools.product(signs, twp, region, met):
+        for tuple_path in itertools.product(signs, twp, jetN, tDM):
             folder.append(os.path.join(*tuple_path))
             path = list(tuple_path)
         
@@ -225,7 +200,7 @@ class MMEAnalyzer(MegaBase):
         #self.book('os/', "e1_e2_Mass",  "h_vismass",  32, 0, 320)
                 
         for f in folder:
-            #self.book(f,"weight", "weight", 100, 0, 10)
+            self.book(f,"weight", "weight", 100, 0, 10)
 
             self.book(f,"ePt", "e p_{T}", 40, 0, 200)             
             self.book(f,"ePhi", "e phi", 26, -3.25, 3.25)
@@ -252,7 +227,7 @@ class MMEAnalyzer(MegaBase):
 
             self.book(f, "nvtx", "Number of vertices", 50, 0, 50)
             self.book(f, "nTruePU", "true pileup", 60, 0, 60)
-            
+
             self.book(f, "type1_pfMetEt", "type1 PFMET",  40, 0, 200)
 
             
@@ -266,11 +241,7 @@ class MMEAnalyzer(MegaBase):
                 self.histo_locations[location][name] = value
       
         self.book('', "CUT_FLOW", "Cut Flow", len(cut_flow_step), 0, len(cut_flow_step))
-        for f in folder:
-            self.book(f, "duplicatePt", "ept diff duplicate",  200, -100, 100)
-            self.book(f, "duplicateIso", "eIso diff duplicate",  40, -1., 1.)
-            self.book(f, "duplicateIso_vs_duplicatePt", "eIso diff vs ePt diff duplicate", 200, -100, 100, 40, -1., 1.,type=ROOT.TH2F)
-
+            
         xaxis = self.histograms['CUT_FLOW'].GetXaxis()
         self.cut_flow_histo = self.histograms['CUT_FLOW']
         self.cut_flow_map   = {}
@@ -279,12 +250,11 @@ class MMEAnalyzer(MegaBase):
             self.cut_flow_map[name] = i+0.5
 
 
-    def fill_histos(self, folder_str, row, weight, oldept, oldeiso, filter_label = ''):
+    def fill_histos(self, folder_str, row, weight, filter_label = ''):
         '''fills histograms'''
         
         for attr, value in self.histo_locations[folder_str].iteritems():
             name = attr
-            
             if filter_label:
                 if not attr.startswith(filter_label+'$'):
                     continue
@@ -319,11 +289,6 @@ class MMEAnalyzer(MegaBase):
                 else:
                     #print attr, weight
                     value.Fill( getattr(row,attr), weight ) if weight is not None else value.Fill( getattr(row,attr) )
-
-        self.histograms[folder_str+'/duplicatePt'].Fill(ePtdiff(row.ePt, oldept), weight)
-        self.histograms[folder_str+'/duplicateIso'].Fill(eIsodiff(row.eIsoDB03, oldeiso), weight)
-        self.histograms[folder_str+'/duplicateIso_vs_duplicatePt'].Fill(ePtdiff(row.ePt, oldept),eIsodiff(row.eIsoDB03, oldeiso), weight)
-                    
         return None
 
     def process(self):
@@ -335,15 +300,12 @@ class MMEAnalyzer(MegaBase):
         
         lock =()
         ievt = 0
-
-        oldeiso=-999.
-        oldept=-999.
-
-
         logging.debug('Starting evt loop')
         #print 'Starting evt loop'
         #print 'is data?', self.is_data
         for row in self.tree:
+            weight_map = self.event_weight(row, sys_shifts)
+            if weight_map[''] == 0 : continue
             
             #require the trigger on data. Efficiency for MC accounted in the weight
             if self.is_data:
@@ -355,12 +317,11 @@ class MMEAnalyzer(MegaBase):
                # print 'event number', ievt
             ievt += 1
             #avoid double counting events!
-            
             evt_id = (row.run, row.lumi, row.evt)
-
-            weight_map = self.event_weight(row, sys_shifts)
-            if weight_map[''] == 0 : continue
-
+            if evt_id == lock: continue
+            if lock != () and evt_id == lock:
+                logging.info('Removing duplicate of event: %d %d %d' % evt_id)
+            
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
             cut_flow_trk.Fill('allEvents')
             #print 'starting selections'
@@ -382,9 +343,12 @@ class MMEAnalyzer(MegaBase):
             cut_flow_trk.Fill('tdisc')
             logging.debug('object selection passed')
             #e ID/ISO
-            if not selections.lepton_id_iso(row, 'm1', 'MuIDTight_idiso025'): continue
+            ##if not selections.lepton_id_iso(row, 'm1', 'MuIDTight_idiso025'): continue
+            if row.m1IsoDB03 < 0.25 : continue
             logging.debug('Passed m1 selection')
-            if not selections.lepton_id_iso(row, 'm2', 'MuIDTight_idiso025'): continue
+            #if not selections.lepton_id_iso(row, 'm2', 'MuIDTight_idiso025'): continue
+            if row.m2IsoDB03 < 0.25: continue
+
             logging.debug('Passed m2 selection')
             #print 'Passed m2 selection'
             cut_flow_trk.Fill('miso')
@@ -410,107 +374,44 @@ class MMEAnalyzer(MegaBase):
             isEVTight = bool(selections.lepton_id_iso(row, 'e', 'eid16Tight_idiso01'))
             
             passes_full_selection = False
-            isduplicate=False
-            metCut = 30.
-            if evt_id != lock:
-                oldmass = 0
-                oldept =-999.
-                oldeiso=-999.
-            if lock != () and evt_id == lock:
-                print 'duplicate event: %d %d %d. Zmass=%d, oldZmass=%d, m1Pt=%d, m2Pt=%d, ePt=%d, oldePt=%d, %s, %s, %s, %s, %s, %s' %(row.run, row.lumi, row.evt, row.m1_m2_Mass, oldmass, row.m1Pt, row.m2Pt, row.ePt, oldept, str(True), str(isESuperLoose), str(isEVLoose), str(isELoose), str(isETight), str(isEVTight) )
-                logging.info('Removing duplicate of event: %d %d %d' % evt_id)
-                isduplicate=True
 
+            
             
             cut_flow_trk.Fill('vetoes')
             logging.debug('Passed Vetoes')
             selection_categories = []
-            region = 'eB' if abs(row.eEta) <  1.4442 else 'eE'
-            if isduplicate:
-                folder=sign+'/isduplicate'
-                selection_categories.append(folder)
-            else:
-                folder = sign+'/eSSuperLoose'
-                selection_categories.append(folder)
-                if row.type1_pfMetEt < metCut :
-                    folder = sign+'/eSSuperLoose/Met30'
-                    selection_categories.append(folder)
-                    ##folder = sign + '/eSSuperLoose/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                folder = sign + '/eSSuperLoose/' + region
-                selection_categories.append(folder)
-                if row.type1_pfMetEt < metCut :
-                    folder = sign + '/eSSuperLoose/' + region + '/Met30'
-                    selection_categories.append(folder)
+            folder = sign+'/eSSuperLoose'
+            selection_categories.append(folder)
+            folder = sign + '/eSSuperLoose/' + str(int(jets))
+            selection_categories.append(folder)
             
-                if isESuperLoose:
-                    folder = sign+'/eSuperLoose'
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eSuperLoose/Met30'
-                        selection_categories.append(folder)
-                    ##folder = sign+ '/eSuperLoose/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                    folder = sign+'/eSuperLoose/'+ region
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eSuperLoose/'+ region + '/Met30'
-                        selection_categories.append(folder)
-                   
-                if isEVLoose :
-                    folder = sign+'/eVLoose'
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eVLoose/Met30'
-                        selection_categories.append(folder)
-                    ##folder = sign+ '/eVLoose/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                    folder = sign+'/eVLoose/' + region
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eVLoose/' + region + '/Met30'
-                        selection_categories.append(folder)
-                if isELoose :
-                    folder = sign+'/eLoose'
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eLoose/Met30'
-                        selection_categories.append(folder)
-                    ##folder = sign+ '/eLoose/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                    folder = sign+'/eLoose/' + region
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eLoose/' + region + '/Met30'
-                        selection_categories.append(folder)
-                if isETight :
-                    folder = sign+'/eTight'
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eTight/Met30'
-                        selection_categories.append(folder)
-                    ##folder = sign+ '/eTight/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                    folder = sign+'/eTight/' + region
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eTight/' + region + '/Met30'
-                        selection_categories.append(folder)
-    
-                if isEVTight :
-                    folder = sign+'/eVTight'
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eVTight/Met30'
-                        selection_categories.append(folder)
-                    ##folder = sign+ '/eVTight/' + str(int(jets))
-                    ##selection_categories.append(folder)
-                    folder = sign+'/eVTight/' + region
-                    selection_categories.append(folder)
-                    if row.type1_pfMetEt < metCut :
-                        folder = sign+'/eVTight/' + region + '/Met30'
-                        selection_categories.append(folder)
-                
+            if isESuperLoose:
+                folder = sign+'/eSuperLoose'
+                selection_categories.append(folder)
+                folder = sign+ '/eSuperLoose/' + str(int(jets))
+                selection_categories.append(folder)
+               
+            if isEVLoose :
+                folder = sign+'/eVLoose'
+                selection_categories.append(folder)
+                folder = sign+ '/eVLoose/' + str(int(jets))
+                selection_categories.append(folder)
+            if isELoose :
+                folder = sign+'/eLoose'
+                selection_categories.append(folder)
+                folder = sign+ '/eLoose/' + str(int(jets))
+                selection_categories.append(folder)
+            if isETight :
+                folder = sign+'/eTight'
+                selection_categories.append(folder)
+                folder = sign+ '/eTight/' + str(int(jets))
+                selection_categories.append(folder)
+            if isEVTight :
+                folder = sign+'/eVTight'
+                selection_categories.append(folder)
+                folder = sign+ '/eVTight/' + str(int(jets))
+                selection_categories.append(folder)
+            
             for selection in selection_categories:
                 lock = evt_id
                 dirname = selection
@@ -521,15 +422,8 @@ class MMEAnalyzer(MegaBase):
                 weight_to_use=weight_map['']
                 if isEVTight : weight_to_use = weight_map['eVTight']
                 #if row.isZtautau or row.isWtaunu or row.isGtautau: weight_to_use=weight_to_use*tSF
-                self.fill_histos(dirname, row, weight_to_use, oldept, oldeiso)
+                self.fill_histos(dirname, row, weight_to_use)
                 #print '-------------'
-
-            lock = evt_id
-            oldmass = row.m1_m2_Mass
-            oldept = row.ePt
-            oldeiso=row.eIsoDB03
-            
-
         cut_flow_trk.flush() 
             
     def finish(self):

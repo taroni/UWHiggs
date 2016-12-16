@@ -24,7 +24,7 @@ def summer_2016_eid_WP80(row, name):
     return False
 
 def summer_2016_eid_WP90(row, name):
-    mva_output = getattr(row, getVar(name, 'MVANonTriWP90'))
+    mva_output = getattr(row, getVar(name, 'MVANonTrigWP90'))
     pT    = getattr(row, getVar(name, 'Pt'))
     abseta= getattr(row, getVar(name, 'AbsEta'))
     if pT < 10    and abseta < 0.8:

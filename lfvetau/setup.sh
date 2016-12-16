@@ -3,26 +3,21 @@ export OVERRIDE_META_TREE_data_ET='et/metaInfo'
 
 export IGNORE_LUMI_ERRORS=1
 
-source jobid.sh
-
+#source jobid.sh
+echo $jobid
 #./make_proxies.sh
-export datasrc=/hdfs/store/user/taroni/
-export MEGAPATH=/hdfs/store/user/taroni
-#export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
-#export MEGAPATH=/hdfs/store/user/$USER
+#export datasrc=/hdfs/store/user/caillol/
+#export MEGAPATH=/hdfs/store/user/caillol/
+export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
+export MEGAPATH=/hdfs/store/user/$USER
 
 echo $jobid
-export jobid=$jobid13
-rake "meta:getinputs[$jobid, $datasrc,eet/metaInfo, eet/summedWeights]"
-rake "meta:getmeta[inputs/$jobid, eet/metaInfo, 13, eet/summedWeights]"
+#export jobid=$jobid13
+#rake "meta:getinputs[$jobid, $datasrc,emm/metaInfo, emm/summedWeights]"
+#rake "meta:getmeta[inputs/$jobid, emm/metaInfo, 13, emm/summedWeights]"
+rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
+rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
 
-export jobid='LFV_sep16_v2'
-rake "meta:getinputs[$jobid, $datasrc,mmt/metaInfo, mmt/summedWeights]"
-rake "meta:getmeta[inputs/$jobid, mmt/metaInfo, 13, mmt/summedWeights]"
-
-#export jobid='LFV_808v1'
-#rake "meta:getinputs[$jobid, $datasrc,em/metaInfo, em/summedWeights]"
-#rake "meta:getmeta[inputs/$jobid, em/metaInfo, 13, em/summedWeights]"
 
 unset OVERRIDE_META_TREE_data_ET
 unset IGNORE_LUMI_ERRORS
