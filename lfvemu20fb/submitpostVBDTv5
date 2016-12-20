@@ -1,0 +1,3 @@
+/usr/lib/ruby/gems/1.8/gems/rake-0.8.7/bin/rake:31: Interrupt
+	from /usr/bin/rake:19:in `load'
+	from /usr/bin/rake:19

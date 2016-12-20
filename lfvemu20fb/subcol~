@@ -1,0 +1,16 @@
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/UWHiggs/lfvemu20fb)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVApostBDTcollmass.py inputs/Oct30/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVApostBDTcollmass_TT_TuneCUETP8M1_13TeV-powheg-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVApostBDTcollmass.py inputs/Oct30/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVApostBDTcollmass/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVApostBDTcollmass_DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.log &
+sleep 10s

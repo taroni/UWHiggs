@@ -1,0 +1,29 @@
+#!/bin/bash                                                                                                                                  \
+                                                                                                                                              
+
+usage='Usage: -a <analyzer name>  -lumi <luminosity in pb> -ns <num_samples> -nf <sampling frequency> -ph <phase position> (-cpt <old  <old no. of samples> -cnf<old sampling freq>) '
+
+args=`getopt rdlp: -- "$@"`
+if test $? != 0
+     then
+         echo $usage
+         exit 1
+fi
+
+eval set -- "$args"
+
+
+for i
+ do
+    case "$i" in
+      -analyzer) shift; analyzer=$2;shift;;
+      -lumi) shift; luminosity=$2;shift;;
+      -jobid) shift;jobid=$2;shift;;
+    esac
+done
+
+
+
+python makestructdata20p1fakemethod2.py $analyzer $luminosity $jobid
+
+makeLFVdatacardfakemethod --i LFV_fakes_20fb_$analyzer --l goldenjson_20fb_fakemethod --a $analyzer

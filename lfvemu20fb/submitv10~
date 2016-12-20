@@ -1,0 +1,16 @@
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVAv10/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/UWHiggs/lfvemu20fb)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVAv10/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVAv10/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVAv10.py inputs/Oct30/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVAv10/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVAv10_DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVAv10/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVAv10.py inputs/Oct30/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVAv10/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVAv10_W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s

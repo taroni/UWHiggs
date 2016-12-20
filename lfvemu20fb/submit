@@ -1,0 +1,16 @@
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/UWHiggs/lfvemu_20fb)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVAmakeBDTtrees.py inputs/Oct30/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.txt results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVAmakeBDTtrees_GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVAmakeBDTtrees.py inputs/Oct30/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.txt results/Oct30/LFVHEMuAnalyzerMVAmakeBDTtrees/VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVAmakeBDTtrees_VBF_LFV_HToETau_M125_13TeV_powheg_pythia8.log &
+sleep 10s

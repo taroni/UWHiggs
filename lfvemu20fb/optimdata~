@@ -1,0 +1,23 @@
+mkdir -p `dirname results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016B_PromptReco-v2_25ns.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_8/src/UWHiggs/lfvemu)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016C_PromptReco-v2_25ns.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016B_PromptReco-v2_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_optim.py inputs/LFV_8013v1/data_SingleMuon_Run2016B_PromptReco-v2_25ns.txt results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016B_PromptReco-v2_25ns.root --verbose >& batch_logs/results_LFV_8013v1_LFVHEMuAnalyzerMVA_optim_data_SingleMuon_Run2016B_PromptReco-v2_25ns.log &
+sleep 10s
+mkdir -p `dirname results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016D_PromptReco-v2_25ns.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016C_PromptReco-v2_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_optim.py inputs/LFV_8013v1/data_SingleMuon_Run2016C_PromptReco-v2_25ns.txt results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016C_PromptReco-v2_25ns.root --verbose >& batch_logs/results_LFV_8013v1_LFVHEMuAnalyzerMVA_optim_data_SingleMuon_Run2016C_PromptReco-v2_25ns.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016D_PromptReco-v2_25ns.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVA_optim.py inputs/LFV_8013v1/data_SingleMuon_Run2016D_PromptReco-v2_25ns.txt results/LFV_8013v1/LFVHEMuAnalyzerMVA_optim/data_SingleMuon_Run2016D_PromptReco-v2_25ns.root --verbose >& batch_logs/results_LFV_8013v1_LFVHEMuAnalyzerMVA_optim_data_SingleMuon_Run2016D_PromptReco-v2_25ns.log &
+sleep 10s
