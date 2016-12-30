@@ -41,6 +41,8 @@ for sign in ['os','ss']:
                     hist_path="antiIsolatedweighted/"+sign+"/gg/"+cat_now[i]+"/"+var[0]
                 else:
                     hist_path="antiIsolatedweighted/"+sign+"/gg/"+cat_now[i]+"/selected/nosys/"+var[0]
+                if j!=0 and 'collmass' not in var[0]:
+                    continue
                 histo=file.Get(hist_path)
                 new_histo=copy.copy(histo)
                 new_key=hist_path.split('/',1)[1]

@@ -354,12 +354,28 @@ class LFVHEMuAnalyzerMVAv2(MegaBase):
        
         histos = self.histograms
         pudir=['']
-        pudir =['','fakeRateMethod/']
+        pudir =['','fakeRateMethod/']#,'subtractedup/','subtracteddown/']
+#        elooseList = ['eLoose_nofrweight/','eLoose/','eLooseUp/', 'eLooseDown/']
+#        mlooseList = ['mLoose_nofrweight/','mLoose/','mLooseUp/', 'mLooseDown/']
+#        emlooseList= ['mLooseeLoose_nofrweight/','mLooseeLoose/','mLooseeLooseUp/','mLooseeLooseDown/']
         alllooselist=['antiIsolatedweighted/','antiIsolated/']
-
+#        alllooselist=['antiIsolatedweighted_nofrweight/','antiIsolatedweighted/','antiIsolatedweightedUp/','antiIsolatedweightedDown/']
+#        if region!='signal':
+#        fr_weights=None
+#            fr_weights = [1,fakerate_weight,fakerate_weight+0.3*fakerate_weight,fakerate_weight-0.3*fakerate_weight]
+#  elif region=='eTightmLoose':
+#      fr_weights=[1,0.7,0.91,0.59]
+#  elif region=='eLoosemLoose': 
+#      frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
+#      efr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]
+#      mfr_weights=[1,0.7,0.91,0.59]
+#      comb_error=efr_weights[1]*mfr_weights[1]*sqrt(0.3*0.3+((frweight_array[1]/frweight_array[0])*(frweight_array[1]/frweight_array[0])))
+#      fr_weights = [1,efr_weights[1]*mfr_weights[1],efr_weights[1]*mfr_weights[1]+comb_error,efr_weights[1]*mfr_weights[1]-comb_error]
         if region=='eLoosemTight':
             frarray=fakerateWeightGetter(row.ePt,abs(row.eEta)) 
             fakerateWeight=frarray[0]
+#            fakerateFactor=self.geteFakeFactor(row)
+           # fakerateWeight=fakerateFactor/(1-fakerateFactor)
             antiIsolatedWeightList=[fakerateWeight,1.0]
             for n, l in enumerate(alllooselist) :
                 antiIsolatedWeight= weight*antiIsolatedWeightList[n]
@@ -396,7 +412,39 @@ class LFVHEMuAnalyzerMVAv2(MegaBase):
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp),antiIsolatedWeight)
                 elif sys=='udown':
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown),antiIsolatedWeight)
+                    """
+        if region=='eTightmLoose' and (sys=='presel' or sys=='nosys'):
+            fr_weights=[1,0.7,0.91,0.59]
+            if not self.isData :
+                for n in range(1,4) :
+                    subfolder=pudir[n]+f
+                    subweight=fr_weights[n]*weight*(-1)
+                    histos[subfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),subweight)
+                    histos[folder+'/mPt'].Fill(row.mPt, subweight)
+                    histos[folder+'/mEta'].Fill(row.mEta, subweight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, subweight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, subweight)
+                    histos[folder+'/eEta'].Fill(row.eEta, subweight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, subweight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), subweight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
+                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
+                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, subweight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
 
+            for n, l in enumerate(mlooseList) :
+                frweight = weight*fr_weights[n]
+                folder = l+f
+                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
+        elif region=='eLoosemTight' and (sys=='presel' or sys=='nosys'):
+            frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
+            fr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]"""
             if not self.isData and not self.isGluGlu_LFV and not self.isVBF_LFV and not self.isGluGluEtauSig and not self.isVBFEtauSig:
                 fakeRateMethodfolder=pudir[1]+f
                 fakeRateMethodweight=fakerateWeight*weight*(-1)
@@ -419,6 +467,46 @@ class LFVHEMuAnalyzerMVAv2(MegaBase):
                 histos[fakeRateMethodfolder+'/vbfMass'].Fill(row.vbfMass, fakeRateMethodweight)
                 histos[fakeRateMethodfolder+'/vbfDeta'].Fill(row.vbfDeta, fakeRateMethodweight)
                 histos[fakeRateMethodfolder+'/jetN_30'].Fill(row.jetVeto30, fakeRateMethodweight) 
+        """
+            for n, l in enumerate(elooseList) :
+                frweight = weight*fr_weights[n]
+                folder = l+f
+                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
+
+        elif region=='eLoosemLoose' and (sys=='presel' or sys=='nosys'):
+            frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
+            efr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]
+            mfr_weights=[1,0.7,0.91,0.59]
+            comb_error=efr_weights[1]*mfr_weights[1]*sqrt(0.3*0.3+((frweight_array[1]/frweight_array[0])*(frweight_array[1]/frweight_array[0])))
+            fr_weights = [1,efr_weights[1]*mfr_weights[1],efr_weights[1]*mfr_weights[1]+comb_error,efr_weights[1]*mfr_weights[1]-comb_error]
+            if not self.isData and fr_weights[1]==123123:
+                for n in range(1,4):
+                    subfolder=pudir[n]+f
+                    subweight=fr_weights[n]*weight*(-1)
+                    histos[subfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),subweight)
+                    histos[folder+'/mPt'].Fill(row.mPt, subweight)
+                    histos[folder+'/mEta'].Fill(row.mEta, subweight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, subweight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, subweight)
+                    histos[folder+'/eEta'].Fill(row.eEta, subweight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, subweight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), subweight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
+                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
+                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, subweight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
+
+            for n, l in enumerate(emlooseList) :
+                frweight = weight*fr_weights[n]
+                folder = l+f
+                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
+"""          
         if region=='signal' :
             for n,d  in enumerate(pudir) :
                 folder = d+f                

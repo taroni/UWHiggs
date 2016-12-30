@@ -72,7 +72,7 @@ files=  glob.glob(Analyzer+'/*.root')
 #print "files",files
 outputdir = 'plots/'+sys.argv[3]+'/'+Analyzer+'/' 
 
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweighted/os/.*ass*")
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweightedelectron/os/.*ass*")
 
 EWKDiboson = views.StyleView(
     views.SumView( 
@@ -209,7 +209,7 @@ if not no_plots:
    logging.debug("Starting plotting")
    
 
-   for regions in ['antiIsolatedweighted']:
+   for regions in ['antiIsolatedweightedelectron']:
        for sign,  njet in itertools.product(signs,  jets):
            path = os.path.join(regions,sign,'gg',njet)
 #          print path
@@ -231,7 +231,7 @@ if not no_plots:
                logging.debug("Plotting %s/%s" % (path, var) )
                plotter.pad.SetLogy(False)
  #              print var
-               if int(njet)==112 or int(njet)==21 or int(njet)==22: 
+               if int(njet)==1 or int(njet)==21 or int(njet)==22: 
                  rebin = rebin*2
 #               if int(njet)==22:
  #                  rebin=rebin*2
@@ -246,7 +246,7 @@ if not no_plots:
        
            for var, xlabel, rebin in histo_info:
                if 'collmass' not in var:continue
-               if int(njet)==1 or int(njet)==21 or int(njet)==22:
+               if int(njet)==112 or int(njet)==21 or int(njet)==22:
                    rebin = rebin*2
   #             if int(njet)==22:
    #                rebin=rebin*2

@@ -49,7 +49,7 @@ class GetQCD(object):
 	        self.histodata=None
 	        self.histoQCD=None
 	        for var in vars:
-	        	for sign in ['ss','antiIsolatedweighted/ss','antiIsolated/ss']:
+	        	for sign in ['ss','antiIsolatedweighted/ss','antiIsolated/ss','antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in range(2):
 	        			for i in range(len(cat_now)):
 	        				x=0
@@ -58,6 +58,8 @@ class GetQCD(object):
 	        					hist_path=sign+"/gg/"+cat_now[i]+"/"+var[0]
 	        				else:
 	        					hist_path= sign+"/gg/"+cat_now[i]+"/selected/nosys/"+var[0]
+						if j!=0 and 'collmass' not in var[0]:
+							continue
 						self.histomc=None
 						self.histodata=None
 						self.histoQCD=None
@@ -65,7 +67,7 @@ class GetQCD(object):
 							if "FAKES" in filename or "QCD" in filename: continue
 	        					file=ROOT.TFile("results/"+jobid+"/"+Analyzer+"/"+filename)
 							histo=file.Get(hist_path)
-#							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
+							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
 								if x==0:
 	        							self.histomc=histo.Clone()

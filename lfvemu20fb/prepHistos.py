@@ -96,7 +96,7 @@ def do_binbybin(histo,eff_lumi,lowBound,highBound,norm_uncert): #fill empty bins
 		histo.SetBinError(bin,math.sqrt(binError*binError+norm_uncert*binContent*norm_uncert*binContent))
 
 
-for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os','antiIsolated/ss','antiIsolatedweighted/os','antiIsolatedweighted/ss']:
+for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os','antiIsolated/ss','antiIsolatedweighted/os','antiIsolatedweighted/ss','antiIsolatedweightedmuon/ss','antiIsolatedweightedmuon/os','antiIsolatedweightedelectron/ss','antiIsolatedweightedelectron/os','antiIsolatedweightedmuonelectron/os','antiIsolatedweightedmuonelectron/ss']:
     for var in vars:
         for j in range(2):
             for i in range(4):
@@ -104,7 +104,8 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 			     hist_path=sign+"/gg/"+cat_now[i]+"/"+var[0]
 		     else:
 			     hist_path=sign+"/gg/"+cat_now[i]+"/selected/nosys/"+var[0]
-
+		     if j!=0 and 'collmass' not in var[0]:
+			     continue
 		     jojo= hist_path.split('/')
 		     folder= '/'.join(hist_path.split('/')[0:(len(jojo)-1)])
 		     datafile=ROOT.TFile(Analyzer+"/data_obs.root")
@@ -128,8 +129,9 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     WGhisto=WGfile.Get(hist_path)
 
+		     print WGhisto.Integral()
 		     do_binbybin(WGhisto,8e-07,lowDataBin,highDataBin,0.1)
-
+		     print WGhisto.Integral()
 		     WGfile.cd(folder)
 		     WGhisto.Write()
 

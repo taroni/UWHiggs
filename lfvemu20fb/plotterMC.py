@@ -230,7 +230,7 @@ if not no_plots:
      # plotter.set_subdir(os.path.join('embedded', path+'/selected'))if embedded else plotter.set_subdir(path+'/selected')
 
       for var, xlabel, rebin in histo_info:
-          if "mass" not in var:continue
+          if "collmass" not in var:continue
           if (int(njet)==21):
               rebin = rebin*2
           if ( int(njet)==22 or  int(njet)==1 ):

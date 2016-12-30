@@ -51,6 +51,8 @@ class GetFAKES(object):
 	        					hist_path=sign+"/gg/"+cat_now[i]+"/"+var[0]
 	        				else:
 	        					hist_path= sign+"/gg/"+cat_now[i]+"/selected/nosys/"+var[0]
+						if j!=0 and 'collmass' not in var[0]:
+								continue
 						self.histomc=None
 						self.histodata=None
 						self.histoFAKES=None

@@ -6,7 +6,7 @@ import math
 import glob
 import array
 #import mcCorrections
-import baseSelections2 as selections
+import baseSelections as selections
 import FinalStateAnalysis.PlotTools.pytree as pytree
 from FinalStateAnalysis.PlotTools.decorators import  memo_last
 from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
@@ -16,8 +16,8 @@ from math import sqrt, pi, cos
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
-import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
+import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 import bTagSF as bTagSF
 from inspect import currentframe
 
@@ -45,7 +45,28 @@ def deltaR(phi1, phi2, eta1, eta2):
     if (dphi>pi) : dphi = 2*pi-dphi
     return sqrt(deta*deta + dphi*dphi);
 
+
+
+def topPtreweight(pt1,pt2):
+    #pt1=pt of top quark
+    #pt2=pt of antitop quark
+    #13 Tev parameters: a=0.0615,b=-0.0005
+    #for toPt >400, apply SF at 400
+
+    if pt1>400:pt1=400
+    if pt2>400:pt2=400
+    a=0.0615
+    b=-0.0005 
+
+    wt1=math.exp(a+b*pt1)
+    wt2=math.exp(a+b*pt2)
+
+    wt=sqrt(wt1*wt2)
+
+    return wt
+
 pu_distributions = glob.glob(os.path.join('inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
+
 
 pu_corrector = PileupWeight.PileupWeight('MC_Spring16', *pu_distributions)
 id_corrector  = MuonPOGCorrections.make_muon_pog_PFMedium_2016BCD()
@@ -59,6 +80,7 @@ eiso_corr0p10 =HetauCorrection.iso0p10_ele_2016
 eiso_corr0p15 =HetauCorrection.iso0p15_ele_2016
 
 
+
 fakerateWeight =FakeRate2D.make_fakerate2D()
 class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
     tree = 'em/final/Ntuple'
@@ -66,7 +88,6 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         self.channel='EMu'
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
-        self.output=outfile
         self.is_WJet=('WJetsToLNu' in target or 'W1JetsToLNu' in target or 'W2JetsToLNu' in target or 'W3JetsToLNu' in target or 'W4JetsToLNu' in target)
         self.is_DYJet= ('DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM' in target or  'DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM' in target or 'DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM' in target or 'DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM' in target or 'DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM' in target) 
         self.isDYlowmass=('DYJetsToLL_M-10to50_' in target)
@@ -104,17 +125,22 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         self.GluGlu_LFV_HToETau_weight=1.9428e-06
         self.VBF_LFV_HToETau_weight=4.05239613191e-08  
 
+
         self.tree = EMTree(tree)
-        self.out=outfile
+        self.output=outfile
         self.histograms = {}
         self.mym1='m'
         self.mye1='e'
+        self.sysdir=['nosys','jetup','jetdown','tup','tdown','uup','udown']
+#        self.sysdir=['nosys']
         if self.is_WJet:
             self.binned_weight=[0.618332066,0.199958214,0.106098513,0.053599448,0.058522049]
         elif self.is_DYJet:
             self.binned_weight=[0.064154079,0.014052138,0.01505218,0.015583224,0.012508924]
         else:
             self.binned_weight=[1,1,1,1,1]
+
+
 
 
         """need to think about this"""
@@ -130,38 +156,54 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
     def obj3_matches_gen(row):
         return t.genDecayMode != -2 
 
-    def mc_corrector_2015(self, row,region):
+
+    def mc_corrector_2015(self, row, region):
         
         pu = pu_corrector(row.nTruePU)
+ #       pu=1
         muidcorr = id_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta')))
         muisocorr = iso_corrector('Tight', getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta')))
+#        print "id corr", muidcorr
+ #       print "iso corr", muisocorr
         mutrcorr = trg_corrector(getattr(row, self.mym1+'Pt'), abs(getattr(row, self.mym1+'Eta'))) 
+#        eidcorr = eId_corrector(getattr(row,self.mye1+'Eta'),getattr(row, self.mye1+'Pt'))
         mutrkcorr=mtrk_corrector(getattr(row,self.mym1+'Eta'))[0]
         eisocorr0p10= eiso_corr0p10(getattr(row, self.mye1+'Pt'),abs(getattr(row,self.mye1+'Eta')))[0]
         eisocorr0p15= eiso_corr0p15(getattr(row, self.mye1+'Pt'),abs(getattr(row,self.mye1+'Eta')))[0]
         etrkcorr=etrk_corrector(getattr(row,self.mye1+'Eta'),getattr(row, self.mye1+'Pt'))
-        eidcorr=1
-        if region=='eLoosemTight':
-            return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p15*etrkcorr
-        else:
-            return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p10*etrkcorr
+#        mutrkcorr=trk_corrector(getattr(row,self.mym1+'Eta'))
+ #       print "trk corr",mutrkcorr
+  #      print "tr corr", mutrcorr
+   #     print "eid corr", eidcorr
+#       mutrcorr=1
+     # if pu*muidcorr1*muisocorr1*muidcorr2*muisocorr2*mutrcorr==0: print pu, muidcorr1, muisocorr1, muidcorr2, muisocorr2, mutrcorr
+    #    print "pileup--------   =",pu
+   #     print pu*muidcorr*muisocorr*mutrcorr
+#        print eisocorr
 
+        topptreweight=1
+        eidcorr=1
+        if self.isTT:
+            topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
+
+        return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p10*etrkcorr*topptreweight
+ 
+       # return pu*muidcorr*mutrcorr*eidcorr
 
 
     def correction(self,row,region):
 	return self.mc_corrector_2015(row,region)
         
-    def event_weight(self, row,region):
+    def event_weight(self, row, region):
  
-        if row.run > 2: 
+        if row.run > 2: #FIXME! add tight ID correction
             return 1.
-#        if row.GenWeight<0:
-#        print "Gen weight negative:  ",row.GenWeight
- #       print "            "
+       # if row.GenWeight*self.correction(row) == 0 : print 'weight==0', row.GenWeight*self.correction(row), row.GenWeight, self.correction(row), row.m1Pt, row.m2Pt, row.m1Eta, row.m2Eta
+       # print row.GenWeight, "lkdfh"
+
+
         return row.GenWeight*self.correction(row,region) 
-
-
-
+#        return self.correction(row) 
 
 
     def begin(self):
@@ -181,8 +223,8 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         self.vbfDeltaEta_=array.array( 'f', [ 0 ] )
         self.numjets_=array.array( 'f', [ 0 ] )
         self.mColl_=array.array( 'f', [ 0 ] )
-        self.lepAsym_=array.array( 'f', [ 0 ] )
-        
+        self.pZeta_=array.array( 'f', [ 0 ] )
+        self.lepAsym_=array.array( 'f', [ 0 ] )        
 
         if self.isGluGlu_LFV or self.isVBF_LFV or self.isVBFEtauSig or self.isGluGluEtauSig:
             self.treeS=ROOT.TTree("treeS","treeS")
@@ -202,6 +244,7 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
             self.treeS.Branch("vbfDeltaEta_",self.vbfDeltaEta_,"vbfDeltaEta_/F")
             self.treeS.Branch("numjets_",self.numjets_,"numjets_/F")
             self.treeS.Branch("mColl_",self.mColl_,"mColl_/F")
+            self.treeS.Branch("pZeta_",self.pZeta_,"pZeta_/F")
             self.treeS.Branch("lepAsym_",self.lepAsym_,"lepAsym_/F")
         else:
             self.treeB=ROOT.TTree("treeB","treeB")
@@ -221,12 +264,15 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
             self.treeB.Branch("vbfDeltaEta_",self.vbfDeltaEta_,"vbfDeltaEta_/F")
             self.treeB.Branch("numjets_",self.numjets_,"numjets_/F")
             self.treeB.Branch("mColl_",self.mColl_,"mColl_/F")
+            self.treeB.Branch("pZeta_",self.pZeta_,"pZeta_/F")
             self.treeB.Branch("lepAsym_",self.lepAsym_,"lepAsym_/F")
+
 
         
 
 
-    def fill_tree(self,row,btagweight=1,region='signal'):
+    def fill_tree(self, row,btagweight=1,region='signal'):
+
         if self.is_WJet or self.is_DYJet:
             weight = self.event_weight(row,region) *self.binned_weight[int(row.numGenJets)]*0.001
         elif self.isWGToLNuG:
@@ -263,7 +309,9 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
             weight=self.GluGlu_LFV_HToETau_weight*self.event_weight(row,region) 
         else:
             weight = self.event_weight(row,region) 
-            
+        
+#        if btagweight<0:
+ #           print "btagweight is negative:  ",btagweight
         weight=btagweight*weight
 
         self.weight_[0]=weight
@@ -274,12 +322,13 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         self.eEta_[0]=row.eEta
         self.mTmuMet_[0]=row.mMtToPfMet_type1  
         self.mTeMet_[0]=row.eMtToPfMet_type1 
-        self.eDphiPFMet_[0]=abs(row.eDPhiToPfMet_type1) 
-        self.mDphiPFMet_[0]=abs(row.mDPhiToPfMet_type1) 
+        self.eDphiPFMet_[0]=abs(row.eDPhiToPfMet_type1)
+        self.mDphiPFMet_[0]=abs(row.mDPhiToPfMet_type1)
         self.metEt_[0]=row.type1_pfMetEt  
         self.metPhi_[0]=row.type1_pfMetPhi
         self.numjets_[0]=row.jetVeto30
         self.mColl_[0]=collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)
+        self.pZeta_[0]=row.e_m_PZeta
         self.lepAsym_[0]=(row.mPt-row.ePt)/(row.ePt+row.mPt)
 
         if row.jetVeto30==0 or row.jetVeto30==1:
@@ -289,7 +338,7 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
             self.vbfMass_[0]=row.vbfMass
             self.vbfDeltaEta_[0]=row.vbfDeta
         
-        if self.isGluGlu_LFV or self.isVBF_LFV:
+        if self.isGluGlu_LFV or self.isVBF_LFV or self.isVBFEtauSig or self.isGluGluEtauSig:
             self.treeS.Fill()
         else:
             self.treeB.Fill()
@@ -301,6 +350,7 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         for row in self.tree:
             sign = 'ss' if row.e_m_SS else 'os'
 
+ #           ptthreshold = [30]
             repeatEvt=True
             if row.evt!=curr_event:
                 curr_event=row.evt
@@ -308,9 +358,11 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
             
             if repeatEvt:continue
 
-
- #           ptthreshold = [30]
+#            print "non-repeat"
             processtype ='gg'##changed from 20
+
+           
+
 
             #trigger
             if (not bool(row.singleIsoMu22Pass or row.singleIsoTkMu22Pass)) and self.isData: 
@@ -330,25 +382,21 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
 
 
             if row.tauVetoPt20Loose3HitsVtx : continue
-
+            
 
             #mu preselection
             if not selections.muSelection(row, 'm'): continue
-
-            if not selections.lepton_id_iso(row, 'm', 'MuIDTight_idiso025'): continue
 
 
 
             #E Preselection
             if not selections.eSelection(row, 'e'): continue
-
            
-            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1'): continue
-
+            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1','WP80'): continue
+            
 
             #take care of ecal gap
             if row.eAbsEta > 1.4442 and row.eAbsEta < 1.566 : continue             
-
 
 
             nbtagged=row.bjetCISVVeto30Medium
@@ -368,14 +416,10 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
 
             if btagweight==0: continue
 
-
-            #id isolation
-            if not selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso015'):continue
-
+            if not selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso0p15'):continue
  
-            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso01'): continue
-            ## All preselection passed 
-
+            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso0p1','WP80'):continue 
+ 
             self.fill_tree(row,btagweight)
 
             

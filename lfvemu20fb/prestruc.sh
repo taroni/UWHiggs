@@ -94,8 +94,31 @@ python plotterAntiIsolatedOS.py $analyzer $luminosity $jobid
 #plot anti-isolated SS region
 python plotterAntiIsolatedSS.py $analyzer $luminosity $jobid
 
-#plot weighted anti-isolated SS region
+#plot weighted anti-isolated SS region all fakes -- muon + electron -electron muon
 python plotterAntiIsolatedWeightedSS.py  $analyzer $luminosity $jobid
 
 #plot weighted anti-isolated OS region
 python plotterAntiIsolatedWeightedOS.py  $analyzer $luminosity $jobid
+
+#plot weighted anti-isolated OS region electron fakes
+python plotterAntiIsolatedWeightedElectronOS.py $analyzer $luminosity $jobid
+
+
+#plot weighted anti-isolated SS region electron fakes
+python plotterAntiIsolatedWeightedElectronSS.py $analyzer $luminosity $jobid
+
+
+#plot weighted anti-isolated OS region muon fakes                                                                                                                               
+python plotterAntiIsolatedWeightedMuonOS.py $analyzer $luminosity $jobid
+
+
+#plot weighted anti-isolated SS region muon fakes                                                                                                                               
+python plotterAntiIsolatedWeightedMuonSS.py $analyzer $luminosity $jobid
+
+
+#plot weighted anti-isolated OS region muon electron fakes                                                                                                                               
+python plotterAntiIsolatedWeightedMuonElectronOS.py $analyzer $luminosity $jobid
+
+
+#plot weighted anti-isolated SS region muon electron fakes                                                                                                                               
+python plotterAntiIsolatedWeightedMuonElectronSS.py $analyzer $luminosity $jobid

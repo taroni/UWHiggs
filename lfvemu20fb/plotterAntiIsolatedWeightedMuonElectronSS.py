@@ -72,7 +72,7 @@ files=  glob.glob(Analyzer+'/*.root')
 #print "files",files
 outputdir = 'plots/'+sys.argv[3]+'/'+Analyzer+'/' 
 
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweighted/os/.*ass*")
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweightedmuonelectron/os/.*ass*")
 
 EWKDiboson = views.StyleView(
     views.SumView( 
@@ -209,7 +209,7 @@ if not no_plots:
    logging.debug("Starting plotting")
    
 
-   for regions in ['antiIsolatedweighted']:
+   for regions in ['antiIsolatedweightedmuonelectron']:
        for sign,  njet in itertools.product(signs,  jets):
            path = os.path.join(regions,sign,'gg',njet)
 #          print path

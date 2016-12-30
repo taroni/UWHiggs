@@ -72,7 +72,7 @@ files=  glob.glob(Analyzer+'/*.root')
 #print "files",files
 outputdir = 'plots/'+sys.argv[3]+'/'+Analyzer+'/' 
 
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweighted/os/.*ass*")
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweightedelectron/os/.*ass*")
 
 EWKDiboson = views.StyleView(
     views.SumView( 
@@ -151,7 +151,7 @@ new_mc_samples = []
 
 #print new_sigsamples 
 #new_mc_samples.extend(['DYLL','TT','SingleT','EWKDiboson', 'SMH','Wplus'])
-new_mc_samples.extend(['WGamma','SMH','SingleT','EWKDiboson','TT','Wplus','DYLL'])
+new_mc_samples.extend(['WGamma','SMH','SingleT','EWKDiboson','TT','Wplus','QCD','DYLL'])
 
 
 #rebins = [5, 5, 2, 5, 5, 2, 1, 5, 5, 2, 1]
@@ -169,7 +169,7 @@ plotter.mc_samples = new_mc_samples
 print "break 1"
 no_plots=False
 if not no_plots:
-   signs = ['ss']
+   signs = ['os']
    jets = ['0',
       '1',
       '21',
@@ -209,7 +209,7 @@ if not no_plots:
    logging.debug("Starting plotting")
    
 
-   for regions in ['antiIsolatedweighted']:
+   for regions in ['antiIsolatedweightedelectron']:
        for sign,  njet in itertools.product(signs,  jets):
            path = os.path.join(regions,sign,'gg',njet)
 #          print path
