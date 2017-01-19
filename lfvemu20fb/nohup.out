@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "plotterMCBDT.py", line 1, in <module>
+    import rootpy.plotting.views as views
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/__init__.py", line 24, in <module>
+    import ROOT as R
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed4/lib/ROOT.py", line 24, in <module>
+    import cppyy
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed4/lib/cppyy.py", line 60, in <module>
+    import libPyROOT as _backend
+KeyboardInterrupt

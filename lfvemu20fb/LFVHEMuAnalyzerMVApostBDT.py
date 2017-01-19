@@ -454,7 +454,12 @@ class LFVHEMuAnalyzerMVApostBDT(MegaBase):
 
             self.var_d_00 ={'mTmuMet_':row.mMtToPfMet_type1,'mTeMet_':row.eMtToPfMet_type1,'deltaPhimue_':row.e_m_DPhi,'eDphiPFMet_':row.eDPhiToPfMet_type1,'mDphiPFMet_':row.mDPhiToPfMet_type1}
             
+
             MVAval=self.functor(**self.var_d_00)
+
+            if MVAval>-0.54 and MVAval<-0.47:
+                print 'mTmuMet  ',row.mMtToPfMet_type1.'    mTeMet  ',row.eMtToPfMet_type1.'    deltaPhimue  ',row.e_m_DPhi.'    eDphiPFMet  ',row.eDPhiToPfMet_type1.'    mDphiPFMet  ',row.mDPhiToPfMet_type1
+
 
             folder = sign+'/'+processtype+'/'+str(int(jetN))
             self.fill_histos(row,MVAval,folder,region,btagweight,'presel')

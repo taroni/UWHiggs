@@ -177,21 +177,21 @@ if not no_plots:
    histo_info = [
 
       ('h_collmass_pfmet', 'M_{coll}(emu) (GeV)', 1),
-      ('mPt', 'p_{T}(mu) (GeV)', 4), 
-      ('mEta', 'eta(mu)', 2),  
-      ('mPhi', 'phi(mu)', 4), 
-      ('ePt', 'p_{T}(e) (GeV)', 4), 
-      ('eEta', 'eta(e)', 2),  
-      ('ePhi', 'phi(e)', 4), 
-      ('em_DeltaPhi', 'emu Deltaphi', 2), 
-      ('em_DeltaR', 'emu Delta R', 2),
-      ('h_vismass', 'M_{vis} (GeV)', 1),
-      ('Met', 'MET (GeV)', 1),
-      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
-      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
-      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
+#      ('mPt', 'p_{T}(mu) (GeV)', 4), 
+#      ('mEta', 'eta(mu)', 2),  
+#      ('mPhi', 'phi(mu)', 4), 
+#      ('ePt', 'p_{T}(e) (GeV)', 4), 
+#      ('eEta', 'eta(e)', 2),  
+#      ('ePhi', 'phi(e)', 4), 
+#      ('em_DeltaPhi', 'emu Deltaphi', 2), 
+#      ('em_DeltaR', 'emu Delta R', 2),
+#      ('h_vismass', 'M_{vis} (GeV)', 1),
+#      ('Met', 'MET (GeV)', 1),
+#      ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
+#      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
+#      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
+#      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+#      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),  
    ]
    
    logging.debug("Starting plotting")
@@ -226,7 +226,7 @@ if not no_plots:
                                                 sort=True,br=50)
         
          print "**************************************************************************************************************************************************"
-         plotter.save(path+"/"+var,dotroot=False)
+         plotter.save(path+"/"+njet+"_"+var,dotroot=False)
      # plotter.set_subdir(os.path.join('embedded', path+'/selected'))if embedded else plotter.set_subdir(path+'/selected')
 
       for var, xlabel, rebin in histo_info:
@@ -241,7 +241,7 @@ if not no_plots:
                                              leftside=False, xrange=(-10.,300.0), show_ratio=True, ratio_range=1., 
                                       sort=True,br=10)
           
-          plotter.save(path+"/selected/"+var,dotroot=False)
+          plotter.save(path+"/selected/"njet+"_"+var,dotroot=False)
 
 
 

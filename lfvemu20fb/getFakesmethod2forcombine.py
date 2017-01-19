@@ -6,8 +6,8 @@ import math
 import copy
 ROOT.gROOT.SetStyle("Plain")
 cat_now=['0','1','21','22']   #category names in analyzer                                                                                    
-                                                                                                                                              
-syst_names_now=['jetup','jetdown','tup','tdown','uup','udown']      #sysfolder names in analyzer                                             
+syst_names_now=['jetup','jetdown','tup','tdown','uup','udown','par0up','par1up','par2up','par3up','par0eeup','par1eeup','par0down','par1down','par2down','par3down','par0eedown','par1eedown'] 
+      #sysfolder names in analyzer                                             
 vars = [
       ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
       ('mPt', 'p_{T}(mu) (GeV)', 4),

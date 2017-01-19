@@ -6,7 +6,7 @@ import math
 import glob
 import array
 #import mcCorrections
-import baseSelections2 as selections
+import baseSelections as selections
 import FinalStateAnalysis.PlotTools.pytree as pytree
 from FinalStateAnalysis.PlotTools.decorators import  memo_last
 from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
@@ -25,12 +25,20 @@ from inspect import currentframe
 
 
 cut_flow_step=['allEvents','HLTIsoPasstrg','DR_e_mu','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','musel','mulooseiso','esel','elooseiso','ecalgap','bjetveto','muiso','eiso','jet0sel','jet1sel','jet2loosesel','jet2tightsel']
-
+"""
 def collmass(row, met, metPhi):
     ptnu =abs(met*cos(deltaPhi(metPhi, row.ePhi)))
     visfrac = row.ePt/(row.ePt+ptnu)
     #print met, cos(deltaPhi(metPhi, row.tPhi)), ptnu, visfrac
     return (row.e_m_Mass / sqrt(visfrac))
+"""
+def collmass(row, met, metPhi,elecPhi,elecPt):
+    ptnu =abs(met*cos(deltaPhi(metPhi, elecPhi)))
+    visfrac = elecPt/(elecPt+ptnu)
+    #print met, cos(deltaPhi(metPhi, row.tPhi)), ptnu, visfrac
+    return (row.e_m_Mass / sqrt(visfrac))
+
+
 
 def deltaPhi(phi1, phi2):
     PHI = abs(phi1-phi2)
@@ -63,6 +71,7 @@ def topPtreweight(pt1,pt2):
 
     return wt
 
+
 pu_distributions = glob.glob(os.path.join('inputs', os.environ['jobid'], 'data_SingleMu*pu.root'))
 
 
@@ -78,7 +87,7 @@ eiso_corr0p10 =HetauCorrection.iso0p10_ele_2016
 eiso_corr0p15 =HetauCorrection.iso0p15_ele_2016
 
 
-fakerateWeightGetter =FakeRate2D.make_fakerate2D()
+fakerateWeightGetter =FakeRate2D.make_fakerate2DSuperLoose()
 
 class LFVHEMuAnalyzerMVAv8(MegaBase):
     tree = 'em/final/Ntuple'
@@ -131,7 +140,8 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
         self.histograms = {}
         self.mym1='m'
         self.mye1='e'
-        self.sysdir=['nosys','jetup','jetdown','tup','tdown','uup','udown']
+        self.sysdir=['nosys','jetup','jetdown','tup','tdown','uup','udown','eup','edown','mup','mdown']
+        self.fakeshapesdir=['par0up','par1up','par2up','par3up','par0eeup','par1eeup','par0down','par1down','par2down','par3down','par0eedown','par1eedown']
 #        self.sysdir=['nosys']
         if self.is_WJet:
             self.binned_weight=[0.618332066,0.199958214,0.106098513,0.053599448,0.058522049]
@@ -177,19 +187,13 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
    #     print pu*muidcorr*muisocorr*mutrcorr
 #        print eisocorr
 
-        eidcorr=1
-
         topptreweight=1
-
+        eidcorr=1
         if self.isTT:
             topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
 
-        wtzpt=1
-
-        if region=='eLoosemTight':
-            return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p15*etrkcorr
-        else:
-            return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p10*etrkcorr
+        return pu*muidcorr*muisocorr*mutrcorr*eidcorr*mutrkcorr*eisocorr0p10*etrkcorr*topptreweight
+ 
        # return pu*muidcorr*mutrcorr*eidcorr
 
 
@@ -218,7 +222,7 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
         jetN = [0,1,21,22,3]
         folder=[]
 #        pudir = ['','p1s/', 'm1s/','trp1s/', 'trm1s/', 'eidp1s/','eidm1s/',  'eisop1s/','eisom1s/', 'mLoose/','mLooseUp/','mLooseDown/', ]
-        alldirs=['','antiIsolatedweighted/','antiIsolated/','fakeRateMethod/']#,'antiIsolatedweightedUp/','antiIsolatedweightedDown/','antiIsolatedweighted_nofrweight/','subtracted/','subtractedup/','subtracteddown/','mLoose_nofrweight/','mLoose/','mLooseUp/','mLooseDown/','eLoose_nofrweight/','eLoose/','eLooseUp/','eLooseDown/','mLooseeLoose_nofrweight/','mLooseeLoose/','mLooseeLooseUp/','mLooseeLooseDown/']
+        alldirs=['','antiIsolatedweighted/','antiIsolated/','antiIsolatedweightedelectron/','antiIsolatedweightedmuon/','antiIsolatedweightedmuonelectron/','fakeRateMethod/']#,'antiIsolatedweightedUp/','antiIsolatedweightedDown/','antiIsolatedweighted_nofrweight/','subtracted/','subtractedup/','subtracteddown/','mLoose_nofrweight/','mLoose/','mLooseUp/','mLooseDown/','eLoose_nofrweight/','eLoose/','eLooseUp/','eLooseDown/','mLooseeLoose_nofrweight/','mLooseeLoose/','mLooseeLooseUp/','mLooseeLooseDown/']
 #        alldirs=['']
         for d  in alldirs :
             for i in sign:
@@ -228,12 +232,14 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                         folder.append(d+i+'/'+j+'/'+str(jn))
                         for s in self.sysdir:
                             folder.append(d+i+'/'+j+'/'+str(jn)+'/selected/'+s)
-                        
+                        for shape in self.fakeshapesdir:
+                            folder.append(d+i+'/'+j+'/'+str(jn)+'/selected/'+shape)
+                   
                             
 
         for k in range(len(folder)):
             f=folder[k]
-            if k<5150:
+            if 'selected' not in f:
                 self.book(f,"mPt", "mu p_{T}", 200, 0, 200)
                 self.book(f,"mPhi", "mu phi", 100, -3.2, 3.2)
                 self.book(f,"mEta", "mu eta",  50, -2.5, 2.5)
@@ -288,27 +294,6 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                 self.cut_flow_map[name] = i+0.5
 
 
-    def geteFakeFactor(self,row):
-        electronPt=row.ePt
-        if electronPt<10:
-            raise ValueError("Electron with Pt less than 10 got through!")
-        if electronPt<=20:
-            return 0.205
-        elif electronPt<=30:
-            return 0.1350
-        elif electronPt<=40:
-            return  0.315
-        elif electronPt<=50:
-            return  0.38
-        elif electronPt<=70:
-            return  0.49
-        elif electronPt<=100:
-            return  0.63
-        elif electronPt<=150:
-            return 0.70
-        else:
-            return 0.85
-
     def fill_jet_histos(self,row,sign,region,btagweight):
 
         if self.is_WJet or self.is_DYJet:
@@ -322,9 +307,58 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
         self.histograms[sign+'/numGenJets'].Fill(row.numGenJets,weight1)
 
 
+    def get_fakerate(self,row,shape='None'):
+        if row.ePt<10:
+            raise ValueError("electron Pt less than 10")
+        elecPt=row.ePt if row.ePt<200 else 200
+        par0=0.449
+        par1=0.289
+        par2=0.043
+        par3=2.686
+        par0ee=0.268
+        par1ee=0.001
+        parVariation=0
 
+        if shape=='par0up':
+            par0+=0.080
+        if shape=='par1up':
+            par1+=0.082
+        if shape=='par2up':
+            par2+=0.024
+        if shape=='par3up':
+            par3+=1.068
+        if shape=='par0eeup':
+            par0ee+=0.038
+        if shape=='par1eeup':
+            par1ee+=0.002
+
+
+        if shape=='par0down':
+            par0-=0.080
+        if shape=='par1down':
+            par1-=0.082
+        if shape=='par2down':
+            par2-=0.024
+        if shape=='par3down':
+            par3-=1.068
+        if shape=='par0eedown':
+            par0ee-=0.038
+        if shape=='par1eedown':
+            par1ee-=0.002
+            
+
+        if abs(row.eEta)<1.479: #par[0]+par[1]*TMath::Erf(par[2]*x - par[3])  Barrel
+            fakerateFactor=par0+par1*ROOT.TMath.Erf(par2*elecPt-par3)
+        else:#endcap par[0]+par[1]*x
+            fakerateFactor=par0ee+par1ee*elecPt
+
+        return fakerateFactor/(1-fakerateFactor)
+            
+            
 
     def fill_histos(self, row,sign,f=None,fillCommonOnly=False,region=None,btagweight=1,sys=''):
+
+
         if self.is_WJet or self.is_DYJet:
             weight = self.event_weight(row,region) *self.binned_weight[int(row.numGenJets)]*0.001
         elif self.isWGToLNuG:
@@ -363,7 +397,6 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
             weight = self.event_weight(row,region) 
             
         weight=btagweight*weight
-
         #fill some histograms before dividing into categories (looking at some variables before dividing into njet categories makes more sense)
         if fillCommonOnly==True:
             if region=='signal':
@@ -371,43 +404,29 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                 self.histograms[sign+'/NUP'].Fill(row.NUP,weight)
                 self.histograms[sign+'/numGenJets'].Fill(row.numGenJets,weight)
                 self.histograms[sign+'/numVertices'].Fill(row.nvtx,weight)
-                self.histograms[sign+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi),weight)
+                self.histograms[sign+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),weight)
                 self.histograms[sign+'/h_vismass'].Fill(row.e_m_Mass,weight)
                 return 1
             else:
                 return 0
 
-       
         histos = self.histograms
         pudir=['']
-        pudir =['','fakeRateMethod/']#,'subtractedup/','subtracteddown/']
-#        elooseList = ['eLoose_nofrweight/','eLoose/','eLooseUp/', 'eLooseDown/']
-#        mlooseList = ['mLoose_nofrweight/','mLoose/','mLooseUp/', 'mLooseDown/']
-#        emlooseList= ['mLooseeLoose_nofrweight/','mLooseeLoose/','mLooseeLooseUp/','mLooseeLooseDown/']
+        pudir =['','fakeRateMethod/']
+        elooseList = ['antiIsolatedweightedelectron/']
+        mlooseList = ['antiIsolatedweightedmuon/']
+        emlooseList= ['antiIsolatedweightedmuonelectron/']
         alllooselist=['antiIsolatedweighted/','antiIsolated/']
-#        alllooselist=['antiIsolatedweighted_nofrweight/','antiIsolatedweighted/','antiIsolatedweightedUp/','antiIsolatedweightedDown/']
-#        if region!='signal':
-#        fr_weights=None
-#            fr_weights = [1,fakerate_weight,fakerate_weight+0.3*fakerate_weight,fakerate_weight-0.3*fakerate_weight]
-#  elif region=='eTightmLoose':
-#      fr_weights=[1,0.7,0.91,0.59]
-#  elif region=='eLoosemLoose': 
-#      frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
-#      efr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]
-#      mfr_weights=[1,0.7,0.91,0.59]
-#      comb_error=efr_weights[1]*mfr_weights[1]*sqrt(0.3*0.3+((frweight_array[1]/frweight_array[0])*(frweight_array[1]/frweight_array[0])))
-#      fr_weights = [1,efr_weights[1]*mfr_weights[1],efr_weights[1]*mfr_weights[1]+comb_error,efr_weights[1]*mfr_weights[1]-comb_error]
+
         if region=='eLoosemTight':
-#            frarray=fakerateWeightGetter(row.ePt,abs(row.eEta)) 
- #           fakerateWeight=frarray[0]
-            fakerateFactor=self.geteFakeFactor(row)
-            fakerateWeight=fakerateFactor/(1-fakerateFactor)
-            antiIsolatedWeightList=[fakerateWeight,1.0]
-            for n, l in enumerate(alllooselist) :
+            frarray=self.get_fakerate(row) 
+            fakerateWeight=frarray
+            antiIsolatedWeightList=[fakerateWeight,1]
+            for n, l in enumerate(elooseList) :
                 antiIsolatedWeight= weight*antiIsolatedWeightList[n]
                 folder = l+f
-                if sys=='presel' or sys=='nosys':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi),antiIsolatedWeight)
+                if sys=='presel':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
                     histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
                     histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
                     histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
@@ -426,117 +445,223 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                     histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
                     histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
                     histos[folder+'/jetN_30'].Fill(row.jetVeto30, antiIsolatedWeight) 
-                elif sys=='jetup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnUp, row.type1_pfMet_shiftedPhi_JetEnUp),antiIsolatedWeight)
-                elif sys=='jetdown':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnDown, row.type1_pfMet_shiftedPhi_JetEnDown),antiIsolatedWeight)
-                elif sys=='tup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnUp, row.type1_pfMet_shiftedPhi_TauEnUp),antiIsolatedWeight)
-                elif sys=='tdown':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnDown, row.type1_pfMet_shiftedPhi_TauEnDown),antiIsolatedWeight)
-                elif sys=='uup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp),antiIsolatedWeight)
-                elif sys=='udown':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown),antiIsolatedWeight)
-                    """
-        if region=='eTightmLoose' and (sys=='presel' or sys=='nosys'):
-            fr_weights=[1,0.7,0.91,0.59]
-            if not self.isData :
-                for n in range(1,4) :
-                    subfolder=pudir[n]+f
-                    subweight=fr_weights[n]*weight*(-1)
-                    histos[subfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),subweight)
-                    histos[folder+'/mPt'].Fill(row.mPt, subweight)
-                    histos[folder+'/mEta'].Fill(row.mEta, subweight)
-                    histos[folder+'/mPhi'].Fill(row.mPhi, subweight) 
-                    histos[folder+'/ePt'].Fill(row.ePt, subweight)
-                    histos[folder+'/eEta'].Fill(row.eEta, subweight)
-                    histos[folder+'/ePhi'].Fill(row.ePhi, subweight)
-                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), subweight)
-                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
-                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
-                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
-                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
-                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
-                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
-                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
-                    histos[folder+'/vbfMass'].Fill(row.vbfMass, subweight)
-                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
-                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
-
+                elif sys=='nosys':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+        if region=='eTightmLoose':
+            fakerateWeight=3
+            antiIsolatedWeightList=[fakerateWeight,1]
             for n, l in enumerate(mlooseList) :
-                frweight = weight*fr_weights[n]
+                antiIsolatedWeight= weight*antiIsolatedWeightList[n]
                 folder = l+f
-                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
-        elif region=='eLoosemTight' and (sys=='presel' or sys=='nosys'):
-            frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
-            fr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]"""
+                if sys=='presel':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+                    histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
+                    histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
+                    histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, antiIsolatedWeight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, antiIsolatedWeight)
+                    histos[folder+'/eEta'].Fill(row.eEta, antiIsolatedWeight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, antiIsolatedWeight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), antiIsolatedWeight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, antiIsolatedWeight)
+                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), antiIsolatedWeight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), antiIsolatedWeight)
+#                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , antiIsolatedWeight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, antiIsolatedWeight) 
+                elif sys=='nosys':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+
+        if region=='eLoosemLoose':
+            efrarray=fakerateWeightGetter(row.ePt,abs(row.eEta)) 
+            efakerateWeight=efrarray[0]
+            mfakerateWeight=3
+            antiIsolatedWeightList=[mfakerateWeight*efakerateWeight,1]
+            for n, l in enumerate(emlooseList) :
+                antiIsolatedWeight= weight*antiIsolatedWeightList[n]
+                folder = l+f
+                if sys=='presel':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+                    histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
+                    histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
+                    histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, antiIsolatedWeight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, antiIsolatedWeight)
+                    histos[folder+'/eEta'].Fill(row.eEta, antiIsolatedWeight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, antiIsolatedWeight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), antiIsolatedWeight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, antiIsolatedWeight)
+                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), antiIsolatedWeight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), antiIsolatedWeight)
+#                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , antiIsolatedWeight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, antiIsolatedWeight) 
+                elif sys=='nosys':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+
+        if region!='signal':
+            if region=='eLoosemTight':
+                frarray=self.get_fakerate(row)
+                fakerateWeight=frarray
+            elif region=='eTightmLoose':
+                fakerateWeight=3
+            elif region=='eLoosemLoose':
+                frarray=self.get_fakerate(row)
+                efakerateWeight=frarray
+                mfakerateWeight=3
+                fakerateWeight=-efakerateWeight*mfakerateWeight
+            antiIsolatedWeightList=[fakerateWeight,1]
+            for n, l in enumerate(alllooselist):
+                antiIsolatedWeight= weight*antiIsolatedWeightList[n]
+                folder = l+f
+                if sys=='presel':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+                    histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
+                    histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
+                    histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, antiIsolatedWeight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, antiIsolatedWeight)
+                    histos[folder+'/eEta'].Fill(row.eEta, antiIsolatedWeight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, antiIsolatedWeight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), antiIsolatedWeight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, antiIsolatedWeight)
+                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, antiIsolatedWeight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), antiIsolatedWeight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), antiIsolatedWeight)
+#                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , antiIsolatedWeight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, antiIsolatedWeight) 
+                elif sys=='nosys':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),antiIsolatedWeight)
+                    folder=folder.replace('nosys','')
+                    if n==0:
+                        for shape in self.fakeshapesdir:
+                            folder=folder+shape
+                            if region=='eLoosemTight':
+                                frarray=self.get_fakerate(row,shape)
+                                fakerateWeight=frarray
+                            elif region=='eTightmLoose':
+                                fakerateWeight=3
+                            elif region=='eLoosemLoose':
+                                frarray=self.get_fakerate(row)
+                                efakerateWeight=frarray
+                                mfakerateWeight=3
+                                fakerateWeight=-efakerateWeight*mfakerateWeight
+                            fakeshapeWeight=fakerateWeight*weight
+                            histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),fakeshapeWeight)
+                            folder=folder.replace(shape,'')
+                elif sys=='jetup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnUp, row.type1_pfMet_shiftedPhi_JetEnUp,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='jetdown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnDown, row.type1_pfMet_shiftedPhi_JetEnDown,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='tup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnUp, row.type1_pfMet_shiftedPhi_TauEnUp,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='tdown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnDown, row.type1_pfMet_shiftedPhi_TauEnDown,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='uup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='udown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='eup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnUp, row.type1_pfMet_shiftedPhi_ElectronEnUp,row.ePhi_ElectronEnUp,row.ePt_ElectronEnUp),antiIsolatedWeight)
+
+                elif sys=='edown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnDown, row.type1_pfMet_shiftedPhi_ElectronEnDown,row.ePhi_ElectronEnDown,row.ePt_ElectronEnDown),antiIsolatedWeight)
+                elif sys=='mup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnUp, row.type1_pfMet_shiftedPhi_MuonEnUp,row.ePhi,row.ePt),antiIsolatedWeight)
+                elif sys=='mdown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnDown, row.type1_pfMet_shiftedPhi_MuonEnDown,row.ePhi,row.ePt),antiIsolatedWeight)
+            
             if not self.isData and not self.isGluGlu_LFV and not self.isVBF_LFV and not self.isGluGluEtauSig and not self.isVBFEtauSig:
+                if region=='eLoosemTight':
+                    frarray=self.get_fakerate(row)
+                    efakerateWeight=frarray
+                elif region=='eTightmLoose':
+                    fakerateWeight=3
+                elif region=='eLoosemLoose':
+                    frarray=self.get_fakerate(row)
+                    efakerateWeight=frarray
+                    mfakerateWeight=3
+                    fakerateweight=-efakerateWeight*mfakerateWeight
+                antiIsolatedWeightList=[fakerateWeight,1]
                 fakeRateMethodfolder=pudir[1]+f
                 fakeRateMethodweight=fakerateWeight*weight*(-1)
-                histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/Met'].Fill(row.type1_pfMetEt, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/mPt'].Fill(row.mPt, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/mEta'].Fill(row.mEta, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/mPhi'].Fill(row.mPhi, fakeRateMethodweight) 
-                histos[fakeRateMethodfolder+'/ePt'].Fill(row.ePt, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/eEta'].Fill(row.eEta, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/ePhi'].Fill(row.ePhi, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/em_DeltaR'].Fill(row.e_m_DR, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/h_vismass'].Fill(row.e_m_Mass, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), fakeRateMethodweight)
- #               histos[fakeRateMethodfolder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/vbfMass'].Fill(row.vbfMass, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/vbfDeta'].Fill(row.vbfDeta, fakeRateMethodweight)
-                histos[fakeRateMethodfolder+'/jetN_30'].Fill(row.jetVeto30, fakeRateMethodweight) 
-        """
-            for n, l in enumerate(elooseList) :
-                frweight = weight*fr_weights[n]
-                folder = l+f
-                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
 
-        elif region=='eLoosemLoose' and (sys=='presel' or sys=='nosys'):
-            frweight_array=fakerateWeight(row.ePt,abs(row.eEta))
-            efr_weights = [1,frweight_array[0],frweight_array[0]+frweight_array[1],frweight_array[0]-frweight_array[1]]
-            mfr_weights=[1,0.7,0.91,0.59]
-            comb_error=efr_weights[1]*mfr_weights[1]*sqrt(0.3*0.3+((frweight_array[1]/frweight_array[0])*(frweight_array[1]/frweight_array[0])))
-            fr_weights = [1,efr_weights[1]*mfr_weights[1],efr_weights[1]*mfr_weights[1]+comb_error,efr_weights[1]*mfr_weights[1]-comb_error]
-            if not self.isData and fr_weights[1]==123123:
-                for n in range(1,4):
-                    subfolder=pudir[n]+f
-                    subweight=fr_weights[n]*weight*(-1)
-                    histos[subfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),subweight)
-                    histos[folder+'/mPt'].Fill(row.mPt, subweight)
-                    histos[folder+'/mEta'].Fill(row.mEta, subweight)
-                    histos[folder+'/mPhi'].Fill(row.mPhi, subweight) 
-                    histos[folder+'/ePt'].Fill(row.ePt, subweight)
-                    histos[folder+'/eEta'].Fill(row.eEta, subweight)
-                    histos[folder+'/ePhi'].Fill(row.ePhi, subweight)
-                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), subweight)
-                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, subweight)
-                    histos[folder+'/h_vismass'].Fill(row.e_m_Mass, subweight)
-                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, subweight)
-                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, subweight)
-                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), subweight)
-                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), subweight)
-                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , subweight)
-                    histos[folder+'/vbfMass'].Fill(row.vbfMass, subweight)
-                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, subweight)
-                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, subweight) 
+                if sys=='presel':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/Met'].Fill(row.type1_pfMetEt, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/mPt'].Fill(row.mPt, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/mEta'].Fill(row.mEta, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/mPhi'].Fill(row.mPhi, fakeRateMethodweight) 
+                    histos[fakeRateMethodfolder+'/ePt'].Fill(row.ePt, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/eEta'].Fill(row.eEta, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/ePhi'].Fill(row.ePhi, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/em_DeltaR'].Fill(row.e_m_DR, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/h_vismass'].Fill(row.e_m_Mass, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), fakeRateMethodweight)
+                #               histos[fakeRateMethodfolder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/vbfMass'].Fill(row.vbfMass, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/vbfDeta'].Fill(row.vbfDeta, fakeRateMethodweight)
+                    histos[fakeRateMethodfolder+'/jetN_30'].Fill(row.jetVeto30, fakeRateMethodweight) 
+                elif sys=='nosys':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),fakeRateMethodweight)
+                    fakeRateMethodfolder=fakeRateMethodfolder.replace('nosys','')
+                    for shape in self.fakeshapesdir:
+                        fakeRateMethodfolder=fakeRateMethodfolder+shape
+                        if region=='eLoosemTight':
+                            frarray=self.get_fakerate(row,shape)
+                            fakerateWeight=frarray
+                        elif region=='eTightmLoose':
+                            fakerateWeight=3
+                        elif region=='eLoosemLoose':
+                            frarray=self.get_fakerate(row)
+                            efakerateWeight=frarray
+                            mfakerateWeight=3
+                            fakerateWeight=-efakerateWeight*mfakerateWeight
+                        fakeshapeWeight=-1*fakerateWeight*weight
+                        histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),fakeshapeWeight)
+                        fakeRateMethodfolder=fakeRateMethodfolder.replace(shape,'')
 
-            for n, l in enumerate(emlooseList) :
-                frweight = weight*fr_weights[n]
-                folder = l+f
-                histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),frweight)
-"""          
+                elif sys=='jetup':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnUp, row.type1_pfMet_shiftedPhi_JetEnUp,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='jetdown':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnDown, row.type1_pfMet_shiftedPhi_JetEnDown,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='tup':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnUp, row.type1_pfMet_shiftedPhi_TauEnUp,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='tdown':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnDown, row.type1_pfMet_shiftedPhi_TauEnDown,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='uup':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='udown':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='eup':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnUp, row.type1_pfMet_shiftedPhi_ElectronEnUp,row.ePhi_ElectronEnUp,row.ePt_ElectronEnUp),fakeRateMethodweight)
+                elif sys=='edown':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnDown, row.type1_pfMet_shiftedPhi_ElectronEnDown,row.ePhi_ElectronEnDown,row.ePt_ElectronEnDown),fakeRateMethodweight)
+
+                elif sys=='mup':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnUp, row.type1_pfMet_shiftedPhi_MuonEnUp,row.ePhi,row.ePt),fakeRateMethodweight)
+                elif sys=='mdown':
+                    histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnDown, row.type1_pfMet_shiftedPhi_MuonEnDown,row.ePhi,row.ePt),fakeRateMethodweight)
         if region=='signal' :
             for n,d  in enumerate(pudir) :
                 folder = d+f                
-                if sys=='presel' or sys=='nosys':
+                if sys=='presel':
                     histos[folder+'/mPt'].Fill(row.mPt, weight)
                     histos[folder+'/mEta'].Fill(row.mEta, weight)
                     histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
@@ -547,7 +672,7 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                     histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
                     histos[folder+'/h_vismass'].Fill(row.e_m_Mass, weight)
 
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),weight)
  #                   histos[folder+'/scaledmPt'].Fill(float(row.mPt)/float(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)),weight)
  #                   histos[folder+'/scaledePt'].Fill(float(row.ePt)/float(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)),weight)
  #
@@ -562,30 +687,41 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                     histos[folder+'/vbfMass'].Fill(row.vbfMass, weight)
                     histos[folder+'/vbfDeta'].Fill(row.vbfDeta, weight)
                     histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight) 
- #                   
+
+                elif sys=='nosys':
+                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi,row.ePhi,row.ePt),weight)
 
                 elif sys=='jetup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnUp, row.type1_pfMet_shiftedPhi_JetEnUp),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnUp, row.type1_pfMet_shiftedPhi_JetEnUp,row.ePhi,row.ePt),weight)
 
                 
                 elif sys=='jetdown':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnDown, row.type1_pfMet_shiftedPhi_JetEnDown),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_JetEnDown, row.type1_pfMet_shiftedPhi_JetEnDown,row.ePhi,row.ePt),weight)
 
 
                 elif sys=='tup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnUp, row.type1_pfMet_shiftedPhi_TauEnUp),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnUp, row.type1_pfMet_shiftedPhi_TauEnUp,row.ePhi,row.ePt),weight)
 
 
                 elif sys=='tdown':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnDown, row.type1_pfMet_shiftedPhi_TauEnDown),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_TauEnDown, row.type1_pfMet_shiftedPhi_TauEnDown,row.ePhi,row.ePt),weight)
 
 
                 elif sys=='uup':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnUp, row.type1_pfMet_shiftedPhi_UnclusteredEnUp,row.ePhi,row.ePt),weight)
 
                 elif sys=='udown':
-                    folder = d+f
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown),weight)
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown,row.ePhi,row.ePt),weight)
+                elif sys=='eup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnUp, row.type1_pfMet_shiftedPhi_ElectronEnUp,row.ePhi_ElectronEnUp,row.ePt_ElectronEnUp),weight)
+
+                elif sys=='edown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_ElectronEnDown, row.type1_pfMet_shiftedPhi_ElectronEnDown,row.ePhi_ElectronEnDown,row.ePt_ElectronEnDown),weight)
+                elif sys=='mup':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnUp, row.type1_pfMet_shiftedPhi_MuonEnUp,row.ePhi,row.ePt),weight)
+
+                elif sys=='mdown':
+                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_MuonEnDown, row.type1_pfMet_shiftedPhi_MuonEnDown,row.ePhi,row.ePt),weight)
 
     def process(self):
         
@@ -686,10 +822,8 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
 
             if not isMuonTight and not isElecTight: #double fakes, should be tiny
                 region="eLoosemLoose"
-                continue
             elif not isMuonTight and  isElecTight:   # mu fakes, should be small
                 region="eTightmLoose"
-                continue
             elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
                 region="eLoosemTight"
             elif isMuonTight and isElecTight: #signal region
@@ -714,72 +848,204 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
             for sys in self.sysdir:
                 if sys =='nosys':
                     shifted_jetVeto30=row.jetVeto30
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_type1
                     shifted_mMtToPfMet=row.mMtToPfMet_type1
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_type1
                     shifted_eMtToPfMet=row.eMtToPfMet_type1
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMetPhi
                     shifted_type1_pfMetEt=row.type1_pfMetEt
+
                     shifted_vbfMass=row.vbfMass
                     shifted_vbfDeta=row.vbfDeta
                 elif sys =='jetup':
                     shifted_jetVeto30=row.jetVeto30_JetEnUp
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_JetEnUp
                     shifted_mMtToPfMet=row.mMtToPfMet_JetEnUp
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_JetEnUp
                     shifted_eMtToPfMet=row.eMtToPfMet_JetEnUp
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_JetEnUp
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_JetEnUp
+
                     shifted_vbfMass=row.vbfMass_JetEnUp
                     shifted_vbfDeta=row.vbfDeta_JetEnUp
                 elif sys =='jetdown':
                     shifted_jetVeto30=row.jetVeto30_JetEnDown
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_JetEnDown
                     shifted_mMtToPfMet=row.mMtToPfMet_JetEnDown
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_JetEnDown
                     shifted_eMtToPfMet=row.eMtToPfMet_JetEnDown
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_JetEnDown
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_JetEnDown
+
                     shifted_vbfMass=row.vbfMass_JetEnDown
                     shifted_vbfDeta=row.vbfDeta_JetEnDown
                 elif sys =='tup':
                     shifted_jetVeto30=row.jetVeto30
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_TauEnUp
                     shifted_mMtToPfMet=row.mMtToPfMet_TauEnUp
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_TauEnUp
                     shifted_eMtToPfMet=row.eMtToPfMet_TauEnUp
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_TauEnUp
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_TauEnUp
+
                     shifted_vbfMass=row.vbfMass
                     shifted_vbfDeta=row.vbfDeta
                 elif sys =='tdown':
                     shifted_jetVeto30=row.jetVeto30
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_TauEnDown
                     shifted_mMtToPfMet=row.mMtToPfMet_TauEnDown
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_TauEnDown
                     shifted_eMtToPfMet=row.eMtToPfMet_TauEnDown
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_TauEnDown
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_TauEnDown
+
                     shifted_vbfMass=row.vbfMass
                     shifted_vbfDeta=row.vbfDeta
                 elif sys =='uup':
                     shifted_jetVeto30=row.jetVeto30
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_UnclusteredEnUp
                     shifted_mMtToPfMet=row.mMtToPfMet_UnclusteredEnUp
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_UnclusteredEnUp
                     shifted_eMtToPfMet=row.eMtToPfMet_UnclusteredEnUp
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_UnclusteredEnUp
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_UnclusteredEnUp
+
                     shifted_vbfMass=row.vbfMass
                     shifted_vbfDeta=row.vbfDeta
                 elif sys =='udown':
                     shifted_jetVeto30=row.jetVeto30
+
                     shifted_mDPhiToPfMet=row.mDPhiToPfMet_UnclusteredEnDown
                     shifted_mMtToPfMet=row.mMtToPfMet_UnclusteredEnDown
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
                     shifted_eDPhiToPfMet=row.eDPhiToPfMet_UnclusteredEnDown
                     shifted_eMtToPfMet=row.eMtToPfMet_UnclusteredEnDown
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
                     shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_UnclusteredEnDown
                     shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_UnclusteredEnDown
+
+                    shifted_vbfMass=row.vbfMass
+                    shifted_vbfDeta=row.vbfDeta
+                elif sys =='eup':
+                    shifted_jetVeto30=row.jetVeto30
+
+                    shifted_mDPhiToPfMet=row.mDPhiToPfMet_ElectronEnUp
+                    shifted_mMtToPfMet=row.mMtToPfMet_ElectronEnUp
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
+                    shifted_eDPhiToPfMet=row.eDPhiToPfMet_ElectronEnUp
+                    shifted_eMtToPfMet=row.eMtToPfMet_ElectronEnUp
+                    shifted_ePhi=row.ePhi_ElectronEnUp
+                    shifted_ePt=row.ePt_ElectronEnUp
+
+                    shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_ElectronEnUp
+                    shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_ElectronEnUp
+
+                    shifted_vbfMass=row.vbfMass
+                    shifted_vbfDeta=row.vbfDeta
+
+                elif sys =='edown':
+                    shifted_jetVeto30=row.jetVeto30
+
+                    shifted_mDPhiToPfMet=row.mDPhiToPfMet_ElectronEnDown
+                    shifted_mMtToPfMet=row.mMtToPfMet_ElectronEnDown
+                    shifted_mPt=row.mPt
+                    shifted_mPhi=row.mPhi
+
+
+                    shifted_eDPhiToPfMet=row.eDPhiToPfMet_ElectronEnDown
+                    shifted_eMtToPfMet=row.eMtToPfMet_ElectronEnDown
+                    shifted_ePhi=row.ePhi_ElectronEnDown
+                    shifted_ePt=row.ePt_ElectronEnDown
+
+                    shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_ElectronEnDown
+                    shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_ElectronEnDown
+
+                    shifted_vbfMass=row.vbfMass
+                    shifted_vbfDeta=row.vbfDeta
+                elif sys =='mup':
+                    shifted_jetVeto30=row.jetVeto30
+
+                    shifted_mDPhiToPfMet=row.mDPhiToPfMet_MuonEnUp
+                    shifted_mMtToPfMet=row.mMtToPfMet_MuonEnUp
+                    shifted_mPt=row.mPt_MuonEnUp
+                    shifted_mPhi=row.mPhi_MuonEnUp
+
+                    shifted_eDPhiToPfMet=row.eDPhiToPfMet_MuonEnUp
+                    shifted_eMtToPfMet=row.eMtToPfMet_MuonEnUp
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
+                    shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_MuonEnUp
+                    shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_MuonEnUp
+
+                    shifted_vbfMass=row.vbfMass
+                    shifted_vbfDeta=row.vbfDeta
+
+                elif sys =='mdown':
+                    shifted_jetVeto30=row.jetVeto30
+
+                    shifted_mDPhiToPfMet=row.mDPhiToPfMet_MuonEnDown
+                    shifted_mMtToPfMet=row.mMtToPfMet_MuonEnDown
+                    shifted_mPt=row.mPt_MuonEnDown
+                    shifted_mPhi=row.mPhi_MuonEnDown
+
+                    shifted_eDPhiToPfMet=row.eDPhiToPfMet_MuonEnDown
+                    shifted_eMtToPfMet=row.eMtToPfMet_MuonEnDown
+                    shifted_ePhi=row.ePhi
+                    shifted_ePt=row.ePt
+
+                    shifted_type1_pfMetPhi=row.type1_pfMet_shiftedPhi_MuonEnDown
+                    shifted_type1_pfMetEt=row.type1_pfMet_shiftedPt_MuonEnDown
+
                     shifted_vbfMass=row.vbfMass
                     shifted_vbfDeta=row.vbfDeta
 
@@ -791,40 +1057,40 @@ class LFVHEMuAnalyzerMVAv8(MegaBase):
                     else:
                         jn=21
                 if jn == 0 :
-                    if row.mPt < 30: continue 
-                    if row.ePt < 10: continue
-                    if deltaPhi(row.ePhi,row.mPhi) < 2.5 : continue
+                    if shifted_mPt < 30: continue 
+                    if shifted_ePt < 10: continue
+                    if deltaPhi(shifted_ePhi,shifted_mPhi) < 2.5 : continue
                     if abs(shifted_eDPhiToPfMet) > 0.7 : continue
                     if shifted_mMtToPfMet < 60 : continue
  #                   if shifted_eMtToPfMet > 65 : continue
                     cut_flow_trk.Fill('jet0sel')
                 
                 if jn == 1 :
-                    if row.mPt < 25: continue 
-                    if row.ePt < 10 : continue
+                    if shifted_mPt < 25: continue 
+                    if shifted_ePt < 10 : continue
                     if abs(shifted_eDPhiToPfMet) > 0.7 : continue
-                    if deltaPhi(row.ePhi,row.mPhi)<1:continue
+                    if deltaPhi(shifted_ePhi,shifted_mPhi)<1:continue
                     if shifted_mMtToPfMet < 40 : continue
 #                    if shifted_eMtToPfMet > 65 : continue
                     cut_flow_trk.Fill('jet1sel')
                     
                 if jn == 21 :
-                    if row.mPt < 25: continue 
-                    if row.ePt < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
+                    if shifted_mPt < 25: continue 
+                    if shifted_ePt < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(shifted_eDPhiToPfMet) > 0.5 : continue
                     if shifted_mMtToPfMet < 15 : continue
 #                    if shifted_eMtToPfMet > 15 : continue
-                    if shifted_vbfMass < 60 : continue
+ #                   if shifted_vbfMass < 60 : continue
  #                   if shifted_vbfDeta < 0.5 : continue
                     cut_flow_trk.Fill('jet2loosesel')
 
                 if jn == 22 :
-                    if row.mPt < 25: continue 
-                    if row.ePt < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
+                    if shifted_mPt < 25: continue 
+                    if shifted_ePt < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(shifted_eDPhiToPfMet) > 0.3 : continue
                     if shifted_mMtToPfMet < 15 : continue
 #                    if shifted_eMtToPfMet > 15 : continue
-                    if shifted_vbfMass < 60 : continue
+#                    if shifted_vbfMass < 60 : continue
 #                    if shifted_vbfDeta < 0.5 : continue
                     cut_flow_trk.Fill('jet2tightsel')
 

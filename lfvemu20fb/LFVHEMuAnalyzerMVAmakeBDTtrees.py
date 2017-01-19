@@ -328,7 +328,7 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         self.metPhi_[0]=row.type1_pfMetPhi
         self.numjets_[0]=row.jetVeto30
         self.mColl_[0]=collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)
-        self.pZeta_[0]=row.e_m_PZeta
+        self.pZeta_[0]=row.e_m_PZetaLess0p85PZetaVis
         self.lepAsym_[0]=(row.mPt-row.ePt)/(row.ePt+row.mPt)
 
         if row.jetVeto30==0 or row.jetVeto30==1:
@@ -350,6 +350,7 @@ class LFVHEMuAnalyzerMVAmakeBDTtrees(MegaBase):
         for row in self.tree:
             sign = 'ss' if row.e_m_SS else 'os'
 
+            if sign=='ss':continue
  #           ptthreshold = [30]
             repeatEvt=True
             if row.evt!=curr_event:

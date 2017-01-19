@@ -62,6 +62,11 @@ blind   = 'blind' not in os.environ or os.environ['blind'] == 'YES'
 print 'blind?', blind
 blind_region=[100, 150] if blind else None
 #blind_region=[100, 200] if blind else None
+blindpath="antiIsolatedweightedelectron/os/.*ass*"
+#blind_region=[100, 200] if blind else None
+if 'BDT2' in sys.argv[4]:
+    blind_region=[0.0,0.3]
+    blindpath="antiIsolatedweightedelectron/os/.*BDT*"
 
 embedded = False
 print jobid
@@ -72,7 +77,7 @@ files=  glob.glob(Analyzer+'/*.root')
 #print "files",files
 outputdir = 'plots/'+sys.argv[3]+'/'+Analyzer+'/' 
 
-plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path="antiIsolatedweightedelectron/os/.*ass*")
+plotter = BasePlotter(files, outputdir, blind_region,use_embedded=embedded,blind_path=blindpath)
 
 EWKDiboson = views.StyleView(
     views.SumView( 
@@ -186,6 +191,7 @@ if not no_plots:
    ]
        
    histo_info = [
+      ('BDT_value', 'BDT value', 1),
       ('h_collmass_pfmet', 'M_{coll}(emu) (GeV)', 1),
       ('mPt', 'p_{T}(mu) (GeV)', 4), 
       ('mEta', 'eta(mu)', 2),  
@@ -228,6 +234,7 @@ if not no_plots:
 #                                          sort=True)
 #             plotter.save(path+"/vbfDeta",dotroot=True)
            for var, xlabel, rebin in histo_info:
+               if 'BDT' not in sys.argv[4] and 'BDT' in var:continue
                logging.debug("Plotting %s/%s" % (path, var) )
                plotter.pad.SetLogy(False)
  #              print var
@@ -241,11 +248,14 @@ if not no_plots:
                                                     sort=True,br=50)
             
                print "**************************************************************************************************************************************************"
-               plotter.save(path+"/"+var,dotroot=True)
+               plotter.save(path+"/"+njet+"_preselection_"+var,dotroot=True)
          # plotter.set_subdir(os.path.join('embedded', path+'/selected'))if embedded else plotter.set_subdir(path+'/selected')
        
            for var, xlabel, rebin in histo_info:
-               if 'collmass' not in var:continue
+               if 'BDT2' not in sys.argv[4] and 'BDT' in var:continue
+               if 'BDT2' not in sys.argv[4] and "collmass" not in var:continue
+               if 'BDT2' in sys.argv[4] and 'BDT' not in var:continue
+
                if int(njet)==1 or int(njet)==21 or int(njet)==22:
                    rebin = rebin*2
   #             if int(njet)==22:
@@ -258,7 +268,7 @@ if not no_plots:
                                                  leftside=False, xrange=(-4.0,300.), show_ratio=True, ratio_range=1., 
                                           sort=True,br=5)
               
-               plotter.save(path+"/selected/"+var,dotroot=True)
+               plotter.save(path+"/selected/"+njet+"_selection_"+var,dotroot=True)
 
  
 print "break 2"

@@ -1,0 +1,30 @@
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_13/src/UWHiggs/lfvemu20fb)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVABDTfitBDT.py inputs/Oct30/TT_TuneCUETP8M1_13TeV-powheg-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/TT_TuneCUETP8M1_13TeV-powheg-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVABDTfitBDT_TT_TuneCUETP8M1_13TeV-powheg-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016E.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVABDTfitBDT.py inputs/Oct30/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.txt results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVABDTfitBDT_W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.log &
+sleep 10s
+mkdir -p `dirname results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016F.root`
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016E.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVABDTfitBDT.py inputs/Oct30/data_SingleMuon_Run2016E.txt results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016E.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVABDTfitBDT_data_SingleMuon_Run2016E.log &
+sleep 10s
+#using farmout:1
+#dry run:1
+export megatarget=results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016F.root
+mkdir -p batch_logs
+mega-farmout LFVHEMuAnalyzerMVABDTfitBDT.py inputs/Oct30/data_SingleMuon_Run2016F.txt results/Oct30/LFVHEMuAnalyzerMVABDTfitBDT/data_SingleMuon_Run2016F.root --verbose >& batch_logs/results_Oct30_LFVHEMuAnalyzerMVABDTfitBDT_data_SingleMuon_Run2016F.log &
+sleep 10s
