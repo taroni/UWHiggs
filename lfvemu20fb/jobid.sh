@@ -9,5 +9,5 @@
 #export jobid='SMHTT_aug16_v2' 
 #export jobid13='SMHTT_aug16_v2'
 
-export jobid='Oct30' 
-export jobid13='Oct30' 
+export jobid='SMHTT_mc_jan17' 
+export jobid13='SMHTT_mc_jan17' 
