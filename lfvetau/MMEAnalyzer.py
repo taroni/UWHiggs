@@ -236,6 +236,15 @@ class MMEAnalyzer(MegaBase):
             self.book(f,"eMtToPfMet_type1", "M_{T}(e, PFMET)" , 20, 0, 200)
             self.book(f,"eGenPdgId", "e gen pdgid", 100, -50, 50 )
             self.book(f,"eGenMotherPdgId", "e gen mother pdgid", 100, -50, 50 )
+
+            self.book(f,"eRelIso", "e Relative Isolation", 100, 0., 2.)
+            self.book(f,"eRelIso_vs_ePt", "e relIso vs Pt", 40, 0, 200., 25, 0., 1., type=ROOT.TH2F)
+            self.book(f,"eIsoDB03", "e IsoDB03", 100, 0., 2.)
+            self.book(f,"eIsoDB03_vs_ePt", "e IsoDB03 vs Pt", 40, 0, 200., 25, 0., 1., type=ROOT.TH2F)
+            self.book(f,"eEcalIsoDR03", "eEcalIsoDR03", 200, 0, 200.)
+            self.book(f,"eHcalIsoDR03", "eHcalIsoDR03", 200, 0, 200.)
+            self.book(f,"eTrkIsoDR03", "eTrkIsoDR03", 200, 0, 200.)
+            
             
             self.book(f,"m1Pt", "m1 p_{T}", 40, 0, 200)
             self.book(f,"m1Phi", "m1 phi",  26, -3.2, 3.2)
