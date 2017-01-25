@@ -6,7 +6,7 @@ ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
 
 
-file0 = ROOT.TFile.Open("results/LFVtrilepton_oct31/MMEAnalyzer/data.root")
+file0 = ROOT.TFile.Open("../results/LFVtrilepton_oct31/MMEAnalyzer/data.root")
 
 h_SL = file0.Get("os/eSuperLoose/eIsoDB03_vs_ePt")
 h_VT = file0.Get("os/eVTight/eIsoDB03_vs_ePt")
@@ -109,3 +109,22 @@ ratio1.GetYaxis().SetTitle("e RelIso")
 c.Update()
 
 c.SaveAs("VTight_over_SLoose.pdf")
+
+c.Clear()
+SLpt=hh_SL.ProjectionX("SL_pt", 0, -1, "e")
+SLpt.Draw("E")
+c.SetLogy(1)
+SLpt.GetXaxis().SetTitle("e p_{T} GeV")
+c.Update()
+
+VTpt=hh_VT.ProjectionX("VT_pt", 0, -1, "e")
+VTpt.Draw("ESAME")
+VTpt.SetLineColor(2)
+VTpt.SetMarkerColor(2)
+VTpt.SetMarkerStyle(20)
+c.Update()
+c.SaveAs("SL_VT_pt_comparison.pdf")
+
+
+for ibin in range(1, VTpt.GetXaxis().GetNbins()+1):
+    print '%.1f & %.1f &%.1f\\\\\hline' %(VTpt.GetXaxis().GetBinCenter(ibin), SLpt.GetBinContent(ibin), VTpt.GetBinContent(ibin))
