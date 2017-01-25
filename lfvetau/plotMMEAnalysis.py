@@ -105,7 +105,7 @@ new_mc_samples.extend(['EWKDiboson', 'singleT','Wplus', 'DYLL' , 'TT'
 
 histoname = [('m1Pt','m1 p_{T} (GeV)', 2),('m1Phi','m1 #phi',2),('m1Eta','m1 #eta',1),('m2Pt','m2 p_{T} (GeV)',2),('m2Phi','m2 #phi',2),('m2Eta','m2 #eta',1),
              ('m1_m2_Mass', 'm1-m2 Inv Mass (GeV)',1), ('ePt','e p_{T} (GeV)',2), ('ePhi','e #phi',2),('eEta','e #eta',5),('eAbsEta','e |#eta|',5),
-             ( 'jetVeto30', 'Number of jets, p_{T}>30', 1),( 'jetVeto20', 'Number of jets, p_{T}>20', 1), ('eGenPdgId', 'e Gen pdgID', 1) , ('nvtx', 'number of vertices', 2), ('nTruePU', 'true pileup', 1), ('type1_pfMetEt', 'type1 MET', 1) ]
+             ( 'jetVeto30', 'Number of jets, p_{T}>30', 1),( 'jetVeto20', 'Number of jets, p_{T}>20', 1), ('eGenPdgId', 'e Gen pdgID', 1) , ('nvtx', 'number of vertices', 2), ('nTruePU', 'true pileup', 1), ('type1_pfMetEt', 'type1 MET', 1), ('eIsoDB03', 'eIsoDB03', 1), ('eEcalIsoDR03', 'eEcalIsoDR03', 1), ('eHcalIsoDR03', 'eHcalIsoDR03', 1), ('eTrkIsoDR03', 'eTrkIsoDR03', 1)]
 plotter.mc_samples = new_mc_samples
 
 #print plotter.mc_samples
