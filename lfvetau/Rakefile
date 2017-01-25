@@ -76,7 +76,7 @@ $mmefrfit_dir = "results/#{$jobid}/mmefakerate_fits"
 directory $mmefrfit_dir
 $mmefr_analyzer = "MMEAnalyzer"
 
-$fr_binning2d = "'0,10,15,20,25,30,40,50,70,100,200 0,1.5,2.5'"
+$fr_binning2d = "'0,10,15,20,25,30,40,50,70,100,150,200 0,1.5,2.5'"
 #$fr_binning2d = "'10,20,30,40,50,70,150,200 0,1.5,2.5'"
 
 pol0 = "const"
@@ -184,7 +184,7 @@ mme2dfr_fits["e_os_eVLoose_eVTight_eAbsEta_vs_ePt"] = Hash[
                                           "variables"=>pol1_vars, 
                                           #"rebin" => 1,
                                           "rebin" => $fr_binning2d,
-                                          "range" => "10 200",
+                                          "range" => "20 200",
                                           "title" => "e p_{T} (GeV)",
                                           "min"=>"0",
                                         "max"=>"1"

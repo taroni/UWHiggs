@@ -14,9 +14,9 @@ export MEGAPATH=/hdfs/store/user/$USER
 echo $jobid
 #export jobid=$jobid13
 #rake "meta:getinputs[$jobid, $datasrc,emm/metaInfo, emm/summedWeights]"
-#rake "meta:getmeta[inputs/$jobid, emm/metaInfo, 13, emm/summedWeights]"
-rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
-rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
+rake "meta:getmeta[inputs/$jobid, emm/metaInfo, 13, emm/summedWeights]"
+#rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
+#rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
 
 
 unset OVERRIDE_META_TREE_data_ET
