@@ -69,6 +69,8 @@ for name in files:
     h0.Draw("APE")
     h0.SetMinimum(0)
     h0.SetMaximum(1.1)
+    h0.GetXaxis().SetTitle("e p_{T}")
+    h0.GetYaxis().SetTitle("e fakerate")
 
     canvas.SaveAs(name.replace(".root", ".pdf"))
     canvas.SaveAs(name.replace(".root", ".png"))
