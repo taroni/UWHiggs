@@ -154,8 +154,8 @@ class MMEControl(MegaBase):
             self.book(f,"m2Eta", "m2 eta", 10, -2.5, 2.5)
              
             self.book(f, "m1_m2_Mass",  "h_m1m2mass",  40, 0, 400)
-            self.book(f, "m1_m2_DR",  "#Delta R(#mu1, #mu2)",  40, 0, 400)
-            self.book(f, "m1_m2_DPhi",  "#Delta #Phi (#mu1, #mu2)",  40, 0, 400)
+            self.book(f, "m1_m2_DR",  "#Delta R(#mu1, #mu2)",  40, 0, 4)
+            self.book(f, "m1_m2_DPhi",  "#Delta #Phi (#mu1, #mu2)",  32, 0, 3.2)
             
             self.book(f, "jetVeto20", "Number of jets, p_{T}>20", 5, -0.5, 4.5) 
             self.book(f, "jetVeto30", "Number of jets, p_{T}>30", 5, -0.5, 4.5)

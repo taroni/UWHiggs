@@ -10,7 +10,7 @@ for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
             if  os.path.isfile(os.path.join(path, name.replace('_ext1', ''))):
                 files.append([os.path.join(path,name.replace('_ext1', '')), os.path.join(path,name)])
-print files
+#print files
 
 for names in files:
     print names
@@ -26,7 +26,7 @@ for names in files:
             except:
                 raise ValueError('I could not parse %s as a float!' % weight)
     
-    with open(os.path.join(path,name.replace('_ext1', '')), 'w') as out:
+    with open(names[0], 'w') as out:
         out.write("Weights: %s\n" % sum_weight)
     cmd="rm %s" %(names[1])
     os.system(cmd)
@@ -39,18 +39,18 @@ for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
             if  os.path.isfile(os.path.join(path, name.replace('_ext1', ''))):
                 files.append((os.path.join(path,name.replace('_ext1', '')), os.path.join(path,name)))
-
+print files
 
             
 for names in files:
 
-    outfile = open (os.path.join(path, names[0]), "a")
+    outfile = open (names[0], "a")
     
-    lines = [line.strip() for line in open(os.path.join(path, names[1]))]
+    lines = [line.strip() for line in open( names[1])]
 
     for line in lines:
         outfile.write(line+'\n')
 
     outfile.close()
-    cmd=
-    os.system("rm "+os.path.join(path, names[1]))
+    cmd= "rm %s" %( names[1])
+    os.system(cmd)

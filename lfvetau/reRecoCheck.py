@@ -2,7 +2,7 @@ import ROOT
 import os
 
 ROOT.gROOT.SetBatch(1)
-ROOT.gStyle.SetOptStat(1111111)
+ROOT.gStyle.SetOptStat(0)
 
 dataperiod = ['2016B', '2016C', '2016D', '2016E', '2016F']
 
@@ -20,7 +20,7 @@ eleDirs=[ 'isduplicate','eSSuperLoose','eSuperLoose','eVLoose', 'eLoose','eTight
 c=ROOT.TCanvas()
 c.Draw()
 
-leg = ROOT.TLegend(0.6,0.6, 0.5, 0.8)
+leg = ROOT.TLegend(0.7,0.5, 0.85, 0.4)
 
 
 for n,myfile in enumerate(filesReReco):
@@ -50,8 +50,9 @@ for n,myfile in enumerate(filesReReco):
             histoReReco.Draw("E")
             histoReReco.SetMarkerStyle(20)
             histoReReco.GetXaxis().SetTitle(histoReReco.GetTitle())
-            if 'Phi' in histo: histoReReco.Rebin(2)
-            if 'Eta' in histo: histoReReco.Rebin(5)
+            if 'ePhi' in histo: histoReReco.Rebin(2)
+            if 'eEta' or 'eAbsEta' in histo: histoReReco.Rebin(5)
+            
             histoPrompt.Sumw2()
             print 'scaling factor', float(lumi[0])/float(lumiPrompt[0])
             histoPrompt.Scale(float(lumi[0])/float(lumiPrompt[0]))
@@ -59,9 +60,14 @@ for n,myfile in enumerate(filesReReco):
             histoPrompt.SetMarkerStyle(20)
             histoPrompt.SetMarkerColor(2)
             histoPrompt.SetLineColor(2)
-            if 'Phi' in histo: histoPrompt.Rebin(2)
-            if 'Eta' in histo: histoPrompt.Rebin(5)
-
+            if 'ePhi' in histo: histoPrompt.Rebin(2)
+            if 'eEta'  or 'eAbsEta' in histo: histoPrompt.Rebin(5)
+            mymax = histoPrompt.GetBinContent(histoPrompt.GetMaximumBin()) if  histoPrompt.GetBinContent(histoPrompt.GetMaximumBin())> histoReReco.GetBinContent(histoReReco.GetMaximumBin()) else histoReReco.GetBinContent(histoReReco.GetMaximumBin())
+            errmax = histoPrompt.GetBinError(histoPrompt.GetMaximumBin()) if  histoPrompt.GetBinError(histoPrompt.GetMaximumBin())> histoReReco.GetBinError(histoReReco.GetMaximumBin()) else histoReReco.GetBinError(histoReReco.GetMaximumBin())
+            mymax=1.2*(mymax+errmax)
+            
+            histoReReco.GetYaxis().SetRangeUser(0, mymax)                                                                                                                                                                                                            
+            
 
             leg.Draw()
             
@@ -73,9 +79,19 @@ for n,myfile in enumerate(filesReReco):
             c.SaveAs(outputfilename+'.pdf')
             c.SaveAs(outputfilename+'.png')
             
-            
+
+rereco_tot=0.
+prompt_tot=0.
+
+for n,myfile in enumerate(filesReReco):
+    lumi = [line.rstrip('\n') for line in open('inputs/SMHTT_data_jan25/'+myfile+'.lumicalc.sum')]
+    lumiPrompt = [line.rstrip('\n') for line in open('/afs/hep.wisc.edu/home/taroni/nobackup/13TeV/CMSSW_8_0_18/src/UWHiggs/lfvetau/inputs/LFVtrilepton_oct31/'+filesPrompt[n]+'.lumicalc.sum')]
     print myfile, float(lumi[0])
+    print 'lumi rereco %s, prompt %s' %(filesPrompt[n], float(lumiPrompt[0]))
 
     
 
-    
+    rereco_tot += float(lumi[0])
+    prompt_tot += float(lumiPrompt[0])
+
+print 'total lumi rereco %s, prompt %s' %(str(rereco_tot), str(prompt_tot))
