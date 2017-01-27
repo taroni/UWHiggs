@@ -9,7 +9,7 @@ import math
 import glob
 import array
 import baseSelections as selections
-import mcCorrections
+#import mcCorrections
 import FinalStateAnalysis.PlotTools.pytree as pytree
 from FinalStateAnalysis.PlotTools.MegaBase import MegaBase
 from math import sqrt, pi, cos
@@ -81,14 +81,14 @@ def eIsodiff (iso, oldiso):
     else:
         return -999.
     
-pucorrector = mcCorrections.make_puCorrector('singlem', None)
+#pucorrector = mcCorrections.make_puCorrector('singlem', None)
 
         
 
-class MMEAnalyzer(MegaBase):
+class MMEControl(MegaBase):
     tree = 'emm/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
-        logging.debug('MMEAnalyzer constructor')
+        logging.debug('MMEControl constructor')
         self.channel='MME'
         target = os.path.basename(os.environ['megatarget'])
         self.is_data = target.startswith('data_')
@@ -97,7 +97,7 @@ class MMEAnalyzer(MegaBase):
         self.is_DY = bool('JetsToLL_M-50' in target)
         self.is_W = bool('JetsToLNu' in target)
         
-        super(MMEAnalyzer, self).__init__(tree, outfile, **kwargs)
+        super(MMEControl, self).__init__(tree, outfile, **kwargs)
         self.tree = MMETree(tree)
         self.out=outfile
         self.histograms = {}
@@ -105,117 +105,19 @@ class MMEAnalyzer(MegaBase):
 
         self.histo_locations = {}
         self.hfunc   = {
-            #'ePtduplicate': lambda ePtdiff, weight: (, weight) if oldept!=-999. else (-999., weight),
-            #'eIsoduplicate': lambda row, weight: (row.eIsoDB03-oldeiso, weight) if oldeiso!=-999. else (-999., weight)
-            #'nTruePU' : lambda row, weight: (row.nTruePU,None),
-            #'weight'  : lambda row, weight: (weight,None) if weight is not None else (1.,None),
-            #'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
         }
-        self.trig_weight  = mcCorrections.efficiency_trigger_mu_2016 if not self.is_data else 1.
-        self.mid_weight = mcCorrections.muonID_tight if not self.is_data else 1.
-        self.mIso_weight = mcCorrections.muonIso_loose if not self.is_data else 1.
-        self.mtrk_corrector= mcCorrections.muonTracking if not self.is_data else 1.
-        self.eleid_weight = mcCorrections.electronID_WP80_2016
-        self.eleIso_weight = mcCorrections.electronIso_0p10_2016 
-        self.eleidLoose_weight = mcCorrections.electronID_WP90_2016
-        self.eleIsoLoose_weight = mcCorrections.electronIso_0p15_2016 
-        self.DYreweight = mcCorrections.DYreweight
- 
-        self.tauSF={
-            'vloose' : 0.83,
-            'loose'  : 0.84,
-            'medium' : 0.84,
-            'tight'  : 0.83,
-            'vtight' : 0.80
-            }
-        
-        self.ZTTLweight={ #Mll < 150 if ZTT or all Mll if ZLL
-            0 : 0.063558578,
-            1 : 0.014023359,
-            2 : 0.015076197,
-            3 : 0.01554784,
-            4 : 0.012486114
-            }
-        self.Wweight={
-            0 : 0.6194146,
-            1 : 0.20038245,
-            2 : 0.10613034,
-            3 : 0.053607569,
-            4 : 0.058531731
-            }
         
     def event_weight(self, row, sys_shifts):
-        nbtagged=row.bjetCISVVeto30Medium
-        if nbtagged>2:
-            nbtagged=2
-        if self.is_data:
-            if nbtagged>0 :
-                return {'' : 0.,
-                        'eVTight' : 0.}
-            else:
-                return {'' : 1.,
-                        'eVTight' : 1.}
-
-        mcweight = self.trig_weight(row.m1Pt, row.m1AbsEta)
-        if row.m2Pt>row.m1Pt :  mcweight = self.trig_weight(row.m2Pt, row.m2AbsEta)
-        #print 'computing iso weight', row.e1Pt, row.e1Eta, row.e2Pt, row.e2Eta
-        m1isoweight = self.mIso_weight('Tight',row.m1Pt,row.m1AbsEta)
-        m2isoweight = self.mIso_weight('Tight',row.m2Pt,row.m2AbsEta)
-        m1idweight =  self.mid_weight(row.m1Pt,row.m1AbsEta)
-        m2idweight =  self.mid_weight(row.m2Pt,row.m2AbsEta)
-        m1Trkweight = self.mtrk_corrector(row.m1Eta)[0] #tracking correction factor is a tuple (value, error)
-        m2Trkweight = self.mtrk_corrector(row.m2Eta)[0]
-
-        eisoweight = self.eleIso_weight(row,'e')
-        eidweight =  self.eleid_weight(row.eEta,row.ePt)
-
-        eisoloosew = self.eleIsoLoose_weight(row,'e')
-        eidloosew = self.eleidLoose_weight(row.eEta,row.ePt)
-
-        dyweight = self.DYreweight(row.genMass, row.genpT) 
-
-        #print 'tracking weight', m1Trkweight, m2Trkweight
-        btagweight = 1. 
-        if nbtagged>0:
-            btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0)
-        
-        mcweight =  mcweight*pucorrector(row.nTruePU)*m1idweight*m2idweight*m1isoweight*m2isoweight*m1Trkweight*m2Trkweight*btagweight*eisoloosew
-
-
-        #print 'DY weight', dyweight, mcweight, mcweight*dyweight
-        if self.is_DY:
-            #mcweight = mcweight*dyweight
-            if row.numGenJets < 5:
-                mcweight = mcweight*self.ZTTLweight[row.numGenJets]*dyweight
-            else:
-                mcweight = mcweight*self.ZTTLweight[0]*dyweight
-            if dyweight > 1.5 : 
-                print  row.evt, row.run, row.lumi, row.m1Pt, row.m2Pt, row.ePt, mcweight, dyweight, mcweight/dyweight
-        if self.is_W:
-            if row.numGenJets < 5:
-                mcweight = mcweight*self.Wweight[row.numGenJets]
-            else:
-                mcweight = mcweight*self.Wweight[0]
-
-        mcweight_tight = mcweight*eisoweight/eisoloosew
-
-        if self.is_data :
-            mcweight = 1.
-            mcweight_tight=1.
-        
-        weights = {'': mcweight,
-                   'eVTight' : mcweight_tight
+        weights = {'': 1.,
+                'eVTight' : 1
         } #put the weight here later (mc Correction, trigger eff)
-        
-
         return weights
     
     def begin(self):
         sys_shifts = []
         signs =['os', 'ss']
-        twp =[ 'isduplicate', 'eSSuperLoose','eSuperLoose','eVLoose', 'eLoose','eTight','eVTight']
+        twp =[ 'isduplicate','eSSuperLoose','eSuperLoose','eVLoose', 'eLoose','eTight','eVTight']
         jetN = ['', '0', '1', '2', '3']
-        tDM = ['', 'tDM0', 'tDM1', 'tDM10']
         region = ['','eB', 'eE']
         met = ['', 'Met30']
         folder=[]
@@ -225,12 +127,7 @@ class MMEAnalyzer(MegaBase):
             folder.append(os.path.join(*tuple_path))
             path = list(tuple_path)
         
-        #self.book('os/', "h_collmass_pfmet" , "h_collmass_pfmet",  32, 0, 320)
-        #self.book('os/', "e1_e2_Mass",  "h_vismass",  32, 0, 320)
-                
         for f in folder:
-            #self.book(f,"weight", "weight", 100, 0, 10)
-
             self.book(f,"ePt", "e p_{T}", 40, 0, 200)             
             self.book(f,"ePhi", "e phi", 26, -3.25, 3.25)
             self.book(f,"eEta", "e eta",  50, -2.5, 2.5)
@@ -238,8 +135,6 @@ class MMEAnalyzer(MegaBase):
             self.book(f,"eEta_vs_ePt", "e #eta vs p_{T}", 40, 0, 200, 50, -2.5, 2.5, type=ROOT.TH2F)
             self.book(f,"eAbsEta_vs_ePt", "e |#eta| vs p_{T}", 40, 0, 200, 25, 0, 2.5, type=ROOT.TH2F)
             self.book(f,"eMtToPfMet_type1", "M_{T}(e, PFMET)" , 20, 0, 200)
-            self.book(f,"eGenPdgId", "e gen pdgid", 100, -50, 50 )
-            self.book(f,"eGenMotherPdgId", "e gen mother pdgid", 100, -50, 50 )
 
             self.book(f,"eRelIso", "e Relative Isolation", 100, 0., 2.)
             self.book(f,"eRelIso_vs_ePt", "e relIso vs Pt", 40, 0, 200., 25, 0., 1., type=ROOT.TH2F)
@@ -259,9 +154,12 @@ class MMEAnalyzer(MegaBase):
             self.book(f,"m2Eta", "m2 eta", 10, -2.5, 2.5)
              
             self.book(f, "m1_m2_Mass",  "h_m1m2mass",  40, 0, 400)
+            self.book(f, "m1_m2_DR",  "#Delta R(#mu1, #mu2)",  40, 0, 400)
+            self.book(f, "m1_m2_DPhi",  "#Delta #Phi (#mu1, #mu2)",  40, 0, 400)
             
             self.book(f, "jetVeto20", "Number of jets, p_{T}>20", 5, -0.5, 4.5) 
             self.book(f, "jetVeto30", "Number of jets, p_{T}>30", 5, -0.5, 4.5)
+            self.book(f, "vbfMass", "vfb mass", 100, 0,  1000)
 
             self.book(f, "nvtx", "Number of vertices", 50, 0, 50)
             self.book(f, "nTruePU", "true pileup", 60, 0, 60)

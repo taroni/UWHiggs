@@ -1,4 +1,4 @@
-export jobidData='SMHTT_data_jan17'
+export jobidData='SMHTT_data_jan25'
 export jobidMC='SMHTT_mc_jan21'
 #export jobid13='LFVtrilepton_oct31'
 #export jobid13='LFV_sep16_et'

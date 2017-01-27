@@ -38,7 +38,7 @@ samples = Hash[
                "zjets" => get_sample_names('JetsToLL_M-50'),
                "zjets_skimmedLL" => get_sample_names('jets_M50_skimmedLL'),
                "zjets_skimmedTT" => get_sample_names('jets_M50_skimmedTT'),
-               "diboson" =>get_sample_names('WWTo2L2Nu_13TeV-powheg')+get_sample_names('WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8')+get_sample_names('ZZTo4L_13TeV_powheg_pythia8'),
+               "diboson" =>get_sample_names('WWTo')+get_sample_names('WZTo')+get_sample_names('ZZTo'),
                "extra" => Array['T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola','Tbar_t-channel','T_t-channel'],
                "ewk" => Array['Zjets_M50', 
                               'WWJetsTo2L2Nu_TuneZ2_8TeV',
@@ -374,10 +374,14 @@ task :fakemmt => get_analyzer_results("MMTauAnalyser.py",
                                       samples['wwjets']  + samples['zzjets'] + 
                                       samples['wzjets'] )
 
+task :controlReReco => get_analyzer_results("MMEControl.py",
+                                      samples['dataSingleM'] )
+task :fakemmeData => get_analyzer_results("MMEAnalyzer.py",
+                                      samples['dataSingleM'] )
+
 task :fakemme => get_analyzer_results("MMEAnalyzer.py",
-                                      samples['dataSingleM'] +
                                       samples['zjets'] +  
-                                      samples['ttbar'] + samples['singlet'] + samples['wjets']+
+                                      #samples['ttbar'] + samples['singlet'] + samples['wjets']+
                                       samples['diboson']+
                                       samples['wwjets']+samples['wzjets']+samples['zzjets']
                                      )
