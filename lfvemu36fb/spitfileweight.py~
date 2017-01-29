@@ -1,0 +1,7 @@
+import os 
+for filename in os.listdir("original_inputs_folder/mc_ntuples_jan21"):
+    if "lumicalc.sum" in filename:
+        with open("original_inputs_folder/mc_ntuples_jan21/"+filename) as lumifile:
+            lumistr=float(lumifile.readline().strip())
+
+        print filename,":  ",lumistr,"    ",1/lumistr
