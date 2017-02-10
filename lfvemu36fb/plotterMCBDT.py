@@ -64,11 +64,11 @@ print "\nPlotting %s for %s\n" % (channel, jobid)
 blind   = 'blind' not in os.environ or os.environ['blind'] == 'YES'
 print 'blind?', blind
 blind_region=[100, 150] if blind else None
-blindpath="os/.*ass*"
+blindpath="oshhhhhhh/.*ass*"
 #blind_region=[100, 200] if blind else None
 if 'BDT2' in sys.argv[4] or len(sys.argv)>7:
     blind_region=[0.0,0.3]
-    blindpath="os/.*BDT*"
+    blindpath="daddddddddddddddddddddddos/.*BDT*"
 
 embedded = False
 print jobid
@@ -153,7 +153,8 @@ new_mc_samples = []
 
 
 #print new_sigsamples 
-new_mc_samples.extend(['WGamma','SMH','SingleT','EWKDiboson','TT','Wplus','QCD','DYLL','ZTT'])
+new_mc_samples.extend(['WGamma','SMH','Wplus','QCD','EWKDiboson','SingleT','TT','DYLL','ZTT'])
+#new_mc_samples.extend(['QCD'])
 #new_mc_samples.extend(['EWKDiboson','DYLL', 'DYTT'])
 #new_mc_samples.extend(['EWKDiboson'])
 
@@ -198,6 +199,7 @@ if not no_plots:
    else:
        histo_info = [
            ('BDT_value', 'BDT value', 1),
+           ('pZeta', 'pZeta', 1),
            ('h_collmass_pfmet', 'M_{coll}(emu) (GeV)', 1),
            ('mPt', 'p_{T}(mu) (GeV)', 4), 
            ('mEta', 'eta(mu)', 2),  
@@ -224,8 +226,8 @@ if not no_plots:
 
    for var, xlabel, rebin in common_histo_info:
          plotter.plot_mc_vs_data_new('os', var, 'region-I',rebin, xlabel,
-                                                leftside=False, xrange=(-10.0,300.0), show_ratio=True, ratio_range=1., 
-                                                sort=True,br=50)
+                                                leftside=False, xrange=(-10.0,400.0), show_ratio=True, ratio_range=1., 
+                                                sort=True,br=10)
          plotter.save("os/"+var,dotroot=False)
 
 
@@ -238,19 +240,33 @@ if not no_plots:
          os.makedirs(outputdir+path+'/selected')
       for var, xlabel, rebin in histo_info:
          if 'BDT' not in sys.argv[4] and 'BDT' in var:continue
-         if 'BDT2' in sys.argv[4] and 'collmass' in var:continue
+#         if 'BDT2' in sys.argv[4] and 'collmass' in var:continue
          if len(sys.argv)<=7 and 'BDT' in var and 'BDT2' not in sys.argv[4]:continue
          if len(sys.argv)>7 and 'collmass' in var:continue
-             
+         if 'Zeta' in var and sys.argv[4]!='BDT2':continue
          logging.debug("Plotting %s/%s" % (path, var) )
          plotter.pad.SetLogy(False)
-         if (int(njet)==21 ):
-             rebin = rebin*2
-         if ( int(njet)==22):
-             rebin=rebin*2
+         #if 'cut' in sys.argv[4]:
+         rebin=1
+#         if 'collmass' in var or "MtToPfMet" in var or "vismass" in var:
+#             if (int(njet)==0 ):
+#                 rebin = 5
+#             if ( int(njet)==1):
+#                 rebin=10
+#             if ( int(njet)==21):
+#                 rebin=25
+#             if ( int(njet)==22):
+#                 rebin=25
+#         else:
+#             if (int(njet)==21):
+#                 rebin = rebin*2
+#             if ( int(njet)==22 or  int(njet)==1 ):
+#                 rebin=rebin*2
+#                     
+
          plotter.plot_mc_vs_data_new(path, var, njet,rebin, xlabel,
-                                                leftside=False, xrange=(-10.0,300.0), show_ratio=True, ratio_range=1., 
-                                                sort=True,br=50,drawData=isDataDrawn)
+                                                leftside=False, xrange=(-300.0,300.0), show_ratio=True, ratio_range=1., 
+                                                sort=True,br=5,drawData=isDataDrawn)
         
          print "**************************************************************************************************************************************************"
          plotter.save(path+"/"+njet+"_preselection_"+var,dotroot=False)
@@ -263,15 +279,26 @@ if not no_plots:
           if 'BDT2' in sys.argv[4] and 'BDT' not in var:continue
           if len(sys.argv)<=7 and 'BDT' in var:continue
           if len(sys.argv)>7 and 'collmass' in var:continue
-
-          if (int(njet)==21):
-              rebin = rebin*2
-          if ( int(njet)==22 or  int(njet)==1 ):
-             rebin=rebin*2
+          rebin=1
+#          if 'collmass' in var or "MtToPfMet" in var or "vismass" in var:
+#              if (int(njet)==0 ):
+#                  rebin = 5
+#              if ( int(njet)==1):
+#                  rebin=10
+#              if ( int(njet)==21):
+#                  rebin=25
+#              if ( int(njet)==22):
+#                  rebin=20
+#          else:
+#              if (int(njet)==21):
+#                  rebin = rebin*2
+#              if ( int(njet)==22 or  int(njet)==1 ):
+#                  rebin=rebin*2
+#                     
           logging.debug("Plotting %s/%s" % (path, var) )
           plotter.pad.SetLogy(False)
           plotter.plot_mc_vs_data_new(path+'/selected/nosys', var,njet, rebin, xlabel,
-                                             leftside=False, xrange=(-10.,300.0), show_ratio=True, ratio_range=1., 
+                                             leftside=False, xrange=(-300.,300.0), show_ratio=True, ratio_range=1., 
                                       sort=True,br=10,drawData=isDataDrawn)
           
           plotter.save(path+"/selected/"+njet+"_selection_"+var,dotroot=False)

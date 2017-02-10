@@ -1,3 +1,4 @@
+import array
 import os 
 from sys import argv, stdout, stderr
 import ROOT
@@ -6,24 +7,26 @@ import math
 import copy
 ROOT.gROOT.SetStyle("Plain")
 cat_now=['0','1','21','22']   #category names in analyzer                                                                                    
-                                                                                                                                              
-syst_names_now=['jetup','jetdown','tup','tdown','uup','udown']      #sysfolder names in analyzer                                             
+syst_names_now=[]      #sysfolder names in analyzer                                             
+if sys.argv[5]=="True":                                                                                                                                              
+	syst_names_now=['jetup','jetdown','uup','udown','mesup','mesdown','eesup','eesdown']      #sysfolder names in analyzer                                             
+
 cutbasedvars = [
       ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
       ('mPt', 'p_{T}(mu) (GeV)', 4),
-      ('mEta', 'eta(mu)', 2),
-      ('mPhi', 'phi(mu)', 4),
+      ('mEta', 'eta(mu)', 1),
+      ('mPhi', 'phi(mu)', 2),
       ('ePt', 'p_{T}(e) (GeV)', 4),
-      ('eEta', 'eta(e)', 2),
-      ('ePhi', 'phi(e)', 4),
-      ('em_DeltaPhi', 'emu Deltaphi', 2),
-      ('em_DeltaR', 'emu Delta R', 2),
+      ('eEta', 'eta(e)', 1),
+      ('ePhi', 'phi(e)', 2),
+      ('em_DeltaPhi', 'emu Deltaphi', 1),
+      ('em_DeltaR', 'emu Delta R', 1),
       ('h_vismass', 'M_{vis} (GeV)', 1),
-      ('Met', 'MET (GeV)', 5),
+      ('Met', 'MET (GeV)', 1),
       ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
       ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
       ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
 ]
 
@@ -35,20 +38,21 @@ BDTvars = [
       ('BDT_value', 'BDT_value', 1),
       ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
       ('mPt', 'p_{T}(mu) (GeV)', 4),
-      ('mEta', 'eta(mu)', 2),
-      ('mPhi', 'phi(mu)', 4),
+      ('mEta', 'eta(mu)', 1),
+      ('mPhi', 'phi(mu)', 2),
       ('ePt', 'p_{T}(e) (GeV)', 4),
-      ('eEta', 'eta(e)', 2),
-      ('ePhi', 'phi(e)', 4),
-      ('em_DeltaPhi', 'emu Deltaphi', 2),
-      ('em_DeltaR', 'emu Delta R', 2),
+      ('eEta', 'eta(e)', 1),
+      ('ePhi', 'phi(e)', 2),
+      ('em_DeltaPhi', 'emu Deltaphi', 1),
+      ('em_DeltaR', 'emu Delta R', 1),
       ('h_vismass', 'M_{vis} (GeV)', 1),
-      ('Met', 'MET (GeV)', 5),
+      ('Met', 'MET (GeV)', 1),
       ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
       ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
       ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
+
 ]
 
 BDTvars2 = [
@@ -58,21 +62,24 @@ BDTvars2 = [
 
 BDT2vars = [
       ('BDT_value', 'BDT_value', 1),
+      ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
+      ('pZeta','pZeta',1),
       ('mPt', 'p_{T}(mu) (GeV)', 4),
-      ('mEta', 'eta(mu)', 2),
-      ('mPhi', 'phi(mu)', 4),
+      ('mEta', 'eta(mu)', 1),
+      ('mPhi', 'phi(mu)', 2),
       ('ePt', 'p_{T}(e) (GeV)', 4),
-      ('eEta', 'eta(e)', 2),
-      ('ePhi', 'phi(e)', 4),
-      ('em_DeltaPhi', 'emu Deltaphi', 2),
-      ('em_DeltaR', 'emu Delta R', 2),
+      ('eEta', 'eta(e)', 1),
+      ('ePhi', 'phi(e)', 2),
+      ('em_DeltaPhi', 'emu Deltaphi', 1),
+      ('em_DeltaR', 'emu Delta R', 1),
       ('h_vismass', 'M_{vis} (GeV)', 1),
-      ('Met', 'MET (GeV)', 5),
+      ('Met', 'MET (GeV)', 1),
       ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
       ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
-      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 2),
-      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 2),
+      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
+      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
       ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
+
 ]
 
 
@@ -100,6 +107,18 @@ commonvars=[('numVertices','number of vertices', 1),
 	    ('h_vismass','M_{vis}(e#mu) (GeV)', 1)            
 	    ]
 
+
+
+
+
+binning=array.array( 'd', [-0.6,-0.5,-0.42,-0.34,-0.28,-0.22,-0.18,-0.14,-0.10,-0.06,-0.02,0.02,0.06,0.1,0.14,0.18,0.24,0.30])
+
+binning1jet=array.array( 'd', [-0.6,-0.5,-0.42,-0.34,-0.26,-0.20,-0.16,-0.12,-0.08,-0.04,0.0,0.04,0.08,0.12,0.16,0.22,0.30])
+
+
+binning2jet=array.array( 'd', [-0.6,-0.5,-0.42,-0.34,-0.28,-0.24,-0.20,-0.16,-0.12,-0.08,-0.04,0.0,0.04,0.08,0.12,0.16,0.20,0.24,0.28,0.30])
+
+
 Analyzer="LFVHEMuAnalyzerMVA"+sys.argv[1]
 Lumi=int(sys.argv[2])
 jobid=sys.argv[3]
@@ -110,7 +129,7 @@ class GetQCD(object):
 	        self.histodata=None
 	        self.histoQCD=None
 	        for var in vars:
-	        	for sign in ['ss','antiIsolatedweighted/ss','antiIsolated/ss','antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
+	        	for sign in ['ss','antiIsolatedweighted/ss','antiIsolated/ss']:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in range(2):
 	        			for i in range(len(cat_now)):
 	        				x=0
@@ -132,7 +151,7 @@ class GetQCD(object):
 							if "FAKES" in filename or "QCD" in filename: continue
 	        					file=ROOT.TFile(Analyzer+str(Lumi)+"/"+filename)
 							histo=file.Get(hist_path)
-#							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
+							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
 								if x==0:
 	        							self.histomc=histo.Clone()
@@ -154,6 +173,31 @@ class GetQCD(object):
 						self.histoQCD=self.histodata.Clone()
 						self.histoQCD.Add(self.histomc,-1)
 						self.histoQCD.Scale(2.30)
+						rebin=var[2]
+						if 'collmass' in var[0] or "MtToPfMet" in var[0] or "vismass" in var[0]:
+							if (i==0 ):
+								rebin = 5
+							if ( i==1):
+								rebin=10
+							if ( i==2):
+								rebin=25
+							if ( i==3):
+								rebin=25
+						elif "BDT" in var[0]:
+							  if (i==0):
+								  self.histoQCD=self.histoQCD.Rebin(len(binning)-1,"",binning)
+							  elif (i==1):
+								  self.histoQCD=self.histoQCD.Rebin(len(binning1jet)-1,"",binning1jet)
+							  else:
+								  self.histoQCD=self.histoQCD.Rebin(len(binning2jet)-1,"",binning2jet)
+						else:
+							if (i==2):
+								rebin = rebin*2
+							if ( i==3 or  i==1 ):
+								rebin=rebin*2
+
+						if "BDT" not in var[0]:
+							self.histoQCD.Rebin(rebin)		
 						lowBound=1
 						highBound=1
 						for bin in range(1,self.histoQCD.GetNbinsX()):
@@ -164,10 +208,12 @@ class GetQCD(object):
 							if self.histoQCD.GetBinContent(bin) != 0:
 								highBound = bin
 								break
+
 						for bin in range(lowBound, highBound+1):
                                                         if self.histoQCD.GetBinContent(bin)<=0:
                                                                 self.histoQCD.SetBinContent(bin,0.001)
-                                                                self.histoQCD.SetBinError(bin,1.8)
+								self.histoQCD.SetBinError(bin,1.8)
+
                                                 for bin in range(1,self.histoQCD.GetNbinsX()+1):
 							binContent=self.histoQCD.GetBinContent(bin)
                                                         binError=self.histoQCD.GetBinError(bin)
@@ -254,7 +300,7 @@ class GetQCD(object):
 	        					file=ROOT.TFile(Analyzer+str(Lumi)+"/"+filename)
 #							print filename
 							histo=file.Get(hist_path)
-							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
+		#					print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
 								if x==0:
 	        							self.histomc=histo.Clone()

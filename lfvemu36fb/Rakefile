@@ -28,7 +28,7 @@ end
 
 samples = Hash[
                "ttbar" => get_sample_names('TT'),
-               "singlet" => get_sample_names('T_t'),
+               "singlet" => get_sample_names('ST_tW'),
                "singletbar" => get_sample_names('Tbar_t'), 
 	       "wg"=>get_sample_names('WG'), 
 	       "suneath" => get_sample_names('W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph'),
@@ -357,23 +357,6 @@ task:inclus =>get_analyzer_results("inclus.py",samples['DYinclus'])
 
 task :runreco => get_analyzer_results("LFVHEMuAnalyzerMVA600",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet'])
 
-task :runoptim => get_analyzer_results("LFVHEMuAnalyzerMVAoptim",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-task :runoptimBDT => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDT",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-task :runoptimBDT2jet => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDT2jet",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-task :runoptimBDT01jet => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDT01jet",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-task :runoptimBDT => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDT",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-
-
-task :runoptimBDTnoDY => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDTnoDY",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
-
-
-task :runoptimBDTdataB => get_analyzer_results("LFVHEMuAnalyzerMVAoptimBDT",samples['dataB'])
-
 task :runv0 => get_analyzer_results("LFVHEMuAnalyzerMVAv0",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson'])
 
 #task :runv1 => get_analyzer_results("LFVHEMuAnalyzerMVAv1",samples['dataB'])
@@ -397,7 +380,95 @@ task :runv4 => get_analyzer_results("LFVHEMuAnalyzerMVAv4",samples['signalMCMuTa
 task :runv4_2 => get_analyzer_results("LFVHEMuAnalyzerMVAv4",samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
 
 
-task :runv5 => get_analyzer_results("LFVHEMuAnalyzerMVAv5",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+task :runBDT => get_analyzer_results("LFVHEMuAnalyzerMVABDT",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT'])
+
+task :runBDT_2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT",samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runBDT2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT2",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDTmes => get_analyzer_results("LFVHEMuAnalyzerMVABDTmes",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runBDTjes27 => get_analyzer_results("LFVHEMuAnalyzerMVABDTjes27",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runBDTnewntuples => get_analyzer_results("LFVHEMuAnalyzerMVABDTnewntuples",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runBDT2ztautau => get_analyzer_results("LFVHEMuAnalyzerMVABDT2ztautau",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runBDT2ttbarbtag => get_analyzer_results("LFVHEMuAnalyzerMVABDT2ttbarbtag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runBDT2ttbarxsec => get_analyzer_results("LFVHEMuAnalyzerMVABDT2ttbarxsec",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runBDT1 => get_analyzer_results("LFVHEMuAnalyzerMVABDT1",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT'])
+
+task :runBDT1_2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT1",samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDTttbarxsec => get_analyzer_results("LFVHEMuAnalyzerMVABDTttbarxsec",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet'])
+
+task :runBDTttbarxsec2 => get_analyzer_results("LFVHEMuAnalyzerMVABDTttbarxsec",samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDTttbarbtag => get_analyzer_results("LFVHEMuAnalyzerMVABDTttbarbtag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB'])
+
+
+task :runBDTttbarbtag2 => get_analyzer_results("LFVHEMuAnalyzerMVABDTttbarbtag",samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runBDTztautau => get_analyzer_results("LFVHEMuAnalyzerMVABDTztautau",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDTztautau2 => get_analyzer_results("LFVHEMuAnalyzerMVABDTztautau",samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDT1ttbarxsec => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ttbarxsec",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet'])
+
+task :runBDT1ttbarxsec2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ttbarxsec",samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDT1ttbarbtag => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ttbarbtag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB'])
+
+
+task :runBDT1ttbarbtag2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ttbarbtag",samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runBDT1ztautau => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ztautau",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+task :runBDT1ztautau2 => get_analyzer_results("LFVHEMuAnalyzerMVABDT1ztautau",samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runv5 => get_analyzer_results("LFVHEMuAnalyzerMVAv5",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT'])
+
+task :runv5_2 => get_analyzer_results("LFVHEMuAnalyzerMVAv5",samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runv6 => get_analyzer_results("LFVHEMuAnalyzerMVAv6",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runv7 => get_analyzer_results("LFVHEMuAnalyzerMVAv7",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runv6ztautau => get_analyzer_results("LFVHEMuAnalyzerMVAv6ztautau",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runv6ttbarbtag => get_analyzer_results("LFVHEMuAnalyzerMVAv6ttbarbtag",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+task :runv6ttbarxsec => get_analyzer_results("LFVHEMuAnalyzerMVAv6ttbarxsec",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
+
+task :runv7 => get_analyzer_results("LFVHEMuAnalyzerMVAv7",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT'])
+
+task :runv7_2 => get_analyzer_results("LFVHEMuAnalyzerMVAv7",samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
+
+
 
 task :runv10 => get_analyzer_results("LFVHEMuAnalyzerMVAv10",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['diboson']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])
 

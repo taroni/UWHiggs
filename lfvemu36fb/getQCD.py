@@ -1,4 +1,5 @@
 import os 
+import array
 from sys import argv, stdout, stderr
 import ROOT
 import sys

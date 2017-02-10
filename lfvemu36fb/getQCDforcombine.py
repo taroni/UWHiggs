@@ -1,3 +1,4 @@
+import array
 import os 
 from sys import argv, stdout, stderr
 import ROOT

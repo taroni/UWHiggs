@@ -69,7 +69,7 @@ def yieldHisto(histo,xmin,xmax):
         signal = histo.Integral(binmin,binmax)
         return signal
 
-def do_binbybin(histo,eff_lumi,lowBound,highBound,norm_uncert): #fill empty bins                                                                                                    
+def do_binbybin(histo,eff_lumi,lowBound,highBound,norm_uncert,cat=0): #fill empty bins                                                                                                    
         for i in range(1,lowBound):
                 if histo.GetBinContent(i) != 0:
                         lowBound = i
@@ -130,7 +130,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 		     WGhisto=WGfile.Get(hist_path)
 
 		     print WGhisto.Integral()
-		     do_binbybin(WGhisto,8e-07,lowDataBin,highDataBin,0.1)
+		     do_binbybin(WGhisto,8e-07,lowDataBin,highDataBin,0.1,i)
 		     print WGhisto.Integral()
 		     WGfile.cd(folder)
 		     WGhisto.Write()
@@ -142,7 +142,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     SThisto=STfile.Get(hist_path)
 
-		     do_binbybin(SThisto,3.5e-06,lowDataBin,highDataBin,0.1)
+		     do_binbybin(SThisto,3.5e-06,lowDataBin,highDataBin,0.1,i)
 
 		     STfile.cd(folder)
 		     SThisto.Write()
@@ -156,7 +156,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     TThisto=TTfile.Get(hist_path)
 
-		     do_binbybin(TThisto,8.7e-06,lowDataBin,highDataBin,0.2)
+		     do_binbybin(TThisto,8.7e-06,lowDataBin,highDataBin,0.2,i)
 
 		     TTfile.cd(folder)
 		     TThisto.Write()
@@ -168,7 +168,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     Dibosonshisto=Dibosonsfile.Get(hist_path)
 
-		     do_binbybin(Dibosonshisto,5e-05,lowDataBin,highDataBin,0.1)
+		     do_binbybin(Dibosonshisto,5e-05,lowDataBin,highDataBin,0.1,i)
 
 		     Dibosonsfile.cd(folder)
 		     Dibosonshisto.Write()
@@ -181,7 +181,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     DYhisto=DYfile.Get(hist_path)
 
-		     do_binbybin(DYhisto,1.1e-05,lowDataBin,highDataBin,0.1)
+		     do_binbybin(DYhisto,1.1e-05,lowDataBin,highDataBin,0.1,i)
 
 		     DYfile.cd(folder)
 		     DYhisto.Write()
@@ -194,7 +194,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     WJETSMChisto=WJETSMCfile.Get(hist_path)
 
-		     do_binbybin(WJETSMChisto,1.5e-04,lowDataBin,highDataBin,0.3)
+		     do_binbybin(WJETSMChisto,1.5e-04,lowDataBin,highDataBin,0.3,i)
 
 		     WJETSMCfile.cd(folder)
 		     WJETSMChisto.Write()
@@ -206,7 +206,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     vbfHTauTauhisto=vbfHTauTaufile.Get(hist_path)
 
-		     do_binbybin(vbfHTauTauhisto,4.2e-08,lowDataBin,highDataBin,0.01)
+		     do_binbybin(vbfHTauTauhisto,4.2e-08,lowDataBin,highDataBin,0.01,i)
 
 		     vbfHTauTaufile.cd(folder)
 		     vbfHTauTauhisto.Write()
@@ -219,7 +219,7 @@ for sign in ['os','ss','fakeRateMethod/os','fakeRateMethod/ss','antiIsolated/os'
 
 		     ggHTauTauhisto=ggHTauTaufile.Get(hist_path)
 
-		     do_binbybin(ggHTauTauhisto,2.04e-06,lowDataBin,highDataBin,0.01)
+		     do_binbybin(ggHTauTauhisto,2.04e-06,lowDataBin,highDataBin,0.01,i)
 
 		     ggHTauTaufile.cd(folder)
 		     ggHTauTauhisto.Write()
