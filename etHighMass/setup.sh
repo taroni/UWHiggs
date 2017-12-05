@@ -7,14 +7,22 @@ source jobid.sh
 
 #./make_proxies.sh
 
+export datasrc=/hdfs/store/user/taroni/
+export MEGAPATH=/hdfs/store/user/taroni/
+export jobid=$jobidSignal
+echo $jobid
+
+#rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
+#rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
+
+
 export datasrc=/hdfs/store/user/ndev/
 export MEGAPATH=/hdfs/store/user/ndev/
 
-#export datasrc=/hdfs/store/user/$USER/  #$(ls -d /scratch/*/data/$jobid | awk -F
-#export MEGAPATH=/hdfs/store/user/$USER
-
 export jobid=$jobidData
 echo $jobid
+#rake "meta:getinputs[$jobid, $datasrc,em/metaInfo, em/summedWeights]"
+#rake "meta:getmeta[inputs/$jobid, em/metaInfo, 13, em/summedWeights]"
 #rake "meta:getinputs[$jobid, $datasrc,mm/metaInfo, mm/summedWeights]"
 #rake "meta:getmeta[inputs/$jobid, mm/metaInfo, 13, mm/summedWeights]"
 #rake "meta:getinputs[$jobid, $datasrc,emm/metaInfo, emm/summedWeights]"
@@ -25,7 +33,7 @@ echo $jobid
 export jobid=$jobidMC
 echo $jobid
 #rake "meta:getinputs[$jobid, $datasrc,et/metaInfo, et/summedWeights]"
-rake "meta:getmeta[inputs/$jobid, et/metaInfo, 13, et/summedWeights]"
+rake "meta:getmeta[inputs/$jobid, em/metaInfo, 13, em/summedWeights]"
 
 
 

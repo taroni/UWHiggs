@@ -20,6 +20,15 @@ echo "Building cython wrappers from file: $afile"
 rake "make_wrapper[$afile, et/final/Ntuple, ETauTree]"
 ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
+if [ -z $1 ]; then
+    export afile=`find $datasrc  | grep root | grep MuonEG | head -n 1`
+else
+    export afile=$1
+fi
+
+echo "Building cython wrappers from file: $afile"
+rake "make_wrapper[$afile, em/final/Ntuple, EMuTree]"
+ls *pyx | sed "s|pyx|so|" | xargs -n 1 -P 10 rake 
 
 if [ -z $1 ]; then
     export afile=`find $datasrc | grep data | grep root | grep Muon | head -n 1`

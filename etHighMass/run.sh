@@ -4,10 +4,24 @@
 set -o nounset
 set -o errexit
 
+source ../../FinalStateAnalysis/environment.sh
+
+export CutFlow=1
+
+
 export MEGAPATH=/hdfs/store/user/taroni/
 source jobid.sh
+export jobid=$jobidSignal
+echo $jobid
+rake recoplots
+
+export MEGAPATH=/hdfs/store/user/ndev/
 export jobid=$jobidMC
-rake fakemme
+echo $jobid
+rake recoplots
+
 export jobid=$jobidData
-rake fakemmeData
+echo $jobid
+rake recoplots
+
 

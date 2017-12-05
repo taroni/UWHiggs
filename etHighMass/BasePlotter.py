@@ -133,34 +133,32 @@ class BasePlotter(Plotter):
         self.sqrts  = 8
         jobid = os.environ['jobid']
         self.use_embedded = use_embedded
+        self.forceLumi=forceLumi
         print "\nPlotting e tau for %s\n" % jobid
 
-        files     = glob.glob('results/%s/LFVHETauAnalyzerMVA/*.root' % jobid)
-        lumifiles = glob.glob('inputs/%s/*.lumicalc.sum' % jobid)
+        self.files     = glob.glob('results/%s/ETauAnalyzer/*.root' % jobid)
+        self.lumifiles = glob.glob('inputs/%s/*.lumicalc.sum' % jobid)
 
-        outputdir = 'plots/%s/lfvet' % jobid
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
-
-        samples = [os.path.basename(i).split('.')[0] for i in files]
+        self.outputdir = 'plots/%s/ETauAnalyzer' % jobid
+        if not os.path.exists(self.outputdir):
+            os.makedirs(self.outputdir)
+            
+        samples = [os.path.basename(i).split('.')[0] for i in self.files]
         
         self.blind_region=blind_region
         blinder=None
         if self.blind_region:
-            # Don't look at the SS all pass region
-            blinder = lambda x: BlindView(x, "os/.*ass*",blind_in_range(*self.blind_region))
+            # Don't look at the SS all ass region
+            blinder = lambda x: BlindView(x, "os/.*",blind_in_range(*self.blind_region))
             
-        super(BasePlotter, self).__init__(files, lumifiles, outputdir, blinder, forceLumi=forceLumi)
+            
+        #print files, lumifiles, outputdir, blinder, self.forceLumi
+        super(BasePlotter, self).__init__(self.files, self.lumifiles, self.outputdir, blinder, forceLumi=self.forceLumi)
 
         self.mc_samples = [
-            'ggH[tWB][tWB]',
-            'vbfH[tWB][tWB]',
-            'TTJets*',
-            'T*_t*',
-            '[WZ][WZ]Jets',
-            'Z*jets_M50_skimmedLL',
-            'Z*jets_M50_skimmedTT'
-            
+            'WWTo*', 'ZZ*','WZ*', 'GluGluHToTauTau_M125*', 'ttHJet*', 'ST_*', 'TT_*', 'VBFHToTauTau_M125*', 'WG*',   'WminusHToTauTau_M125*', 'WplusHToTauTau_M125*', 'ZHToTauTau_M125*', #'EWK*',
+    #'WJetsToLNu*','W1JetsToLNu*','W2JetsToLNu*','W3JetsToLNu*','W4JetsToLNu*',
+            'DYJetsToLL*','DY1JetsToLL*','DY2JetsToLL*','DY3JetsToLL*','DY4JetsToLL*', 'DY1JetsToLL_M-10to50*', 'DY2JetsToLL_M-10to50*', 'DYJetsToLL_M-10to50*'
         ]
         
         if use_embedded:            
@@ -170,105 +168,80 @@ class BasePlotter(Plotter):
                 'view' : embedded_view,
                 'weight' : weight
                 }
-        self.views['fakes'] = {'view' : self.make_fakes('t')} # comment in case of optimization study
-        #names must match with what defined in self.mc_samples
+        self.views['fakes'] = {'view' : self.make_fakes('t')}
         self.datacard_names = {
-            'ggH[tWB][tWB]' : 'SMGG126'   , 
-            'vbfH[tWB][tWB]' : 'SMVBF126'   ,
-            'TTJets*'                  : 'ttbar'     ,
-            'T*_t*'                    : 'singlet'   ,
-            '[WZ][WZ]Jets'             : 'diboson'   ,
-            'Z*jets_M50_skimmedTT'     : 'ztautau'   ,
-            'ZetauEmbedded'            : 'ztautau'   ,
-            'Z*jets_M50_skimmedLL'     : 'zjetsother',
-            'ggHiggsToETau'  : 'LFVGG',
-            'vbfHiggsToETau' : 'LFVVBF',
-            'fakes' : 'fakes',
+           # '*HTo[WT][WT]'           : 'SMH126'   ,
+            'SMH'                    : 'SMH126',
+            'TT'                     : 'ttbar'     ,
+            'ST'                     : 'singlet'   ,
+            'EWKDiboson'             : 'EWKDiboson'   ,
+            'DY'                     : 'DY'   ,
+            'ZetauEmbedded'          : 'ztautau'   ,
+            'GluGlu_LFV_HToETau_M200*': 'LFV200',
+            'ggM300ETau'             : 'LFV300',
+            'ggM450ETau'             : 'LFV450',
+            'ggM600ETau'             : 'LFV600',
+            'ggM750ETau'             : 'LFV750',
+            'ggM900ETau'             : 'LFV900',
+            'fakes'                  : 'fakes',
+
         }
-
-        self.sample_groups = {#parse_cgs_groups('card_config/cgs.0.conf')
-            'fullsimbkg' : ['SMGG126', 'SMVBF126','LFVGG', 'LFVVBF','ttbar', 'singlet', 
-                            'diboson', 'zjetsother'],# 'WWVBF126', 'WWGG126','VHWW','VHtautau'], #wplusjets added in case of optimization study# 'wplusjets'],
-            'simbkg' : ['SMGG126', 'SMVBF126', 'LFVGG', 'LFVVBF', 'ttbar', 'singlet', 'ztautau',
-                        'diboson', 'zjetsother'],#, 'WWVBF126', 'WWGG126','VHWW','VHtautau'],# 'wplusjets'],
-            'realtau' : ['diboson', 'ttbar', 'singlet', 'ztautau', 'SMGG126', 'SMVBF126','LFVGG', 'LFVVBF'],#, 'VHtautau'],
-            'Zee' : ['zjetsother']
-            }
-
         self.systematics = {
-            'PU_Uncertainty' : {
-                'type' : 'yield',
-                '+' : dir_systematic('p1s'),
-                '-' : dir_systematic('m1s'),
-                'apply_to' : ['fullsimbkg'],
-            },
-            'E_Trig' : {
-                'type' : 'yield',
-                '+' : dir_systematic('trp1s'),
-                '-' : dir_systematic('trm1s'),
-                'apply_to' : ['simbkg'],
-            },
-            ##'E_ID' : { ## to comment in case of optimization study
+            ##'PU_Uncertainty' : {
             ##    'type' : 'yield',
-            ##    '+' : dir_systematic('eidp1s'),
-            ##    '-' : dir_systematic('eidm1s'),
+            ##    '+' : dir_systematic('p1s'),
+            ##    '-' : dir_systematic('m1s'),
+            ##    'apply_to' : ['fullsimbkg'],
+            ##},
+            ##'E_Trig' : {
+            ##    'type' : 'yield',
+            ##    '+' : dir_systematic('trp1s'),
+            ##    '-' : dir_systematic('trm1s'),
             ##    'apply_to' : ['simbkg'],
             ##},
-            ##'E_Iso' : { ## to comment in case of optimization study
+            ##'JES' : {
             ##    'type' : 'yield',
-            ##    '+' : dir_systematic('eisop1s'),
-            ##    '-' : dir_systematic('eisom1s'),
-            ##    'apply_to' : ['simbkg'],
+            ##    '+' : lambda x: os.path.join('jes_plus', x)+'_jes_plus' ,
+            ##    '-' : lambda x: os.path.join('jes_minus', x)+'_jes_minus' ,
+            ##    'apply_to' : ['fullsimbkg'],
             ##},
-            'JES' : {
-                'type' : 'yield',
-                '+' : lambda x: os.path.join('jes_plus', x)+'_jes_plus' ,
-                '-' : lambda x: os.path.join('jes_minus', x)+'_jes_minus' ,
-                'apply_to' : ['fullsimbkg'],
-            },
-            'TES' : {
-                'type' : 'shape',
-                '+' : lambda x: os.path.join('tes_plus', x)+'_tes_plus' ,
-                '-' : lambda x: os.path.join('tes_minus', x)+'_tes_minus' ,
-                'apply_to' : ['realtau'],
-            },
-            ##'EES' : {
+            ##'TES' : {
             ##    'type' : 'shape',
-            ##    '+' : lambda x: os.path.join('ees_plus', x) +'_ees_plus' ,
-            ##    '-' : lambda x: os.path.join('ees_minus', x)+'_ees_minus' ,
-            ##    'apply_to' : ['simbkg'],
+            ##    '+' : lambda x: os.path.join('tes_plus', x)+'_tes_plus' ,
+            ##    '-' : lambda x: os.path.join('tes_minus', x)+'_tes_minus' ,
+            ##    'apply_to' : ['realtau'],
             ##},
-            'UES' : { ## to comment in case of optimization study
-                'type' : 'yield',
-                '+' : name_systematic('_ues_plus'),
-                '-' : name_systematic('_ues_minus'),
-                'apply_to' : ['fullsimbkg'],
-            },
-            'shape_FAKES' : { ## to comment in case of optimization study
-                'type' : 'shape',
-                '+' : dir_systematic('Up'),
-                '-' : dir_systematic('Down'),
-                'apply_to' : ['fakes']#,'efakes','etfakes'],
-            },
-            'norm_etaufake' : { ## was shape etaufake
-                'type' : 'yield',
-                '+' : dir_systematic('etaufakep1s'),
-                '-' : dir_systematic('etaufakem1s'),
-                'apply_to' : ['Zee']#,'efakes','etfakes'],
-            },
-            'shape_ZeeMassShift' : { ## to comment in case of optimization study
-                'type' : 'shape',
-                '+' : name_systematic('_Zee_p1s'),
-                '-' : name_systematic('_Zee_m1s'),
-                'apply_to' : ['Zee']#,'efakes','etfakes'],
-            },
-            ##'stat' : {
-            ##    'type' : 'stat',
-            ##    '+' : lambda x: x,
-            ##    '-' : lambda x: x,
-            ##    'apply_to' : ['fakes','simbkg'],
-            ##    #'apply_to' : [ 'simbkg'],#['fakes','simbkg'],  ## no fakes in case of optimization study
-            ##}
+            ##'UES' : { ## to comment in case of optimization study
+            ##    'type' : 'yield',
+            ##    '+' : name_systematic('_ues_plus'),
+            ##    '-' : name_systematic('_ues_minus'),
+            ##    'apply_to' : ['fullsimbkg'],
+            ##},
+            ##'shape_FAKES' : { ## to comment in case of optimization study
+            ##    'type' : 'shape',
+            ##    '+' : dir_systematic('Up'),
+            ##    '-' : dir_systematic('Down'),
+            ##    'apply_to' : ['fakes']#,'efakes','etfakes'],
+            ##},
+            ##'norm_etaufake' : { ## was shape etaufake
+            ##    'type' : 'yield',
+            ##    '+' : dir_systematic('etaufakep1s'),
+            ##    '-' : dir_systematic('etaufakem1s'),
+            ##    'apply_to' : ['Zee']#,'efakes','etfakes'],
+            ##},
+            ##'shape_ZeeMassShift' : { ## to comment in case of optimization study
+            ##    'type' : 'shape',
+            ##    '+' : name_systematic('_Zee_p1s'),
+            ##    '-' : name_systematic('_Zee_m1s'),
+            ##    'apply_to' : ['Zee']#,'efakes','etfakes'],
+            ##},
+            ####'stat' : {
+            ####    'type' : 'stat',
+            ####    '+' : lambda x: x,
+            ####    '-' : lambda x: x,
+            ####    'apply_to' : ['fakes','simbkg'],
+            ####    #'apply_to' : [ 'simbkg'],#['fakes','simbkg'],  ## no fakes in case of optimization study
+            ####}
         }
 
         
@@ -277,21 +250,21 @@ class BasePlotter(Plotter):
         print 'making fakes for %s' %obj
         data_view = self.get_view('data')
         tfakes = views.SubdirectoryView(data_view, 'tLoose')
-        efakes = views.SubdirectoryView(data_view, 'eLoose')
-        etfakes= views.SubdirectoryView(data_view, 'etLoose')
-        central_fakes=SubtractionView(views.SumView(tfakes,efakes),etfakes, restrict_positive=True)
+        #efakes = views.SubdirectoryView(data_view, 'eLoose')
+        #etfakes= views.SubdirectoryView(data_view, 'etLoose')
+        #central_fakes=SubtractionView(views.SumView(tfakes,efakes),etfakes, restrict_positive=True)
         mc_views = self.mc_views()
         if self.use_embedded:            
             mc_views.append(self.get_view('ZetauEmbedded'))
         mc_sum = views.SumView(*mc_views)
         mc_sum_t = views.SubdirectoryView(mc_sum, 'tLoose')
-        mc_sum_e = views.SubdirectoryView(mc_sum, 'eLoose')
-        mc_sum_et = views.SubdirectoryView(mc_sum, 'etLoose')
-        allmc=SubtractionView(views.SumView(mc_sum_t,mc_sum_e),mc_sum_et, restrict_positive=True)
-
-        fakes_view = SubtractionView(central_fakes, allmc, restrict_positive=True)
-        #fakes_view =central_fakes
-        style = data_styles['Fakes*']
+        #mc_sum_e = views.SubdirectoryView(mc_sum, 'eLoose')
+        #mc_sum_et = views.SubdirectoryView(mc_sum, 'etLoose')
+        #allmc=SubtractionView(views.SumView(mc_sum_t,mc_sum_e),mc_sum_et, restrict_positive=True)
+        #fakes_view = SubtractionView(central_fakes, allmc, restrict_positive=True)
+        ##fakes_view =central_fakes
+        fakes_view = SubtractionView(tfakes, mc_sum_t, restrict_positive=True)
+        style = data_styles['fakes']
         return views.TitleView(
             views.StyleView(
                 fakes_view,
@@ -323,17 +296,56 @@ class BasePlotter(Plotter):
         )
         return scaled_view, scale_factor
 
+
+    def simple_mcSignal (self, folder, variable, rebin=1, xaxis='',
+                         leftside=True, xrange=None, preprocess=None, sort=True,forceLumi=-1):
+        'plot only mc signal'
+        signalview=[]
+        mymax=0
+        for n,sig in enumerate(self.mc_samples):
+            signal_view=self.get_view(sig)
+            if preprocess:
+                signal_view=preprocess(signal_view)
+            signal_view=self.get_wild_dir(
+                self.rebin_view(signal_view,rebin),folder)
+            signal=signal_view.Get(variable)
+            signalview.append(signal)
+            signal.Draw("SAME") if n!=0 else signal.Draw()
+            if n==0:
+                signal.GetXaxis().SetTitle(xaxis)
+                if xrange: signal.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+                                        
+            if signal.GetBinContent(signal.GetMaximumBin()) > mymax:
+                mymax = signal.GetBinContent(signal.GetMaximumBin())
+                signal.GetYaxis().SetRangeUser(0, mymax*1.2)
+            self.keep.append(signal)
+    
+        
+        all_var=[]
+        all_var.extend(signalview) 
+            
+        self.add_legend(all_var, leftside, entries=len(signalview))
+
+        
     def simpleplot_mc(self, folder, signal, variable, rebin=1, xaxis='',
-                      leftside=True, xrange=None, preprocess=None, sort=True,forceLumi=-1):
+                      leftside=True, xrange=None, preprocess=None, sort=True,forceLumi=-1,inflateSig=[1.]):
         ''' Compare Monte Carlo signal to bkg '''
         #path = os.path.join(folder, variable)
         #is_not_signal = lambda x: x is not signame
         #set_trace()
-        
+
         mc_stack_view = self.make_stack(rebin, preprocess, folder)
         mc_stack=mc_stack_view.Get(variable)
+        fakes_view = self.get_view('fakes')
+        if preprocess:
+            fakes_view = preprocess(fakes_view)
+        fakes_view = RebinView(fakes_view, rebin)
+        path = os.path.join(folder,variable)
+        fakes = fakes_view.Get(path)
+
+        mc_stack.Add(fakes)
         
-        #self.canvas.SetLogy(False)
+        self.canvas.SetLogy(True)
         mc_stack.SetTitle('')
         mc_stack.Draw()
         
@@ -345,13 +357,15 @@ class BasePlotter(Plotter):
 
         signalview=[]
         mymax=0
-        for sig in signal:
+        for n,sig in enumerate(signal):
                 signal_view=self.get_view(sig)
                 if preprocess:
                     signal_view=preprocess(signal_view)
                 signal_view=self.get_wild_dir(
                     self.rebin_view(signal_view,rebin),folder)
+                signal_view=views.ScaleView(signal_view, inflateSig[n])
                 signal=signal_view.Get(variable)
+
                 signalview.append(signal)
                 signal.Draw("SAME")
                 if signal.GetBinContent(signal.GetMaximumBin()) > mymax:
@@ -446,7 +460,7 @@ class BasePlotter(Plotter):
         self.pad.Draw()
         self.canvas.cd()
         #create lower pad
-        self.lower_pad = plotting.Pad('low', 'low', 0, 0., 1., 0.33)
+        self.lower_pad = plotting.Pad(0, 0., 1., 0.33)
         self.lower_pad.Draw()
         self.lower_pad.cd()
 
@@ -492,7 +506,7 @@ class BasePlotter(Plotter):
         ref_function.Draw('same')
         band.SetMarkerStyle(0)
         band.SetLineColor(1)
-        band.SetFillStyle(3001)
+        band.SetFillStyle('3002')
         band.SetFillColor(1)
 
         band.Draw('samee2')
@@ -512,7 +526,7 @@ class BasePlotter(Plotter):
         self.pad.Draw()
         self.canvas.cd()
         #create lower pad
-        self.lower_pad = plotting.Pad('low', 'low', 0, 0., 1., 0.33)
+        self.lower_pad = plotting.Pad(0, 0., 1., 0.33)
         self.lower_pad.Draw()
         self.lower_pad.cd()
 
@@ -534,18 +548,20 @@ class BasePlotter(Plotter):
         while ibin < band.GetXaxis().GetNbins()+1:
             if mc_hist.GetBinContent(ibin) <> 0 : 
                 err.append((ibin, band.GetBinError(ibin)/band.GetBinContent(ibin)))
+                #print ibin, band.GetBinError(ibin), band.GetBinContent(ibin), band.GetBinError(ibin)/band.GetBinContent(ibin)
                 
             ibin+=1
 
-        band.Divide(mc_hist.Clone())
-        #print err
+        #band.Divide(mc_hist.Clone())
+        #print band
         for ibin in err:
             band.SetBinError(ibin[0], ibin[1])
+            band.SetBinContent(ibin[0], 0. )
 
-        if self.blind_region:
-            for ibin in err:
-                if ibin >= band.FindBin(self.blind_region[0]) and ibin <= band.FindBin(self.blind_region[1]):
-                    band.SetBinError(ibin, 10)
+        #if self.blind_region:
+        #    for ibin in err:
+        #        if ibin >= band.FindBin(self.blind_region[0]) and ibin <= band.FindBin(self.blind_region[1]):
+        #            band.SetBinError(ibin, 10)
 
         if not x_range:
             nbins = data_clone.GetNbinsX()
@@ -617,6 +633,22 @@ class BasePlotter(Plotter):
             clone.SetBinError(bin, error )
        
         return clone
+    def plot_simple (self, folder, variable, rebin=1, xaxis='',
+                     leftside=True, xrange=None, preprocess=None,
+                     show_ratio=False, ratio_range=0.2, sort=True, obj=['e1', 'e2'], plot_data=False):
+        path = os.path.join(folder,variable)
+
+        mc_views = self.mc_views(rebin, preprocess)
+        mc_stack_view = views.StackView(*mc_views, sorted=sort) 
+        mc_stack = mc_stack_view.Get( path )
+
+        #make histo clone for err computation
+        mc_sum_view = views.SumView(*mc_views)
+        mc_err = mc_sum_view.Get( path )
+
+        mc_sum_view = views.SumView(*mc_views)
+        mc_err = mc_sum_view.Get( path )
+        
 
 
     def plot_with_bkg_uncert (self, folder, variable, rebin=1, xaxis='',
@@ -627,13 +659,12 @@ class BasePlotter(Plotter):
         #xsection uncertainties
         #names must match with what defined in self.mc_samples
         xsec_unc_mapper = {
-            'TTJets*' : 0.026,
-            'T*_t*' : 0.041,
-            '[WZ][WZ]Jets' : 0.056, #diboson
-            'Wplus*Jets_madgraph*' : 0.035, #WJets
-            'Z*jets_M50_skimmedLL' : 0.300, # theoretical 0.032
-            'Z*jets_M50_skimmedTT' : 0.032,
-        }
+            'TTJets*' : 0.15,
+            'T*_t*' : 0.05,
+            '[WZ][WZ]' : 0.05, #diboson
+            'W*Jets*' : 0.035, #WJets
+            'DY*Jets' : 0.10, # theoretical 0.032
+         }
 
 
         path = os.path.join(folder,variable)
@@ -647,7 +678,7 @@ class BasePlotter(Plotter):
                 xsec_unc_mapper.get(name, 0.) #default to 0
             )
             mc_views.append(new)
-
+        
         #make MC stack
         mc_stack_view = views.StackView(*mc_views, sorted=sort) 
         mc_stack = mc_stack_view.Get( path )
@@ -658,15 +689,9 @@ class BasePlotter(Plotter):
         
         #Add MC-only systematics
         folder_systematics = [
-            ('p1s', 'm1s'), #PU correction
         ]
-
-        met_systematics = [ #it was without plus
-            ('_jes_plus', '_jes_minus'), 
-            ('_mes_plus', '_mes_minus'), 
-            #('_ees_plus', '_ees_minus'), 
-            ('_tes_plus', '_tes_minus'), 
-            ('_ues_plus', '_ues_minus'), 
+        
+        met_systematics = [ 
         ]
 
         name_systematics = [] #which are not MET
@@ -676,7 +701,6 @@ class BasePlotter(Plotter):
             if not variable.lower().startswith('type1'):
                 name_systematics.extend(met_systematics) # TO ADD WHEN RERUN WITH THE NEW BINNING 
 
-        #add them
         
         mc_err = self.add_shape_systematics(
             mc_err, 
@@ -697,7 +721,7 @@ class BasePlotter(Plotter):
         jet_unc = 0.
         if found:
             njet = int(found[0].strip('/'))
-            jet_unc = jetcat_unc_mapper.get(njet, 0. )
+            ##jet_unc = jetcat_unc_mapper.get(njet, 0. ) ##commented as it is not computed yet
         mc_err = SystematicsView.add_error(mc_err, jet_unc)
 
         #check if we are using the embedded sample
@@ -719,17 +743,17 @@ class BasePlotter(Plotter):
 
         #Add MC and embed systematics
         folder_systematics = [
-            ('trp1s', 'trm1s'), #trig scale factor
+        ##    ('trp1s', 'trm1s'), #trig scale factor
         ]
         
         #print folder_systematics
         #Add as many eid sys as requested
-        for name in obj:
-            folder_systematics.extend([
-                ('%sidp1s'  % name, '%sidm1s'  % name), #eID scale factor
-                ('%sisop1s' % name, '%sisom1s' % name), #e Iso scale factor
-                
-            ])
+        ##for name in obj:
+        ##    folder_systematics.extend([
+        ##        ('%sidp1s'  % name, '%sidm1s'  % name), #eID scale factor
+        ##        ('%sisop1s' % name, '%sisom1s' % name), #e Iso scale factor
+        ##        
+        ##    ])
         
             
         mc_err = self.add_shape_systematics(
@@ -739,7 +763,7 @@ class BasePlotter(Plotter):
             folder_systematics)
 
         #add lumi uncertainty
-        mc_err = SystematicsView.add_error( mc_err, 0.026 )
+        mc_err = SystematicsView.add_error( mc_err,  0.025)
         
         #get fakes
         fakes_view = self.get_view('fakes')
@@ -748,13 +772,13 @@ class BasePlotter(Plotter):
         fakes_view = RebinView(fakes_view, rebin)
         fakes = fakes_view.Get(path)
         
-        fakes = self.add_shape_systematics(
-            fakes, 
-            path, 
-            fakes_view, 
-            [('Up','Down')]
-        )
-        fakes = SystematicsView.add_error(fakes, 0.30)
+        ##fakes = self.add_shape_systematics(
+        ##    fakes, 
+        ##    path, 
+        ##    fakes_view, 
+        ##    [('Up','Down')]
+        ##)
+        fakes = SystematicsView.add_error(fakes, 0.20)  # 20% is raccomended from the tau pog
         #add them to backgrounds
         mc_stack.Add(fakes)
         
@@ -762,44 +786,7 @@ class BasePlotter(Plotter):
         mc_err.Add(fakes)
         #set_trace()
          
-        #####get efakes
-        ##efakes_view = self.get_view('efakes')
-        ##if preprocess:
-        ##    efakes_view = preprocess(efakes_view)
-        ##efakes_view = RebinView(efakes_view, rebin)
-        ##efakes = efakes_view.Get(path)
-        ##
-        ##efakes = self.add_shape_systematics(
-        ##    efakes, 
-        ##    path, 
-        ##    efakes_view, 
-        ##    [('Up','Down')]
-        ##)
-        #####add them to backgrounds
-        ##mc_stack.Add(efakes)
-        ##
-        ##mc_err.Sumw2()
-        ##mc_err.Add(efakes)
-        ###set_trace()
-        ##etfakes_view = self.get_view('etfakes')
-        ##if preprocess:
-        ##    etfakes_view = preprocess(etfakes_view)
-        ##etfakes_view = RebinView(etfakes_view, rebin)
-        ##etfakes = etfakes_view.Get(path)
-        ##
-        ##etfakes = self.add_shape_systematics(
-        ##    etfakes, 
-        ##    path, 
-        ##    etfakes_view, 
-        ##    [('Up','Down')]
-        ##)
-        #####add them to backgrounds
-        ##mc_stack.Add(etfakes)
-        ##
-        ##mc_err.Sumw2()
-        ##mc_err.Add(etfakes)
-        ###set_trace()
-
+        self.canvas.SetLogy(True)
         #draw stack
         mc_stack.Draw()
         self.keep.append(mc_stack)
@@ -824,12 +811,9 @@ class BasePlotter(Plotter):
         mc_err.Draw('pe2 same')
         self.keep.append(mc_err)
 
-
-        
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau_M200*', 'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
         ]
         sig = []
         for name in signals:
@@ -857,7 +841,7 @@ class BasePlotter(Plotter):
             data = data_view.Get(path)
 
             data.Draw('same')
-            print 'data', data.Integral()
+            #print 'data', data.Integral()
             self.keep.append(data)
 
             ## Make sure we can see everything
@@ -867,20 +851,22 @@ class BasePlotter(Plotter):
                     mc_stack.SetMaximum(1.2*lfvh.GetMaximum()) 
     
         if plot_data:
-            self.add_legend([data, mc_stack], leftside, entries=len(mc_stack.GetHists())+1)
-            #self.add_legend([data, sig[0], sig[1], mc_stack], leftside, entries=len(mc_stack.GetHists())+3)
+            #self.add_legend([data, mc_stack], leftside, entries=len(mc_stack.GetHists())+1)
+            self.add_legend([data, sig[0], sig[1],sig[2], sig[3],sig[4], sig[5], mc_stack], leftside, entries=len(mc_stack.GetHists())+7)
         else:
-            self.add_legend([sig[0], sig[1], mc_stack], leftside, entries=len(mc_stack.GetHists())+1)
+            self.add_legend([sig[0], sig[1],sig[2], sig[3],sig[4], sig[5], mc_stack], leftside, entries=len(mc_stack.GetHists())+6)
         if show_ratio and plot_data:
-            self.add_ratio_plot(data, mc_err, xrange, ratio_range, True) # add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
-            #self.add_ratio_plot(data, mc_stack, xrange, ratio_range, True) # add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
+            self.add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
+            #self.add_ratio_bandplot(data, mc_stack, mc_err,  xrange, ratio_range) # add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
+
+
             
                        
 ##-----
 
     def plot_without_uncert (self, folder, variable, rebin=1, xaxis='',
                         leftside=True, xrange=None, preprocess=None,
-                              show_ratio=False, ratio_range=0.2, sort=True, obj=['e1', 'e2']):
+                              show_ratio=False, ratio_range=0.2, sort=True):
         
         
 
@@ -931,7 +917,7 @@ class BasePlotter(Plotter):
         if isFakesIn:
             self.mc_samples.append('Fakes')
            # self.mc_samples.append('etFakes')
-            self.mc_samples.append('finalDYLL')
+           # self.mc_samples.append('finalDYLL')
        ## if isEFakesIn:
        ##     self.mc_samples.append('eFakes')
        ##     if not 'finalDYLL' in self.mc_samples:  self.mc_samples.append('finalDYLL')
@@ -958,7 +944,7 @@ class BasePlotter(Plotter):
             )
         data = data_view.Get(variable)
         data.Draw('same')
-        print 'data', data.Integral()
+        #print 'data', data.Integral()
         self.keep.append(data)
         ## Make sure we can see everything
         if data.GetMaximum() > mc_stack.GetMaximum():
@@ -993,72 +979,72 @@ class BasePlotter(Plotter):
         bkg_views  = dict(
             [(self.datacard_names[i], j) for i, j in zip(self.mc_samples, self.mc_views(rebin, preprocess))]
         )
-        bkg_weights = dict(
-            [(self.datacard_names[i], self.get_view(i, 'weight')) for i in self.mc_samples]
-        )
+        ##bkg_weights = dict(
+        ##    [(self.datacard_names[i], self.get_view(i, 'weight')) for i in self.mc_samples]
+        ##)
         #cache histograms, since getting them is time consuming
         bkg_histos = {}
         for name, view in bkg_views.iteritems():
             mc_histo = view.Get(path)
             mc_histo = change_histo_nbins(mc_histo, 0, last)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
-            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
+            #print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
             bkg_histos[name] = mc_histo.Clone()
-            mc_histo = remove_empty_bins(
-                mc_histo, bkg_weights[name],
-                first_filled_bkg, last_filled_bkg)
+            ##mc_histo = remove_empty_bins(
+            ##    mc_histo, bkg_weights[name],
+            ##    first_filled_bkg, last_filled_bkg)
             mc_histo.SetName(name)
             mc_histo.Write()
 
         if self.use_embedded:            
             view = self.get_view('ZetauEmbedded')
-            weight = self.get_view('ZetauEmbedded', 'weight')
+            ##weight = self.get_view('ZetauEmbedded', 'weight')
             if preprocess:
                 view = preprocess(view)
             view = self.rebin_view(view, rebin)
             name = self.datacard_names['ZetauEmbedded']
-            bkg_weights[name] = weight
+            ##bkg_weights[name] = weight
             bkg_views[name] = view
             mc_histo = view.Get(path)
             mc_histo = change_histo_nbins(mc_histo, 0, last)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
             bkg_histos[name] = mc_histo.Clone()
-            mc_histo = remove_empty_bins(
-                mc_histo, weight,
-                first_filled_bkg, last_filled_bkg)
+            ##mc_histo = remove_empty_bins(
+            ##    mc_histo, weight,
+            ##    first_filled_bkg, last_filled_bkg)
             mc_histo.SetName(name)
             mc_histo.Write()
           
         fakes_view = self.get_view('fakes') 
         d_view = self.get_view('data')
-        weights_view = views.SumView(
-            views.SubdirectoryView(d_view, 'tLoose'),
-            views.SubdirectoryView(d_view, 'eLoose'),
-            views.SubdirectoryView(d_view, 'etLoose')
-            )
+        ##weights_view = views.SumView(
+        ##    views.SubdirectoryView(d_view, 'tLoose'),
+        ##    #views.SubdirectoryView(d_view, 'eLoose'),
+        ##    #views.SubdirectoryView(d_view, 'etLoose')
+        ##    )
         if preprocess:
             fakes_view = preprocess(fakes_view)    
-            weights_view = preprocess(weights_view)
-        weights = weights_view.Get(os.path.join(folder,'weight'))
+            ##weights_view = preprocess(weights_view)
+        ##weights = weights_view.Get(os.path.join(folder,'weight'))
         #print folder
         fakes_view = self.rebin_view(fakes_view, rebin)
         bkg_views['fakes'] = fakes_view
-        bkg_weights['fakes'] = mean(weights)
+        ##bkg_weights['fakes'] = mean(weights)
         fake_shape = bkg_views['fakes'].Get(path)
         fake_shape = change_histo_nbins(fake_shape, 0, last)
         bkg_histos['fakes'] = fake_shape.Clone()
         bkg_histos['fakes'] =change_histo_nbins(bkg_histos['fakes'] , 0, last)
         first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos['fakes'])
-        fake_shape = remove_empty_bins(
-            fake_shape, bkg_weights['fakes'],
-            first_filled_bkg, last_filled_bkg)
+        ##fake_shape = remove_empty_bins(
+        ##    fake_shape, bkg_weights['fakes'],
+        ##    first_filled_bkg, last_filled_bkg)
         fake_shape.SetName('fakes')
         fake_shape.Write()
 
         #Get signal
         signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
+            'GluGlu_LFV_HToETau_M200*', 'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
+
         ]
         for name in signals:
             sig_view = self.get_view(name)
@@ -1069,96 +1055,96 @@ class BasePlotter(Plotter):
                 RebinView(sig_view, rebin),
                 br_strenght
                 )
-            weights = self.get_view(name, 'weight')
+            ##weights = self.get_view(name, 'weight')
             bkg_views[card_name] = sig_view
-            bkg_weights[card_name] = weights
+            ##bkg_weights[card_name] = weights
             histogram = sig_view.Get(path)
             histogram = change_histo_nbins(histogram, 0, last)
             bkg_histos[card_name] = histogram.Clone()
             first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos[card_name])
-            histogram = remove_empty_bins(
-                histogram, bkg_weights[card_name],
-                first_filled_bkg, last_filled_bkg)
+            ##histogram = remove_empty_bins(
+            ##    histogram, bkg_weights[card_name],
+            ##    first_filled_bkg, last_filled_bkg)
             histogram.SetName(card_name)
             histogram.Write()
 
 
         unc_conf_lines = []
         unc_vals_lines = []
-        category_name  = output_dir.GetName()
-        for unc_name, info in self.systematics.iteritems():
-            targets = []
-            for target in info['apply_to']:
-                if target in self.sample_groups:
-                    targets.extend(self.sample_groups[target])
-                else:
-                    targets.append(target)
-
-            unc_conf = 'lnN' if info['type'] == 'yield' or info['type'] == 'stat' else 'shape'            
-            #stat shapes are uncorrelated between samples
-            if info['type'] <> 'stat':
-                unc_conf_lines.append('%s %s' % (unc_name, unc_conf))
-            shift = 0.
-            path_up = info['+'](path)
-            path_dw = info['-'](path)
-            for target in targets:
-                up      = bkg_views[target].Get(
-                    path_up
-                )
-                down    = bkg_views[target].Get(
-                    path_dw
-                )
-                if info['type'] == 'yield':
-                    central = bkg_histos[target]
-                    integral = central.Integral()
-                    integral_up = up.Integral()
-                    integral_down = down.Integral()
-                    if integral == 0  and integral_up == 0 and integral_down ==0 :
-                        shift=shift
-                    else:
-                        shift = max(
-                            shift,
-                            (integral_up - integral) / integral,
-                            (integral - integral_down) / integral
-                        )
-                elif info['type'] == 'shape':
-                    #remove empty bins also for shapes 
-                    #(but not in general to not spoil the stat uncertainties)
-                    first_filled_bkg,last_filled_bkg= find_fill_range( bkg_histos[target])
-                    up = remove_empty_bins(
-                        up, bkg_weights[target],
-                        first_filled_bkg, last_filled_bkg)
-                    first_filled_bkg, last_filled_bkg= find_fill_range( bkg_histos[target])
-                    down = remove_empty_bins(
-                        down, bkg_weights[target],
-                        first_filled_bkg, last_filled_bkg)
-                    up.SetName('%s_%sUp' % (target, unc_name))
-                    down.SetName('%s_%sDown' % (target, unc_name))
-                    up.Write()
-                    down.Write()
-                elif info['type'] == 'stat':
-                    nbins = up.GetNbinsX()
-                    up.Rebin(nbins)
-                    yield_val = up.GetBinContent(1)
-                    yield_err = up.GetBinError(1)
-                    print target, yield_val, yield_err, 
-                    if yield_val==0:
-                        unc_value = 0.
-                    else:
-                        unc_value = 1. + (yield_err / yield_val)
-                    stat_unc_name = '%s_%s_%s' % (target, category_name, unc_name)
-                    unc_conf_lines.append('%s %s' % (stat_unc_name, unc_conf))
-                    unc_vals_lines.append(
-                        '%s %s %s %.2f' % (category_name, target, stat_unc_name, unc_value)
-                    )
-                else:
-                    raise ValueError('systematic uncertainty type:"%s" not recognised!' % info['type'])
-
-            if info['type'] <> 'stat':
-                shift += 1
-                unc_vals_lines.append(
-                    '%s %s %s %.2f' % (category_name, ','.join(targets), unc_name, shift)
-                )
+        ##category_name  = output_dir.GetName()
+        ##for unc_name, info in self.systematics.iteritems():
+        ##    targets = []
+        ##    for target in info['apply_to']:
+        ##        if target in self.sample_groups:
+        ##            targets.extend(self.sample_groups[target])
+        ##        else:
+        ##            targets.append(target)
+        ##
+        ##    unc_conf = 'lnN' if info['type'] == 'yield' or info['type'] == 'stat' else 'shape'            
+        ##    #stat shapes are uncorrelated between samples
+        ##    if info['type'] <> 'stat':
+        ##        unc_conf_lines.append('%s %s' % (unc_name, unc_conf))
+        ##    shift = 0.
+        ##    path_up = info['+'](path)
+        ##    path_dw = info['-'](path)
+        ##    for target in targets:
+        ##        up      = bkg_views[target].Get(
+        ##            path_up
+        ##        )
+        ##        down    = bkg_views[target].Get(
+        ##            path_dw
+        ##        )
+        ##        if info['type'] == 'yield':
+        ##            central = bkg_histos[target]
+        ##            integral = central.Integral()
+        ##            integral_up = up.Integral()
+        ##            integral_down = down.Integral()
+        ##            if integral == 0  and integral_up == 0 and integral_down ==0 :
+        ##                shift=shift
+        ##            else:
+        ##                shift = max(
+        ##                    shift,
+        ##                    (integral_up - integral) / integral,
+        ##                    (integral - integral_down) / integral
+        ##                )
+        ##        elif info['type'] == 'shape':
+        ##            #remove empty bins also for shapes 
+        ##            #(but not in general to not spoil the stat uncertainties)
+        ##            first_filled_bkg,last_filled_bkg= find_fill_range( bkg_histos[target])
+        ##            up = remove_empty_bins(
+        ##                up, bkg_weights[target],
+        ##                first_filled_bkg, last_filled_bkg)
+        ##            first_filled_bkg, last_filled_bkg= find_fill_range( bkg_histos[target])
+        ##            down = remove_empty_bins(
+        ##                down, bkg_weights[target],
+        ##                first_filled_bkg, last_filled_bkg)
+        ##            up.SetName('%s_%sUp' % (target, unc_name))
+        ##            down.SetName('%s_%sDown' % (target, unc_name))
+        ##            up.Write()
+        ##            down.Write()
+        ##        elif info['type'] == 'stat':
+        ##            nbins = up.GetNbinsX()
+        ##            up.Rebin(nbins)
+        ##            yield_val = up.GetBinContent(1)
+        ##            yield_err = up.GetBinError(1)
+        ##            #print target, yield_val, yield_err, 
+        ##            if yield_val==0:
+        ##                unc_value = 0.
+        ##            else:
+        ##                unc_value = 1. + (yield_err / yield_val)
+        ##            stat_unc_name = '%s_%s_%s' % (target, category_name, unc_name)
+        ##            unc_conf_lines.append('%s %s' % (stat_unc_name, unc_conf))
+        ##            unc_vals_lines.append(
+        ##                '%s %s %s %.2f' % (category_name, target, stat_unc_name, unc_value)
+        ##            )
+        ##        else:
+        ##            raise ValueError('systematic uncertainty type:"%s" not recognised!' % info['type'])
+        ##
+        ##    if info['type'] <> 'stat':
+        ##        shift += 1
+        ##        unc_vals_lines.append(
+        ##            '%s %s %s %.2f' % (category_name, ','.join(targets), unc_name, shift)
+        ##        )
 
         return unc_conf_lines, unc_vals_lines
                        
@@ -1194,7 +1180,7 @@ class BasePlotter(Plotter):
         for name, view in bkg_views.iteritems():
             mc_histo = view.Get(path)
             first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
-            print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
+            #print name, first_filled_bkg, last_filled_bkg, mc_histo.GetXaxis().GetNbins()
             bkg_histos[name] = mc_histo.Clone()
             #mc_histo = remove_empty_bins(
             #    mc_histo, bkg_weights[name],
@@ -1329,7 +1315,7 @@ class BasePlotter(Plotter):
                     up.Rebin(nbins)
                     yield_val = up.GetBinContent(1)
                     yield_err = up.GetBinError(1)
-                    print target, yield_val, yield_err, 
+                    #print target, yield_val, yield_err, 
                     if yield_val==0:
                         unc_value = 0.
                     else:

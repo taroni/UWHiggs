@@ -16,11 +16,11 @@ def summer_2016_eid_WP80(row, name):
     elif pT < 10  and abseta > 1.479:
         return ( mva_output > -0.303263 )
     elif pT > 10  and abseta < 0.8:
-        return ( mva_output > 0.967083 )
+        return ( mva_output > 0.941 )
     elif pT > 10  and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.929117 )
+        return ( mva_output > 0.899 )
     elif pT > 10  and abseta > 1.479:
-        return ( mva_output > 0.726311 )
+        return ( mva_output > 0.758 )
     return False
 
 def summer_2016_eid_WP90(row, name):
@@ -34,11 +34,11 @@ def summer_2016_eid_WP90(row, name):
     elif pT < 10  and abseta > 1.479:
         return ( mva_output > -0.323 )
     elif pT > 10  and abseta < 0.8:
-        return ( mva_output > 0.933 )
+        return ( mva_output > 0.837 )
     elif pT > 10  and 0.8 < abseta < 1.479:
-        return ( mva_output > 0.825 )
+        return ( mva_output > 0.715 )
     elif pT > 10  and abseta > 1.479:
-        return ( mva_output > 0.337 )
+        return ( mva_output > 0.357 )
 
 
     return False

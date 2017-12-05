@@ -13,32 +13,29 @@ def splitEid(label):
 
 #OBJECT SELECTION
 def muSelection(row, name):
-    if getattr( row, getVar(name,'Pt')) < 20:       return False
+    if getattr( row, getVar(name,'Pt')) < 10:       return False
     if abs(getattr( row, getVar(name,'Eta'))) > 2.4:  return False
     if getattr( row, getVar(name,'PixHits')) < 1:   return False
-    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.89: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2: return False
-    #if abs(getattr(row, getVar(name, 'PVDXY'))) > 0.045: return False
     return True
 
 def eSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
     ept = getattr( row, getVar(name,'Pt')) ##put here ees_minus when available 
     if ept:
-        if ept < 10 : return False 
+        if ept < 26 : return False 
     else:
-        if getattr( row, getVar(name,'Pt')) < 10:   return False #was 20
+        if getattr( row, getVar(name,'Pt')) < 26:   return False #was 20
 
-    if getattr(row, getVar(name, 'AbsEta')) > 2.5:      return False
+    if getattr(row, getVar(name, 'AbsEta')) > 2.1:      return False
     if getattr( row, getVar(name,'MissingHits'))>0:       return False
     if not  getattr( row, getVar(name,'PassesConversionVeto')):     return False
-#    if getattr( row, getVar(name,'HasConversion')):     return False
-    if getattr(row,getVar(name,'AbsEta')) > 1.4442 and getattr(row,getVar(name,'AbsEta')) < 1.566: return False
+    if getattr(row,getVar(name,'AbsEta')) > 1.4442 and getattr(row,getVar(name,'AbsEta')) < 1.567: return False
     if not getattr( row, getVar(name,'ChargeIdTight')): return False
-    #if getattr( row, getVar(name,'JetPFCISVBtag')) > 0.89: return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:     return False
     if abs(getattr( row, getVar(name,'PVDXY'))) > 0.045:     return False
     return True
+
 def eLooseSelection(row, name):
     eAbsEta = getattr( row, getVar(name,'AbsEta'))
     ept = getattr( row, getVar(name,'Pt')) ##put here ees_minus when available 
@@ -78,9 +75,9 @@ def eLowPtSelection(row, name):
 def tauSelection(row, name):
     tpt = getattr( row, getVar(name,'Pt'))# put here Pt_tes_minus when available
     if tpt:
-        if tpt < 20:           return False 
+        if tpt < 30:           return False 
     else:
-        if getattr( row, getVar(name,'Pt')) < 20:          return False
+        if getattr( row, getVar(name,'Pt')) < 30:          return False
     if getattr( row, getVar(name,'AbsEta')) > 2.3:     return False
     if abs(getattr( row, getVar(name,'PVDZ'))) > 0.2:    return False
     if getattr(row, getVar(name, 'DecayModeFinding')) < 0.5 : return False
@@ -103,7 +100,7 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
     'One function to rule them all'
     LEPTON_ID = False
     isolabel, eidlabel = splitEid(label) #memoizes to be faster!
-    #print 'lepton ', name[0], isolabel, eidlabel
+    ##print 'lepton ', name[0], isolabel, eidlabel
     if name[0] == 'e':
         LEPTON_ID = electronIds[eidlabel](row, name)
     elif name[0]=='m':
@@ -117,7 +114,7 @@ def lepton_id_iso(row, name, label): #label in the format eidtype_isotype
         
         #definition of ICHEP Medium Muon
         LEPTON_ID =True
-        if not getattr(row, getVar(name,'PFIDLoose')): LEPTON_ID =False
+        if not getattr(row, getVar(name,'PFIDMedium')): LEPTON_ID =False
         if not getattr(row, getVar(name,'ValidFraction')) > 0.49 : LEPTON_ID = False
         if not bool((goodGlob == True and getattr(row, getVar(name,'SegmentCompatibility')) > 0.303) or (getattr(row, getVar(name,'SegmentCompatibility')) > 0.451)) : LEPTON_ID =False
         if row.run > 280248 : # 2016G and 2016H has a differnt muonMediumID

@@ -1,3 +1,4 @@
+
 # Get common recipes
 recipes = ENV['fsa'] + '/PlotTools/rake/recipes.rake'
 import recipes
@@ -31,14 +32,16 @@ samples = Hash[
                "ttbar" => get_sample_names('TT'),
                "singlet" => get_sample_names('T_t')+get_sample_names('Tbar_t'), 
                "wjets" => get_sample_names('JetsToLNu'),
-               "zjets" => get_sample_names('JetsToLL_M-50'),
+               "zjets" => get_sample_names('JetsToLL_M'),
                "diboson" =>get_sample_names('WWTo')+get_sample_names('WZTo')+get_sample_names('ZZTo')+get_sample_names('WG'),
                "triboson" => get_sample_names('WWW')+get_sample_names('ZZZ')+get_sample_names('WWZ')+get_sample_names('WZZ'),
                "ewk" => get_sample_names('EWK'),
                "signalMC" => get_sample_names('HToETau_M125'),
+               "signalHighMass" => get_sample_names('ggM300ETau')+get_sample_names('ggM450ETau')+get_sample_names('ggM600ETau')+get_sample_names('ggM750ETau')+get_sample_names('ggM900ETau')+get_sample_names('GluGlu_LFV_HToETau_M200'),
                "HiggsTo2Taus" => get_sample_names('HToTauTau_M125_'),
                "dataSingleE" => get_sample_names('data_SingleElectron'),
-               "dataSingleM" => get_sample_names('data_SingleMuon')
+               "dataSingleM" => get_sample_names('data_SingleMuon'),
+               "dataMuonEG" => get_sample_names('data_MuonEG')
 ]
 
 
@@ -63,11 +66,22 @@ end
 ##     mt
 ################################################################################
 
-task :recoplots => get_analyzer_results("ETauAnalyzer.py", samples['dataSingleE']+
-                                                                     #samples['ttbar']+samples['singlet']+
-                                                                     #samples['wjets']+samples['zjets']+
-                                                                     #samples['diboson']+samples['triboson']+
-                                                                     #samples['ewk']+
+task :recoplots => get_analyzer_results("ETauAnalyzer.py",
+                                        samples['dataSingleE']+
+                                        samples['ttbar']+samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['ewk']+
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+samples['HiggsTo2Taus']
+                                       )
+task :recoplotsEMu => get_analyzer_results("EMuAnalyzer.py", samples['dataMuonEG']+
+                                                                     samples['ttbar']+samples['singlet']+
+                                                                     samples['wjets']+samples['zjets']+
+                                                                     samples['diboson']+samples['triboson']+
+                                                                     samples['ewk']+
+                                                                     samples['signalHighMass']+
                                                                      samples['signalMC']+samples['HiggsTo2Taus']
                                        )
 
