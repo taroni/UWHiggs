@@ -76,6 +76,23 @@ def merge_functions(fcn_1, fcn_2):
         return ((r1, r2), w)
     return f
 
+def topPtreweight(pt1,pt2):
+    #pt1=pt of top quark
+    #pt2=pt of antitop quark
+    #13 Tev parameters: a=0.0615,b=-0.0005
+    #for toPt >400, apply SF at 400
+    if pt1>400:pt1=400
+    if pt2>400:pt2=400
+    a=0.0615
+    b=-0.0005 
+    
+    wt1=math.exp(a+b*pt1)
+    wt2=math.exp(a+b*pt2)
+    
+    wt=sqrt(wt1*wt2)
+    
+    return wt
+
 pucorrector = mcCorrections.make_puCorrector('singlee', None)
 
 class ETauAnalyzer(MegaBase):
@@ -95,6 +112,7 @@ class ETauAnalyzer(MegaBase):
         self.is_mc = not (self.is_data or self.is_embedded)
         self.is_DY = bool('JetsToLL_M-50' in target)
         self.is_DYLowMass = bool('JetsToLL_M-10to50' in target)
+        self.isTT= bool('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_v6-v1' in target)
         self.is_W = bool('JetsToLNu' in target)
         self.is_HighMass = bool('ggM' in target)
         self.is_bkg = not (self.is_data or self.is_embedded or self.is_HighMass)
@@ -173,7 +191,7 @@ class ETauAnalyzer(MegaBase):
         return frweight
 
         
-        
+
     def event_weight(self, row, sys_shifts):
         nbtagged=row.bjetCISVVeto30Medium
         if nbtagged>2:
@@ -231,7 +249,13 @@ class ETauAnalyzer(MegaBase):
             else:
                 mcweight = mcweight*self.Wweight[0]
 
-        mcweight_tight = mcweight*eisoweight/eisoloosew*self.tauSF['vtight']/self.tauSF['loose']
+        topptreweight=1
+
+        if self.isTT:
+            topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
+
+                
+        mcweight_tight = mcweight*topptreweight*eisoweight/eisoloosew*self.tauSF['vtight']/self.tauSF['loose']
 
         weights = {'': mcweight,
                    'eVTight' : mcweight_tight
@@ -256,12 +280,12 @@ class ETauAnalyzer(MegaBase):
             #folder.append(os.path.join(*path))
             prefix_path = os.path.join(*tuple_path)
             #print path, prefix_path
-            if 'Mass' in prefix_path:
-                for region in optimizer.regions[tuple_path[-1]]:
-                   
-                    folder.append(
-                        os.path.join(os.path.join(*path), region)
-                    )
+            # if 'Mass' in prefix_path:
+            for region in optimizer.regions[tuple_path[-1]]:
+                
+                folder.append(
+                    os.path.join(os.path.join(*path), region)
+                )
         #print folder 
         self.book('os/', "h_collmass_pfmet" , "h_collmass_pfmet",  100, 0, 1000)
         self.book('os/', "e_t_Mass",  "h_vismass",  100, 0, 1000)
@@ -271,12 +295,13 @@ class ETauAnalyzer(MegaBase):
             self.book(f,"weight", "weight", 100, 0, 10)
 
             self.book(f,"tPt", "tau p_{T}", 100, 0, 1000)             
-            self.book(f,"tPhi", "tau phi", 26, -3.25, 3.25)
-            self.book(f,"tEta", "tau eta",  10, -2.5, 2.5)
-            
+            self.book(f,"tPhi", "tau #phi", 26, -3.25, 3.25)
+            self.book(f,"tEta", "tau #eta",  10, -2.5, 2.5)
+            self.book(f, "tDecayMode", "tDecayMode", 12, -0.5, 11.5)
+                        
             self.book(f,"ePt", "e p_{T}", 100, 0, 1000)
-            self.book(f,"ePhi", "e phi",  26, -3.2, 3.2)
-            self.book(f,"eEta", "e eta", 10, -2.5, 2.5)
+            self.book(f,"ePhi", "e #phi",  26, -3.2, 3.2)
+            self.book(f,"eEta", "e #eta", 10, -2.5, 2.5)
              
             self.book(f, "e_t_DPhi", "e-tau DeltaPhi" , 20, 0, 3.2)
             self.book(f, "e_t_DR", "e-tau DeltaR" , 20, 0, 5.)
@@ -298,6 +323,18 @@ class ETauAnalyzer(MegaBase):
             self.book(f, "e_t_PZeta", "e_t_PZeta", 200, -400, 400)
             self.book(f, "e_t_PZetaLess0p85PZetaVis", "e_t_PZetaLess0p85PZetaVis", 100, -200, 200)
             self.book(f, "e_t_PZetaVis", "e_t_PZetaVis", 100, 0, 300 )
+
+            self.book(f, "nvtx", "number of vertices", 100, 0, 100)
+
+            self.book(f, "eGenEta", "e #eta (gen)", 10, -2.5, 2.5)
+            self.book(f, "eGenPt", "e p_{T} (gen)", 100, 0, 1000)
+            self.book(f, "eGenPhi", "e #phi (gen)",  26, -3.2, 3.2)
+            self.book(f, "tGenEta", "#tau #eta (gen)", 10, -2.5, 2.5)
+            self.book(f, "tGenPt", "#tau p_{T} (gen)", 100, 0, 1000)
+            self.book(f, "tGenPhi", "#tau #phi (gen)",  26, -3.2, 3.2)
+            self.book(f, "eComesFromHiggs", "eComesFromHiggs", 2, -0.5, 1.5)
+            self.book(f, "tComesFromHiggs", "tComesFromHiggs", 2, -0.5, 1.5)
+            self.book(f, "tGenDecayMode", "tGenDecayMode", 12, -0.5, 11.5)
            
             
             #index dirs and histograms
@@ -329,6 +366,8 @@ class ETauAnalyzer(MegaBase):
                 if not attr.startswith(filter_label+'$'):
                     continue
                 attr = attr.replace(filter_label+'$', '')
+            if 'Gen' in attr and self.is_data:
+                continue 
             if value.InheritsFrom('TH2'):
                 if attr in self.hfunc:
                     try:
@@ -455,6 +494,20 @@ class ETauAnalyzer(MegaBase):
                 
                 selection_categories.extend([(sys, '', 'le1', '')])
                 selection_categories.extend([(sys, '', str(jets), '')])
+                selection_categories.extend([
+                    (sys,'','le1',i) for i in optimizer.compute_regions_le1(
+                        row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                ])
+                if jets == 0:
+                    selection_categories.extend([
+                        (sys,'','0',i) for i in optimizer.compute_regions_0jet(
+                            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                    ])
+                if jets == 1:
+                    selection_categories.extend([
+                        (sys,'','1',i) for i in optimizer.compute_regions_1jet(
+                            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                    ])
                 if row.ePt > 60 and row.tPt>30:
                     selection_categories.extend([(sys,'LowMass', 'le1', '')])
                     selection_categories.extend([(sys,'LowMass',str(jets), '')])

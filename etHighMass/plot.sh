@@ -2,9 +2,12 @@
 
 source ../../FinalStateAnalysis/environment.sh
 
-export MEGAPATH=/hdfs/store/user/taroni/
-source jobid.sh
-export jobid=$jobidSignal
-echo $jobid
-python plotSignalHighMass.py
+#to plot all together#
+#python fastPlotETau.py -s "os ss" -m "" -m "LowMass HighMass" -j "le1 0 1" 
 
+python fastPlotETau.py -s "os" -m "" -j "le1 0 1"
+python fastPlotETau.py -s "os" -m "LowMass" -j "le1 0 1"
+python fastPlotETau.py -s "os" -m "HighMass" -j "le1 0 1"
+python fastPlotETau.py -s "ss" -m "" -j "le1 0 1"
+python fastPlotETau.py -s "ss" -m "LowMass" -j "le1 0 1"
+python fastPlotETau.py -s "ss" -m "HighMass" -j "le1 0 1"

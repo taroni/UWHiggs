@@ -9,9 +9,9 @@ source ../../FinalStateAnalysis/environment.sh
 export CutFlow=1
 
 
-export MEGAPATH=/hdfs/store/user/taroni/
+export MEGAPATH=/hdfs/store/user/fmeng/
 source jobid.sh
-export jobid=$jobidSignal
+export jobid=$jobidFanbo
 echo $jobid
 rake recoplots
 
