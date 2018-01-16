@@ -22,7 +22,9 @@ import mcCorrections
 from cutflowtracker import cut_flow_tracker
 import bTagSF
 cut_flow_step = ['allEvents', 'jets','trigger', 'esel', 'tsel', 'tdisc', 'eiso', 'vetoes','sign']
-                 
+
+et_collmass = 'e_t_collinearmass'
+
 @memo
 def getVar(name, var):
     return name+var
@@ -42,6 +44,10 @@ def metphi(shift=''):
         return ty1met_phi %shift
     return met_phi % shift
 
+@memo
+def collinearmass(shift=''):
+    return 
+
 def attr_getter(attribute):
     '''return a function that gets an attribute'''
     def f(row, weight):
@@ -53,6 +59,11 @@ def collmass(row, met, metPhi):
     visfrac = row.tPt/(row.tPt+ptnu)
     #print met, cos(deltaPhi(metPhi, row.tPhi)), ptnu, visfrac
     return (row.e_t_Mass / sqrt(visfrac))
+
+def syst_collmass(met, metPhi, my_ele, my_tau):
+    ptnu =abs(met*cos(deltaPhi(metPhi,my_tau.Phi())))
+    visfrac = my_tau.Pt()/(my_tau.Pt()+ptnu)
+    return ((my_tau+my_ele).M()) / (sqrt(visfrac))
 
 def deltaPhi(phi1, phi2):
     PHI = abs(phi1-phi2)
@@ -76,6 +87,28 @@ def merge_functions(fcn_1, fcn_2):
         return ((r1, r2), w)
     return f
 
+def make_collmass_systematics(shift):
+    
+    if shift.startswith('tes'):
+        ptnu =abs(met*cos(deltaPhi(metPhi, row.tPhi)))
+        visfrac = tpt/(tpt+ptnu)
+        vis_mass = vismass(shift)
+        return (vis_mass / sqrt(visfrac))
+    elif shift.startswith('ees'):
+        ptnu =abs(met*cos(deltaPhi(metPhi, row.tPhi)))
+        visfrac = tpt/(tpt+ptnu)
+        vis_mass = vismass(shift)
+        return (vis_mass / sqrt(visfrac))
+     
+    else:
+        met_name = met(shift)
+        phi_name = metphi(shift)
+        def collmass_shifted(row, weight):
+            met = getattr(row, met_name)
+            phi = getattr(row, phi_name)
+            return collmass(row, met, phi), weight
+        return collmass_shifted
+    
 def topPtreweight(pt1,pt2):
     #pt1=pt of top quark
     #pt2=pt of antitop quark
@@ -93,8 +126,10 @@ def topPtreweight(pt1,pt2):
     
     return wt
 
-pucorrector = mcCorrections.make_puCorrector('singlee', None)
-
+pucorrector={'': mcCorrections.make_puCorrector('singlee', None),
+             'puUp': mcCorrections.make_puCorrectorUp('singlee', None),
+             'puDown': mcCorrections.make_puCorrectorDown('singlee', None)
+}
 class ETauAnalyzer(MegaBase):
     tree = 'et/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
@@ -111,19 +146,32 @@ class ETauAnalyzer(MegaBase):
         self.is_embedded = ('Embedded' in target)
         self.is_mc = not (self.is_data or self.is_embedded)
         self.is_DY = bool('JetsToLL_M-50' in target)
-        self.is_DYLowMass = bool('JetsToLL_M-10to50' in target)
+        self.is_DYTT = bool('JetsToLL_M-50' in target)
+        self.is_DYLowMass = bool('JetsToTT_M-10to50' in target)
         self.isTT= bool('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_v6-v1' in target)
         self.is_W = bool('JetsToLNu' in target)
         self.is_HighMass = bool('ggM' in target)
         self.is_bkg = not (self.is_data or self.is_embedded or self.is_HighMass)
 
+        self.my_tau=ROOT.TLorentzVector()
+        self.my_ele=ROOT.TLorentzVector()
+        self.my_MET=ROOT.TLorentzVector()
+
+        
+        self.systematics = {
+            'pu'   : (['','puUp', 'puDown'] if self.is_mc else []),
+            'trig' : (['', 'trUp', 'trDown'] if not self.is_data else []),
+            'tes'  : (['scale_t_1prong_13TeVUp','scale_t_1prong_13TeVDown','scale_t_1prong1pizero_13TeVUp','scale_t_1prong1pizero_13TeVDown','scale_t_3prong_13TeVUp','scale_t_3prong_13TeVDown'] if not self.is_data else ['']),
+            'ees'  : (["", 'eesUp','eesDown','eesresrhoUp','eesresrhoDown','eesresphiDown'] if not self.is_data else [''])
+            }
+        
         self.histo_locations = {}
 
         self.hfunc   = {
             'nTruePU' : lambda row, weight: (row.nTruePU,None),
             'weight'  : lambda row, weight: (weight,None) if weight is not None else (1.,None),
             'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
-            'h_collmass_pfmet' : lambda row, weight: (collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),weight),
+            'h_collmass_pfmet' : lambda row, weight: (syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), weight),
             'h_collmass_vs_dPhi_pfmet' : merge_functions(
                 attr_getter('tDPhiToPfMet_type1'),
                 lambda row, weight: (collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),weight)
@@ -136,11 +184,7 @@ class ETauAnalyzer(MegaBase):
             'tPFMET_DeltaPhi' : lambda row, weight: (deltaPhi(row.tPhi, getattr(row, metphi())), weight),
             'evtInfo' : lambda row, weight: (struct(run=row.run,lumi=row.lumi,evt=row.evt,weight=weight), None)
             }
-        self.eleid_weight = mcCorrections.electronID_Tight
-        self.eleIso_weight = mcCorrections.electronIso_0p10_2016 
-        self.eleidLoose_weight = mcCorrections.electronID_Tight
-        self.eleIsoLoose_weight = mcCorrections.electronIso_0p15_2016
-        self.eleRecoweight = mcCorrections.erecon_corrector
+
         self.DYreweight = mcCorrections.DYreweight
         self.triggerEff  = mcCorrections.efficiency_trigger_2016 if not self.is_data else 1.
 
@@ -164,14 +208,6 @@ class ETauAnalyzer(MegaBase):
             3 : 0.019206445,
             4 : 0.01923548
         }
-##        self.tauSF={#prompt2016
-##            'vloose' : 0.83,
-##            'loose'  : 0.84,
-##            'medium' : 0.84,
-##            'tight'  : 0.83,
-##            'vtight' : 0.80
-##        }
-
         self.tauSF={ #rerecoData2016
             'vloose' : 0.99,
             'loose'  : 0.99,
@@ -198,74 +234,82 @@ class ETauAnalyzer(MegaBase):
             nbtagged=2
         if self.is_data:
             if nbtagged>0 :
-                return {'' : 0.,
-                        'eVTight' : 0.}
+                return {'' : 0.}
             else:
-                return {'' : 1.,
-                        'eVTight' : 1.}
+                return {'' : 1.}
             
-        mcweight = 1. 
-        if not self.is_data : # applying directly the efficiency measured in data
-            mcweight=self.triggerEff( row, 'e')
-            #print 'trigger Eff', mcweight
-            
-        eisoweight = self.eleIso_weight(row,'e')
-        eidweight =  self.eleid_weight(row.eEta,row.ePt)
-        
-        eisoloosew = self.eleIsoLoose_weight(row,'e')
-        eidloosew = self.eleidLoose_weight(row.eEta,row.ePt)
+        weights = {}
+        for shift in sys_shifts:
+            mcweight=1.
+            if not self.is_data : # applying directly the efficiency measured in data
+                ##print 'trigger SF', self.triggerEff(row.ePt, row.eAbsEta)
+                mcweight=self.triggerEff(row.ePt, row.eAbsEta)[0]
+                ##print shift, 'trig eff ' , mcweight 
+                if shift=='trUp':
+                    mcweight=self.triggerEff(row.ePt, row.eAbsEta)[0]*1.02
+                ##    print 'trig eff up' , mcweight 
+                elif shift=='trDown':
+                    mcweight=self.triggerEff(row.ePt, row.eAbsEta)[0]*0.98
+                ##    print 'trig eff dw' , mcweight 
 
-        erecow = self.eleRecoweight(row.eEta,row.ePt)
+            ##eisoweight = self.eleIso_weight(row,'e')
+            ##eidweight =  self.eleid_weight(row.eEta,row.ePt)
+            ##
+            ##eisoloosew = self.eleIsoLoose_weight(row,'e')
+            ##eidloosew = self.eleidLoose_weight(row.eEta,row.ePt)
+            ##
+            ##erecow = self.eleRecoweight(row.eEta,row.ePt)
             
-        dyweight = self.DYreweight(row.genMass, row.genpT) 
+            dyweight = self.DYreweight(row.genMass, row.genpT) 
         
-        btagweight = 1. 
-        if nbtagged>0:
-            btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0)
-        #print 'mcweight:',mcweight, 'pu:',  pucorrector(row.nTruePU), 'btag:', btagweight, 'eiso:', eisoloosew, 'eid:', eidweight, 'ereco:', erecow, 'tauSF:', self.tauSF['loose']
-        mcweight =  mcweight*pucorrector(row.nTruePU)*btagweight*eisoloosew*eidweight*erecow*self.tauSF['loose']
-
-        
-        if self.is_DY:
-            if row.numGenJets < 5:
-                #print  row.evt, row.run, row.lumi, ', ePt:',row.ePt, ', tPt:',row.tPt, ', mcweight:', mcweight, ', dyweight:',dyweight, ', ZTTreweigth:',self.ZTTLweight[row.numGenJets], ', totweight:',  mcweight*dyweight*self.ZTTLweight[row.numGenJets]
-                mcweight = mcweight*self.ZTTLweight[row.numGenJets]*dyweight
-            else:
-                #print  row.evt, row.run, row.lumi, ', ePt:',row.ePt, ', tPt:',row.tPt, ', mcweight:', mcweight, ', dyweight:',dyweight, ', ZTTreweigth:',self.ZTTLweight[0], ', totweight:',  mcweight*dyweight*self.ZTTLweight[0]
-                mcweight = mcweight*self.ZTTLweight[0]*dyweight
-            #if dyweight > 1.5 : 
-                #print  row.evt, row.run, row.lumi, row.ePt, row.tPt,  mcweight, dyweight, mcweight/dyweight
-        if self.is_DYLowMass:
-            if row.numGenJets < 3:
-                #print  row.evt, row.run, row.lumi, ', ePt:',row.ePt, ', tPt:',row.tPt, ', mcweight:', mcweight, ', dyweight:',dyweight, ', ZTTreweigth:',self.ZTTLowMassLweight[row.numGenJets], ', totweight:',  mcweight*dyweight*self.ZTTLowMassLweight[row.numGenJets]
-                mcweight = mcweight*self.ZTTLowMassLweight[row.numGenJets]*dyweight
-            else:
-                #print  row.evt, row.run, row.lumi, ', ePt:',row.ePt, ', tPt:',row.tPt, ', mcweight:', mcweight, ', dyweight:',dyweight, ', ZTTreweigth:',self.ZTTLowMassLweight[0], ', totweight:',  mcweight*dyweight*self.ZTTLweight[0]
-                mcweight = mcweight*self.ZTTLowMassLweight[0]*dyweight
+            btagweight = 1. 
+            if nbtagged>0:
+                btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0)
+            
+            puweight = pucorrector[''](row.nTruePU)
+            if shift=='puUp' or shift=='puDown':
+                puweight = pucorrector[shift](row.nTruePU)
+            
+            #mcweight =  mcweight*puweight*btagweight*eisoloosew*eidweight*erecow*self.tauSF['loose']
+            mcweight =  mcweight*puweight*btagweight*self.tauSF['loose']
+            if self.is_DY or self.is_DYTT:
+                if row.numGenJets < 5:
+                    mcweight = mcweight*self.ZTTLweight[row.numGenJets]*dyweight
+                else:
+                    mcweight = mcweight*self.ZTTLweight[0]*dyweight
+                    
+            if self.is_DYLowMass:
+                if row.numGenJets < 3:
+                    mcweight = mcweight*self.ZTTLowMassLweight[row.numGenJets]*dyweight
+                else:
+                    mcweight = mcweight*self.ZTTLowMassLweight[0]*dyweight
                        
-        if self.is_W:
-            if row.numGenJets < 5:
-                mcweight = mcweight*self.Wweight[row.numGenJets]
-            else:
-                mcweight = mcweight*self.Wweight[0]
+            if self.is_W:
+                if row.numGenJets < 5:
+                    mcweight = mcweight*self.Wweight[row.numGenJets]
+                else:
+                    mcweight = mcweight*self.Wweight[0]
 
-        topptreweight=1
+            topptreweight=1
 
-        if self.isTT:
-            topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
+            if self.isTT:
+                topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
 
                 
-        mcweight_tight = mcweight*topptreweight*eisoweight/eisoloosew*self.tauSF['vtight']/self.tauSF['loose']
+            mcweight_tight = mcweight*topptreweight*self.tauSF['vtight']/self.tauSF['loose']
 
-        weights = {'': mcweight,
-                   'eVTight' : mcweight_tight
-        } 
+            weights[shift] =  mcweight_tight
+            
   
         return weights
+
+    
     
     def begin(self):
-        sys_shifts = ['','tLoose']
-        sys_shifts = list( set( sys_shifts ) ) #remove double dirs
+        sys_shifts = ['','tLoose'] + self.systematics['pu'] + self.systematics['trig'] \
+                     +  self.systematics['ees'] + self.systematics['tes']
+        #remove double dirs
+        sys_shifts = list(set(sys_shifts))
         signs =['os', 'ss']
         jetN = ['le1','0', '1']
         massRange = ['','LowMass', 'HighMass']
@@ -278,20 +322,19 @@ class ETauAnalyzer(MegaBase):
             
             #path.append('selected')
             #folder.append(os.path.join(*path))
-            prefix_path = os.path.join(*tuple_path)
+            #prefix_path = os.path.join(*tuple_path)
             #print path, prefix_path
             # if 'Mass' in prefix_path:
-            for region in optimizer.regions[tuple_path[-1]]:
-                
-                folder.append(
-                    os.path.join(os.path.join(*path), region)
-                )
-        #print folder 
+            #for region in optimizer.regions[tuple_path[-1]]:
+            #    
+            #    folder.append(
+            #        os.path.join(os.path.join(*path), region)
+            #    )
+        
         self.book('os/', "h_collmass_pfmet" , "h_collmass_pfmet",  100, 0, 1000)
         self.book('os/', "e_t_Mass",  "h_vismass",  100, 0, 1000)
                 
         for f in folder:
-            
             self.book(f,"weight", "weight", 100, 0, 10)
 
             self.book(f,"tPt", "tau p_{T}", 100, 0, 1000)             
@@ -402,9 +445,12 @@ class ETauAnalyzer(MegaBase):
         cut_flow_histo = self.cut_flow_histo
         cut_flow_trk   = cut_flow_tracker(cut_flow_histo)
 
-        sys_shifts = ['']
+        sys_shifts = [''] + self.systematics['pu'] + self.systematics['trig'] \
+                     + self.systematics['ees'] + self.systematics['tes']
         logging.debug('Starting processing')
         
+
+
         lock =()
         ievt = 0
         logging.debug('Starting evt loop')
@@ -421,14 +467,18 @@ class ETauAnalyzer(MegaBase):
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
             #print row.run,row.lumi,row.evt
+            if (self.is_DYTT and not row.isZtautau and not self.is_DYLowMass):
+                continue
+            if (not self.is_DYTT and row.isZtautau and not self.is_DYLowMass):
+                continue
             cut_flow_trk.Fill('allEvents')
             
             jets = min(int(row.jetVeto30), 2)
             if jets==2 : continue
             cut_flow_trk.Fill('jets')
 
-            if self.is_data:
-                if not bool(row.singleE25eta2p1TightPass) : continue
+            #if self.is_data:
+            if not bool(row.singleE25eta2p1TightPass) : continue
             cut_flow_trk.Fill('trigger')
             
             if not selections.eSelection(row, 'e'): continue
@@ -436,6 +486,7 @@ class ETauAnalyzer(MegaBase):
             if not selections.tauSelection(row, 't'): continue
             cut_flow_trk.Fill('tsel')
            
+                            
             if not row.tAgainstElectronTightMVA6: continue
             if not row.tAgainstMuonLoose3 : continue
             if not row.tByVLooseIsolationMVArun2v1DBoldDMwLT : continue
@@ -456,22 +507,19 @@ class ETauAnalyzer(MegaBase):
             if not isEVTight: continue
                         
             weight_map = self.event_weight(row, sys_shifts)
-            if not row.e_t_SS: #Fill embedded sample normalization BEFORE the vetoes
-                self.fill_histos('os', row, weight_map['eVTight'])
+            #print weight_map
+            #if not row.e_t_SS: #Fill embedded sample normalization BEFORE the vetoes
+            #    self.fill_histos('os', row, weight_map[''])
 
             etau_category = ['']                
             if not isTauTight :
-                mc_weight = weight_map['eVTight']
+                mc_weight = weight_map['']
+                tweight=self.fakerate_weights(row.tPt)['tLoose']*mc_weight
+                tLoose_weight = {'tLoose': tweight}
+                weight_map.update(tLoose_weight )
+                sys_directories.extend(['tLoose'])
                 
-                weight_map = self.fakerate_weights(row.tPt)
-                for i in weight_map:
-                    weight_map[i] *= mc_weight
-                
-                etau_category = ['tLoose']
-                
-
-            sys_directories = etau_category
-
+            #print sys_directories
             passes_full_selection = False
             
             sign = 'os'
@@ -489,59 +537,63 @@ class ETauAnalyzer(MegaBase):
             selection_categories = []
             massRanges = ['','LowMass', 'HighMass']
             jetDir = ['le1', '0', '1']
+            
+            self.my_tau.SetPtEtaPhiM(row.tPt,row.tEta,row.tPhi,row.tMass)
+            self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,row.eMass)
+            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
 
             for sys in sys_directories :
                 
                 selection_categories.extend([(sys, '', 'le1', '')])
                 selection_categories.extend([(sys, '', str(jets), '')])
-                selection_categories.extend([
-                    (sys,'','le1',i) for i in optimizer.compute_regions_le1(
-                        row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                ])
-                if jets == 0:
-                    selection_categories.extend([
-                        (sys,'','0',i) for i in optimizer.compute_regions_0jet(
-                            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                    ])
-                if jets == 1:
-                    selection_categories.extend([
-                        (sys,'','1',i) for i in optimizer.compute_regions_1jet(
-                            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                    ])
-                if row.ePt > 60 and row.tPt>30:
+                ##selection_categories.extend([
+                ##    (sys,'','le1',i) for i in optimizer.compute_regions_le1(
+                ##        row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                ##])
+                ##if jets == 0:
+                ##    selection_categories.extend([
+                ##        (sys,'','0',i) for i in optimizer.compute_regions_0jet(
+                ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                ##    ])
+                ##if jets == 1:
+                ##    selection_categories.extend([
+                ##        (sys,'','1',i) for i in optimizer.compute_regions_1jet(
+                ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                ##    ])
+                if self.my_ele.Pt() > 60 and self.my_tau.Pt() >30:
                     selection_categories.extend([(sys,'LowMass', 'le1', '')])
                     selection_categories.extend([(sys,'LowMass',str(jets), '')])
-                    selection_categories.extend([
-                        (sys,'LowMass','le1',i) for i in optimizer.compute_regions_le1(
-                            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                    ])
-                    if jets == 0:
-                        selection_categories.extend([
-                            (sys,'LowMass','0',i) for i in optimizer.compute_regions_0jet(
-                                row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                        ])
-                    if jets == 1:
-                        selection_categories.extend([
-                            (sys,'LowMass','1',i) for i in optimizer.compute_regions_1jet(
-                                row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                        ])
-                    if row.ePt > 100 and row.tPt>45:
+                    ##selection_categories.extend([
+                    ##    (sys,'LowMass','le1',i) for i in optimizer.compute_regions_le1(
+                    ##        row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                    ##])
+                    ##if jets == 0:
+                    ##    selection_categories.extend([
+                    ##        (sys,'LowMass','0',i) for i in optimizer.compute_regions_0jet(
+                    ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                    ##    ])
+                    ##if jets == 1:
+                    ##    selection_categories.extend([
+                    ##        (sys,'LowMass','1',i) for i in optimizer.compute_regions_1jet(
+                    ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                    ##    ])
+                    if self.my_ele.Pt() > 100 and self.my_tau.Pt()>45:
                         selection_categories.extend([(sys, 'HighMass', 'le1','')])
                         selection_categories.extend([(sys, 'HighMass', str(jets),'')])
-                        selection_categories.extend([
-                            (sys,'HighMass','le1',i) for i in optimizer.compute_regions_le1(
-                                row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                        ])
-                        if jets == 0:
-                            selection_categories.extend([
-                                (sys,'HighMass','0', i) for i in optimizer.compute_regions_0jet(
-                                    row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                            ])
-                        if jets == 1:
-                            selection_categories.extend([
-                                (sys,'HighMass','1', i) for i in optimizer.compute_regions_1jet(
-                                    row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
-                            ])
+                        ##selection_categories.extend([
+                        ##    (sys,'HighMass','le1',i) for i in optimizer.compute_regions_le1(
+                        ##        row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                        ##])
+                        ##if jets == 0:
+                        ##    selection_categories.extend([
+                        ##        (sys,'HighMass','0', i) for i in optimizer.compute_regions_0jet(
+                        ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                        ##    ])
+                        ##if jets == 1:
+                        ##    selection_categories.extend([
+                        ##        (sys,'HighMass','1', i) for i in optimizer.compute_regions_1jet(
+                        ##            row.eMtToPfMet_type1, row.e_t_DPhi, row.eDPhiToPfMet_type1, row.tDPhiToPfMet_type1)
+                        ##    ])
                          
                 
 
@@ -549,15 +601,59 @@ class ETauAnalyzer(MegaBase):
             for selection in selection_categories:
                 
                 selection_sys, massRange, jet_dir,  selection_step = selection
-                #print selection_sys, massRange, jet_dir, selection_step
                 dirname =  os.path.join(selection_sys, sign, massRange, jet_dir, selection_step)
-                #print 'dirname', sys, selection, dirname
                 if sign=='os': cut_flow_trk.Fill('sign')
                 if dirname[-1] == '/':
                     dirname = dirname[:-1]
+                weight_to_use = weight_map[selection_sys] if selection_sys in weight_map else weight_map['']
                 
-                weight_to_use = weight_map[sys] if selection_sys in weight_map else weight_map['eVTight']
-                #print sys, weight_map, weight_to_use
+                self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,  0.000511)
+                self.my_tau.SetPtEtaPhiM(row.tPt, row.tEta, row.tPhi, 1.77686)
+                self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
+
+                if 'ees' in selection_sys:
+                    if 'eesUp' in selection_sys:
+                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronScaleUp,row.eEta,row.ePhi, 0.000511)
+                    if 'eesDown' in selection_sys:
+                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronScaleDown,row.eEta,row.ePhi,  0.000511)
+                    if 'eresrhoUp' in selection_sys:
+                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResRhoUp, row.eEta,row.ePhi,  0.000511)
+                    if 'eresrhoDown' in selection_sys:
+                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResRhoDown, row.eEta,row.ePhi,  0.000511)
+                    if 'eresphiDown' in selection_sys:
+                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResPhiDown, row.eEta,row.ePhi,  0.000511)
+
+                        
+                
+                
+                if 'prong' in selection_sys:
+                    if row.tDecayMode == 0 and '_1prong_' in selection_sys:
+                        if 'Up' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
+                        if 'Down' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(0.088*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
+                    elif row.tDecayMode ==1 and '1prong1pizero' in selection_sys:
+                        if 'Up' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
+                        if 'Down' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(0.088*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
+
+                    elif row.tDecayMode ==10 and '_3prong_' in selection_sys:
+                        if 'Up' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
+                        if 'Down' in selection_sys:
+                            self.my_tau.SetPtEtaPhiM(0.088*row.tPt, row.tEta, row.tPhi, 1.77686)
+                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
+                            #print self.my_MET.Pt(), self.my_MET.Phi(), row.type1_pfMetEt, row.tPt,  row.type1_pfMetPhi
+
+
+                #print 'collinear mass', row.e_t_collinearmass, syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), row.ePt, row.tPt, row.eMass, row.tMass
+                #print selection_sys, massRange, jet_dir, selection_step, weight_map, weight_to_use
                 self.fill_histos(dirname, row, weight_to_use)
 
                 

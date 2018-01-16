@@ -7,6 +7,8 @@ from FinalStateAnalysis.PlotTools.decorators import memo, memo_last
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
 
+DEBUG=False
+
 @memo
 def getVar(name, var):
     return name+var
@@ -91,6 +93,7 @@ def make_multiple(fcn, indexed=False, shift=0):
     weight+/-error in this case'''
     def multiple(row,*args):
         ret = 1.
+        if DEBUG:print args
         for arg in args:
             abseta = getattr(
                 row,
@@ -100,6 +103,7 @@ def make_multiple(fcn, indexed=False, shift=0):
             if pt<30: pt =30 #only fakerate checks allow pt < 30. This is an approximation to not re-run the Tag and Probe
             if pt > 1000.: pt=1000.
             fcn_ret = fcn(pt,abseta)
+            if DEBUG:print pt, abseta, fcn_ret
             if indexed:
                 value, err = fcn_ret
                 if shift == 1:
@@ -111,24 +115,26 @@ def make_multiple(fcn, indexed=False, shift=0):
             else:
                 ret   *= fcn_ret
         return ret
+    if DEBUG:print 'multiple', multiple
     return multiple
 
 
 #efficiency_trigger_SF_2016    = make_multiple(HetauCorrection.single_ele_SF_2016, indexed=True)
-efficiency_trigger_2016    = make_multiple(HetauCorrection.single_ele_2016, indexed=True)
+#efficiency_trigger_2016    = make_multiple(HetauCorrection.single_ele_2016, indexed=True)
+efficiency_trigger_2016    = HetauCorrection.single_ele_2016
 
-efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=1)
-efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=-1)
+#efficiency_trigger_2016_up = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=1)
+#efficiency_trigger_2016_dw = make_multiple(HetauCorrection.single_ele_2016, indexed=True, shift=-1)
 
 
-electronID_WP90_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP90')
-electronID_WP80_rereco = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'nontrigWP80')
-electronIso_0p15_2016 =  make_multiple(HetauCorrection.iso0p15_ele_2016, indexed=True)
-electronIso_0p10_2016 =  make_multiple(HetauCorrection.iso0p10_ele_2016, indexed=True)
-erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
-etrk_corrector=EGammaPOGCorrections.make_egamma_pog_tracking_ICHEP2016()
-electronID_Tight = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017('nontrigWP90')
-electronID_Medium = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017('nontrigWP80')
+##electronID_WP90_2016 = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016('nontrigWP90')
+##electronID_WP80_rereco = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'nontrigWP80')
+##electronIso_0p15_2016 =  make_multiple(HetauCorrection.iso0p15_ele_2016, indexed=True)
+##electronIso_0p10_2016 =  make_multiple(HetauCorrection.iso0p10_ele_2016, indexed=True)
+##erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
+##etrk_corrector=EGammaPOGCorrections.make_egamma_pog_tracking_ICHEP2016()
+##electronID_Tight = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017('nontrigWP90')
+##electronID_Medium = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017('nontrigWP80')
 
 eleLeg23_trigger_2016 = EGammaPOGCorrections.eleLeg_trigger("Ele23")
 eleLeg12_trigger_2016 = EGammaPOGCorrections.eleLeg_trigger("Ele12")

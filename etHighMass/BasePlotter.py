@@ -155,7 +155,7 @@ class BasePlotter(Plotter):
         self.mc_samples = [
             'WWTo*', 'ZZ*','WZ*', 'GluGluHToTauTau_M125*', 'ttHJet*', 'ST_*', 'TT_*', 'VBFHToTauTau_M125*', 'WG*',   'WminusHToTauTau_M125*', 'WplusHToTauTau_M125*', 'ZHToTauTau_M125*', #'EWK*',
     #'WJetsToLNu*','W1JetsToLNu*','W2JetsToLNu*','W3JetsToLNu*','W4JetsToLNu*',
-            'DYJetsToLL*','DY1JetsToLL*','DY2JetsToLL*','DY3JetsToLL*','DY4JetsToLL*', 'DY1JetsToLL_M-10to50*', 'DY2JetsToLL_M-10to50*', 'DYJetsToLL_M-10to50*'
+            'DYJetsToLL*','DY1JetsToLL*','DY2JetsToLL*','DY3JetsToLL*','DY4JetsToLL*', 'DY1JetsToLL_M-10to50*', 'DY2JetsToLL_M-10to50*', 'DYJetsToLL_M-10to50*','DYJetsToTT*','DY1JetsToTT*','DY2JetsToTT*','DY3JetsToTT*','DY4JetsToTT*'
         ]
         
         if use_embedded:            
@@ -168,46 +168,64 @@ class BasePlotter(Plotter):
         self.views['fakes'] = {'view' : self.make_fakes('t')}
         self.datacard_names = {
            # '*HTo[WT][WT]'           : 'SMH126'   ,
-            'SMH'                    : 'SMH126',
+            'SMH'                    : 'SMH',
             'TT'                     : 'ttbar'     ,
             'ST'                     : 'singlet'   ,
             'EWKDiboson'             : 'EWKDiboson'   ,
             'DY'                     : 'DY'   ,
+            'DYTT'                   : 'DYTT'   ,
             'ZetauEmbedded'          : 'ztautau'   ,
             'GluGlu_LFV_HToETau_M200*': 'LFV200',
-            'ggM300ETau'             : 'LFV300',
-            'ggM450ETau'             : 'LFV450',
-            'ggM600ETau'             : 'LFV600',
-            'ggM750ETau'             : 'LFV750',
-            'ggM900ETau'             : 'LFV900',
+            'GluGlu_LFV_HToETau_M450*': 'LFV450',
+            'GluGlu_LFV_HToETau_M600*': 'LFV600',
+            'GluGlu_LFV_HToETau_M750*': 'LFV750',
+            'GluGlu_LFV_HToETau_M900*': 'LFV900',
             'fakes'                  : 'fakes',
 
         }
+        self.sample_groups = {#parse_cgs_groups('card_config/cgs.0.conf')
+            'fullsimbkg' : ['SMH', 'ttbar', 'singlet', 'EWKDiboson', 'DYTT', 'DY', 'LFV200', 'LFV450', 'LFV600', 'LFV750', 'LFV900'],# 'WWVBF126', 'WWGG126','VHWW','VHtautau'], #wplusjets added in case of optimization study# 'wplusjets'],
+            'simbkg' : ['SMH', 'ttbar', 'singlet', 'EWKDiboson', 'DYTT', 'DY', 'LFV200',  'LFV450', 'LFV600', 'LFV750', 'LFV900'],# 'WWVBF126', 'WWGG126','VHWW','VHtautau'],
+            'realtau' : ['SMH', 'EWKDiboson', 'DYTT', 'LFV200', 'LFV450', 'LFV600', 'LFV750', 'LFV900'],#'diboson', 'ttbar', 'singlet', 'ztautau', 'SMGG126', 'SMVBF126','LFVGG', 'LFVVBF'],#, 'VHtautau'],
+            'Zll' : ['DY']
+        }
         self.systematics = {
-            ##'PU_Uncertainty' : {
-            ##    'type' : 'yield',
-            ##    '+' : dir_systematic('p1s'),
-            ##    '-' : dir_systematic('m1s'),
-            ##    'apply_to' : ['fullsimbkg'],
-            ##},
-            ##'E_Trig' : {
-            ##    'type' : 'yield',
-            ##    '+' : dir_systematic('trp1s'),
-            ##    '-' : dir_systematic('trm1s'),
-            ##    'apply_to' : ['simbkg'],
-            ##},
+            'PU_Uncertainty' : {
+               'type' : 'shape',
+               '+' : dir_systematic('puUp'),
+               '-' : dir_systematic('puDown'),
+               'apply_to' : ['fullsimbkg'],
+            },
+            'EES' : {
+               'type' : 'shape',
+               '+' : dir_systematic('eesUp'),
+               '-' : dir_systematic('eesDown'),
+               'apply_to' : ['fullsimbkg'],
+            },
             ##'JES' : {
             ##    'type' : 'yield',
             ##    '+' : lambda x: os.path.join('jes_plus', x)+'_jes_plus' ,
             ##    '-' : lambda x: os.path.join('jes_minus', x)+'_jes_minus' ,
             ##    'apply_to' : ['fullsimbkg'],
             ##},
-            ##'TES' : {
-            ##    'type' : 'shape',
-            ##    '+' : lambda x: os.path.join('tes_plus', x)+'_tes_plus' ,
-            ##    '-' : lambda x: os.path.join('tes_minus', x)+'_tes_minus' ,
-            ##    'apply_to' : ['realtau'],
-            ##},
+            'TES1p' : {
+                'type' : 'shape',
+                '+' : dir_systematic('scale_t_1prong_13TeVUp'),
+                '-' : dir_systematic('scale_t_1prong_13TeVDown'),
+                'apply_to' : ['realtau'],
+            },
+            'TES1p10' : {
+                'type' : 'shape',
+                '+' : dir_systematic('scale_t_1prong1pizero_13TeVUp'),
+                '-' : dir_systematic('scale_t_1prong1pizero_13TeVDown'),
+                'apply_to' : ['realtau'],
+            },
+            'TES3p' : {
+                'type' : 'shape',
+                '+' : dir_systematic('scale_t_3prong_13TeVUp'),
+                '-' : dir_systematic('scale_t_3prong_13TeVDown'),
+                'apply_to' : ['realtau'],
+            },
             ##'UES' : { ## to comment in case of optimization study
             ##    'type' : 'yield',
             ##    '+' : name_systematic('_ues_plus'),
@@ -260,8 +278,8 @@ class BasePlotter(Plotter):
         #allmc=SubtractionView(views.SumView(mc_sum_t,mc_sum_e),mc_sum_et, restrict_positive=True)
         #fakes_view = SubtractionView(central_fakes, allmc, restrict_positive=True)
         ##fakes_view =central_fakes
-        #fakes_view = SubtractionView(tfakes, mc_sum_t, restrict_positive=True)
-        fakes_view = tfakes
+        fakes_view = SubtractionView(tfakes, mc_sum_t, restrict_positive=True)
+        #fakes_view = tfakes
         style = data_styles['fakes']
         return views.TitleView(
             views.StyleView(
@@ -827,7 +845,12 @@ class BasePlotter(Plotter):
         if DEBUG: print  'draw mc', datetime.datetime.now()
         #Get signal
         signals = [
-            'GluGlu_LFV_HToETau_M200*', 'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
+            'GluGlu_LFV_HToETau_M200*',
+            'GluGlu_LFV_HToETau_M450*',
+            'GluGlu_LFV_HToETau_M600*',
+            'GluGlu_LFV_HToETau_M750*',
+            'GluGlu_LFV_HToETau_M900*'
+ #'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
         ]
         sig = []
         for name in signals:
@@ -1092,8 +1115,11 @@ class BasePlotter(Plotter):
 
         #Get signal
         signals = [
-            'GluGlu_LFV_HToETau_M200*', 'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
-
+            'GluGlu_LFV_HToETau_M200*',
+            'GluGlu_LFV_HToETau_M450*',
+            'GluGlu_LFV_HToETau_M600*',
+            'GluGlu_LFV_HToETau_M750*',
+            'GluGlu_LFV_HToETau_M900*'#'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
         ]
         for name in signals:
             sig_view = self.get_view(name)
@@ -1314,6 +1340,8 @@ class BasePlotter(Plotter):
                 )
 
         return unc_conf_lines, unc_vals_lines
+
+    
 ##        output_dir.cd()
 ##        path = os.path.join(folder,variable)
 ##
@@ -1478,87 +1506,122 @@ class BasePlotter(Plotter):
     
  
   
-    def write_shapes_for_optimization(self, folder, variable, output_dir, br_strenght=1,
-                                rebin=1, preprocess=None): #, systematics):
+    def write_shapes_with_syst(self, folder, variable, output_dir, br_strenght=1,
+                                rebin=1, last=None, preprocess=None): #, systematics):
         '''Makes shapes for computing the limit and returns a list of systematic effects to be added to unc.vals/conf 
         make_shapes(folder, variable, output_dir, [rebin=1, preprocess=None) --> unc_conf_lines (list), unc_vals_lines (list)
         '''
         output_dir.cd()
         path = os.path.join(folder,variable)
 
+        # Draw data
+        data_view = self.get_view('data')
+        if preprocess:
+            data_view = preprocess( data_view )
+        data_view = self.rebin_view(data_view, rebin)
+
+        data = data_view.Get(path)
+       
+        if last : data=change_histo_nbins(data, 0, last)
+        first_filled, last_filled = find_fill_range(data)
+        data.SetName('data_obs')
+        data.Write()
+        mc_views_nosys = self.mc_views(rebin, preprocess)
+        
+        mc_subt_view=[]
+        ##for view in mc_views_nosys:
+        ##    new = SubtractionView(view,
+        ##                          views.SubdirectoryView(view, 'tLoose'),
+        ##                          restrict_positive=True)
+        ##    
+        ##    mc_subt_view.append(new)
+        
+        print self.mc_samples, self.datacard_names
         #make MC views with xsec error
         bkg_views  = dict(
-            [(self.datacard_names[i], j) for i, j in zip(self.mc_samples, self.mc_views(rebin, preprocess))]
+            [(self.datacard_names[i], j) for i, j in zip(self.mc_samples,  mc_views_nosys)]
         )
-        bkg_weights = dict(
-            [(self.datacard_names[i], self.get_view(i, 'weight')) for i in self.mc_samples]
-        )
-        #cache histograms, since getting them is time consuming
         bkg_histos = {}
         for name, view in bkg_views.iteritems():
+            if DEBUG : print name, path
             mc_histo = view.Get(path)
+            if DEBUG : print name, path
+            if last : mc_histo = change_histo_nbins(mc_histo, 0, last)
+            if DEBUG : print name, path
+            first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
+            if DEBUG : print name, path
             bkg_histos[name] = mc_histo.Clone()
-            #mc_histo = remove_empty_bins(
-            #    mc_histo, bkg_weights[name])
             mc_histo.SetName(name)
+            if DEBUG : print name, mc_histo.GetName()
             mc_histo.Write()
 
         if self.use_embedded:            
             view = self.get_view('ZetauEmbedded')
-            weight = self.get_view('ZetauEmbedded', 'weight')
             if preprocess:
                 view = preprocess(view)
             view = self.rebin_view(view, rebin)
             name = self.datacard_names['ZetauEmbedded']
-            bkg_weights[name] = weight
             bkg_views[name] = view
             mc_histo = view.Get(path)
+            if last : mc_histo = change_histo_nbins(mc_histo, 0, last)
+            first_filled_bkg, last_filled_bkg= find_fill_range(mc_histo)
             bkg_histos[name] = mc_histo.Clone()
-            #mc_histo = remove_empty_bins(
-            #    mc_histo, weight)
+            ##mc_histo = remove_empty_bins(
+            ##    mc_histo, weight,
+            ##    first_filled_bkg, last_filled_bkg)
             mc_histo.SetName(name)
             mc_histo.Write()
           
- ##       fakes_view = self.get_view('fakes')#to comment for optimization study
-        d_view = self.get_view('data')
-        weights_view = views.SumView(
-            views.SubdirectoryView(d_view, 'tLoose'),
-            views.SubdirectoryView(d_view, 'eLoose'),
-            views.SubdirectoryView(d_view, 'etLoose')
-            )
-        if preprocess:
-            fakes_view = preprocess(fakes_view)
-            weights_view = preprocess(weights_view)
-##        weights = weights_view.Get(os.path.join(folder,'weight')) #to comment for optimization study
-##        fakes_view = self.rebin_view(fakes_view, rebin)
-##        bkg_views['fakes'] = fakes_view
-##        bkg_weights['fakes'] = mean(weights)
-##        fake_shape = bkg_views['fakes'].Get(path)
-##        bkg_histos['fakes'] = fake_shape.Clone()
-##        #fake_shape = remove_empty_bins(
-##        #    fake_shape, bkg_weights['fakes'])
-##        fake_shape.SetName('fakes')
-##        fake_shape.Write()
 
+        #Get signal
+        signals = [
+            'GluGlu_LFV_HToETau_M200*',
+            'GluGlu_LFV_HToETau_M450*',
+            'GluGlu_LFV_HToETau_M600*',
+            'GluGlu_LFV_HToETau_M750*',
+            'GluGlu_LFV_HToETau_M900*'#'ggM300ETau', 'ggM450ETau', 'ggM600ETau', 'ggM750ETau', 'ggM900ETau'
+        ]
+        for name in signals:
+            sig_view = self.get_view(name)
+            card_name = self.datacard_names[name]
+            if preprocess:
+                sig_view = preprocess(sig_view)
+            sig_view = views.ScaleView(
+                RebinView(sig_view, rebin),
+                br_strenght
+                )
+            ##weights = self.get_view(name, 'weight')
+            bkg_views[card_name] = sig_view
+            ##bkg_weights[card_name] = weights
+            histogram = sig_view.Get(path)
+            if last : histogram = change_histo_nbins(histogram, 0, last)
+            bkg_histos[card_name] = histogram.Clone()
+            first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos[card_name])
+            ##histogram = remove_empty_bins(
+            ##    histogram, bkg_weights[card_name],
+            ##    first_filled_bkg, last_filled_bkg)
+            histogram.SetName(card_name)
+            histogram.Write()
+            if DEBUG : print name, histogram.GetName()
+
+  
         unc_conf_lines = []
         unc_vals_lines = []
         category_name  = output_dir.GetName()
         for unc_name, info in self.systematics.iteritems():
             targets = []
+            print info['apply_to']
             for target in info['apply_to']:
                 if target in self.sample_groups:
                     targets.extend(self.sample_groups[target])
                 else:
                     targets.append(target)
 
-            unc_conf = 'lnN' if info['type'] == 'yield' or info['type'] == 'stat' else 'shape'            
-            #stat shapes are uncorrelated between samples
-            if info['type'] <> 'stat':
-                unc_conf_lines.append('%s %s' % (unc_name, unc_conf))
             shift = 0.
             path_up = info['+'](path)
             path_dw = info['-'](path)
             for target in targets:
+                print target
                 up      = bkg_views[target].Get(
                     path_up
                 )
@@ -1597,46 +1660,40 @@ class BasePlotter(Plotter):
                         unc_value = 0.
                     else:
                         unc_value = 1. + (yield_err / yield_val)
-                    stat_unc_name = '%s_%s_%s' % (target, category_name, unc_name)
-                    unc_conf_lines.append('%s %s' % (stat_unc_name, unc_conf))
-                    unc_vals_lines.append(
-                        '%s %s %s %.2f' % (category_name, target, stat_unc_name, unc_value)
-                    )
+                    #stat_unc_name = '%s_%s_%s' % (target, category_name, unc_name)
+                    #unc_conf_lines.append('%s %s' % (stat_unc_name, unc_conf))
+                    #unc_vals_lines.append(
+                    #    '%s %s %s %.2f' % (category_name, target, stat_unc_name, unc_value)
+                    #)
                 else:
                     raise ValueError('systematic uncertainty type:"%s" not recognised!' % info['type'])
 
-            if info['type'] <> 'stat':
-                shift += 1
-                unc_vals_lines.append(
-                    '%s %s %s %.2f' % (category_name, ','.join(targets), unc_name, shift)
-                )
-
-        #Get signal
-        signals = [
-            'ggHiggsToETau',
-            'vbfHiggsToETau',
-        ]
-        for name in signals:
-            sig_view = self.get_view(name)
-            if preprocess:
-                sig_view = preprocess(sig_view)
-            sig_view = views.ScaleView(
-                RebinView(sig_view, rebin),
-                br_strenght
-                )
-            
-            histogram = sig_view.Get(path)
-            histogram.SetName(self.datacard_names[name])
-            histogram.Write()
-
-        # Draw data
-        data_view = self.get_view('data')
+        fakes_view = self.get_view('fakes') 
+        d_view = self.get_view('data')
+        ##weights_view = views.SumView(
+        ##    views.SubdirectoryView(d_view, 'tLoose'),
+        ##    #views.SubdirectoryView(d_view, 'eLoose'),
+        ##    #views.SubdirectoryView(d_view, 'etLoose')
+        ##    )
         if preprocess:
-            data_view = preprocess( data_view )
-        data_view = self.rebin_view(data_view, rebin)
-        data = data_view.Get(path)
-        data.SetName('data_obs')
-        data.Write()
+            fakes_view = preprocess(fakes_view)    
+            ##weights_view = preprocess(weights_view)
+        ##weights = weights_view.Get(os.path.join(folder,'weight'))
+        #print folder
+        fakes_view = self.rebin_view(fakes_view, rebin)
+        bkg_views['fakes'] = fakes_view
+        ##bkg_weights['fakes'] = mean(weights)
+        fake_shape = bkg_views['fakes'].Get(path)
+        if last : fake_shape = change_histo_nbins(fake_shape, 0, last)
+        bkg_histos['fakes'] = fake_shape.Clone()
+        if last : bkg_histos['fakes'] =change_histo_nbins(bkg_histos['fakes'] , 0, last)
+        first_filled_bkg, last_filled_bkg = find_fill_range(bkg_histos['fakes'])
+        ##fake_shape = remove_empty_bins(
+        ##    fake_shape, bkg_weights['fakes'],
+        ##    first_filled_bkg, last_filled_bkg)
+        fake_shape.SetName('fakes')
+        fake_shape.Write()
+        if DEBUG : print 'fakes', fake_shape.GetName()
 
         return unc_conf_lines, unc_vals_lines
     

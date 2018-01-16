@@ -47,8 +47,9 @@ sqrts = 13
 
 mc_samples = [
     'WWTo*', 'ZZ*','WZ*', 'GluGluHToTauTau_M125*', 'ttHJet*', 'ST_*', 'TT_*', 'VBFHToTauTau_M125*', 'WG*',   'WminusHToTauTau_M125*', 'WplusHToTauTau_M125*', 'ZHToTauTau_M125*',
-    'DYJetsToLL_M-50*','DY1JetsToLL_M-50*','DY2JetsToLL_M-50*','DY3JetsToLL_M-50*','DY4JetsToLL_M-50*', 'DY1JetsToLL_M-10to50*', 'DY2JetsToLL_M-10to50*', 'DYJetsToLL_M-10to50*'
-]
+    'DYJetsToLL_M-50*','DY1JetsToLL_M-50*','DY2JetsToLL_M-50*','DY3JetsToLL_M-50*','DY4JetsToLL_M-50*', 'DY1JetsToLL_M-10to50*', 'DY2JetsToLL_M-10to50*', 'DYJetsToLL_M-10to50*', 'DYJetsToTT**', 'DY1JetsToTT*', 'DY2JetsToTT*', 'DY3JetsToTT*', 'DY4JetsToTT*']
+
+
 for x in mc_samples:
     files.extend(glob.glob('results/%s/ETauAnalyzer/%s.root' % (jobid, x)))
     lumifiles.extend(glob.glob('inputs/%s/%s.lumicalc.sum' % (jobid, x)))
@@ -87,7 +88,10 @@ SMH = views.StyleView(views.SumView(
           filter(lambda x : x.startswith('VBFHToTauTau_M125') or x.startswith('GluGluHToTauTau_M125') or x.startswith('WminusHToTauTau_M12') or x.startswith('WplusHToTauTau_M125') or  x.startswith('ZHToTauTau_M125') or  x.startswith('VBFHToWW')  or  x.startswith('GluGluHToWW')  or x.startswith('ttH*'), mc_samples )]), **remove_name_entry(data_styles['GluGluHToTauTau_M125*']))
 DY   = views.StyleView(views.SumView( 
         *[ plotter.get_view(regex) for regex in \
-          filter(lambda x : x.startswith('DY') , mc_samples )]), **remove_name_entry(data_styles['DY*']))
+          filter(lambda x : x.startswith('DY') and 'JetsToLL' in x , mc_samples )]), **remove_name_entry(data_styles['DY*']))
+DYTT   = views.StyleView(views.SumView( 
+        *[ plotter.get_view(regex) for regex in \
+          filter(lambda x : x.startswith('DY') and   'JetsToTT' in x , mc_samples )]), **remove_name_entry(data_styles['DYTT*']))
 Wjets = views.StyleView(views.SumView( 
         *[ plotter.get_view(regex) for regex in \
           filter(lambda x : 'JetsToLNu' in x , mc_samples )]), **remove_name_entry(data_styles['W*JetsToLNu*']))
@@ -95,11 +99,12 @@ Wjets = views.StyleView(views.SumView(
 plotter.views['EWKDiboson']={'view' : EWKDiboson }
 plotter.views['Wjets']={'view' : Wjets }
 plotter.views['DY']={'view' : DY }
+plotter.views['DYTT']={'view' : DYTT }
 plotter.views['SMH']={'view' : SMH }
 plotter.views['TT']={'view' : TT }
 plotter.views['ST']={'view' : ST }
 
-new_mc_samples = ['EWKDiboson', 'TT', 'ST', 'SMH', 'DY'#,'EWK'
+new_mc_samples = ['EWKDiboson', 'TT', 'ST', 'SMH', 'DY', 'DYTT'#,'EWK'
 ]
 
 col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,1000,50)))
@@ -108,6 +113,7 @@ plotter.mc_samples = new_mc_samples
 
 sign=['os']
 jets = ['le1', '0', '1']
+
 
 massRanges = [item for i in range(0, len(args.massDirs)) for item in args.massDirs[i].split(' ')]
 for mass in massRanges:
@@ -125,7 +131,7 @@ for mass in massRanges:
         output_path = plotter.base_out_dir
         tfile = ROOT.TFile(pjoin(output_path, 'shapes_%s.%s.root' %(mass,njets)), 'recreate')
         output_dir = tfile.mkdir(cat_name)
-        unc_conf_lines, unc_vals_lines = plotter.write_shapes( 
+        unc_conf_lines, unc_vals_lines = plotter.write_shapes_with_syst( 
             'os/'+mass+'/%s' % (njets), 'h_collmass_pfmet', output_dir, rebin=rebin,
             br_strenght=1)
         logging.warning('shape file %s created' % tfile.GetName()) 
@@ -141,3 +147,4 @@ for mass in massRanges:
                     br_strenght=1)
                 logging.warning('shape file %s created' % tfile.GetName()) 
                 tfile.Close()
+        
