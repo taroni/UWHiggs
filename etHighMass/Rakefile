@@ -32,12 +32,14 @@ samples = Hash[
                "ttbar" => get_sample_names('TT'),
                "singlet" => get_sample_names('T_t')+get_sample_names('Tbar_t'), 
                "wjets" => get_sample_names('JetsToLNu'),
-               "zjets" => get_sample_names('JetsToLL_M'),
-               "diboson" =>get_sample_names('WWTo')+get_sample_names('WZTo')+get_sample_names('ZZTo')+get_sample_names('WG'),
+               "zjets" => get_sample_names('JetsToLL_M')+ get_sample_names('JetsToTT_M'),               
+               "diboson" =>get_sample_names('WW')+get_sample_names('WZ')+get_sample_names('ZZ')+get_sample_names('WG'),
+               "dibosonIncl" =>get_sample_names('WW_')+get_sample_names('WZ_')+get_sample_names('ZZ_'),
                "triboson" => get_sample_names('WWW')+get_sample_names('ZZZ')+get_sample_names('WWZ')+get_sample_names('WZZ'),
                "ewk" => get_sample_names('EWK'),
                "signalMC" => get_sample_names('HToETau_M125'),
-               "signalHighMass" => get_sample_names('ggM200ETau')+get_sample_names('ggM300ETau')+get_sample_names('ggM450ETau')+get_sample_names('ggM600ETau')+get_sample_names('ggM750ETau')+get_sample_names('ggM900ETau')+get_sample_names('GluGlu_LFV_HToETau_M200'),
+               "signalHighMass" => get_sample_names('GluGlu_LFV_HToETau_M'),
+               #"signalHighMass" => get_sample_names('ggM200ETau')+get_sample_names('ggM300ETau')+get_sample_names('ggM450ETau')+get_sample_names('ggM600ETau')+get_sample_names('ggM750ETau')+get_sample_names('ggM900ETau')+get_sample_names('GluGlu_LFV_HToETau_M200'),
                "HiggsTo2Taus" => get_sample_names('HToTauTau_M125_'),
                "dataSingleE" => get_sample_names('data_SingleElectron'),
                "dataSingleM" => get_sample_names('data_SingleMuon'),
@@ -67,14 +69,59 @@ end
 ################################################################################
 
 task :recoplots => get_analyzer_results("ETauAnalyzer.py",
-                                        samples['dataSingleE']+
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+
                                         samples['ttbar']+samples['singlet']+
                                         samples['wjets']+
                                         samples['zjets']+
                                         samples['diboson']+samples['triboson']+
-                                        samples['ewk']+
+                                        samples['ewk']+                                        
+                                        samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
+                                       )
+task :recoplotsEfake => get_analyzer_results("ETauAnalyzerEleFake.py",
                                         samples['signalHighMass']+
-                                        samples['signalMC']+samples['HiggsTo2Taus']
+                                        samples['signalMC']+
+                                        samples['ttbar']+samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['ewk']+                                        
+                                        samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
+                                       )
+task :recoWCR => get_analyzer_results("ETauAnalyzerWCR.py",
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+
+                                        samples['ttbar']+samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['ewk']+                                        
+                                        samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
+                                       )
+task :recopzeta => get_analyzer_results("ETauAnalyzerpZeta.py",
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+
+                                        samples['ttbar']+samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['ewk']+                                        
+                                        samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
+                                       )
+task :recoMVATree => get_analyzer_results("ETauMVATreeProducer.py",
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+
+                                        samples['ttbar']+samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['ewk']+                                        
+                                        samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
                                        )
 task :recoplotsEMu => get_analyzer_results("EMuAnalyzer.py", samples['dataMuonEG']+
                                                                      samples['ttbar']+samples['singlet']+
@@ -83,7 +130,28 @@ task :recoplotsEMu => get_analyzer_results("EMuAnalyzer.py", samples['dataMuonEG
                                                                      samples['ewk']+
                                                                      samples['signalHighMass']+
                                                                      samples['signalMC']+samples['HiggsTo2Taus']
-                                       )
+                                          )
+
+task :fakee => get_analyzer_results("EEEAnalyzer.py", #samples['signalHighMass']+
+                                        #samples['signalMC']+
+                                        samples['ttbar']+#samples['singlet']+
+                                        #samples['wjets']+
+                                        samples['zjets']+
+                                        samples['dibosonIncl']+#samples['triboson']+
+                                        #samples['ewk']+                                        
+                                        #samples['HiggsTo2Taus']+
+                                        samples['dataSingleE']
+                                   )
+task :fakemme => get_analyzer_results("MMEAnalyzer.py", #samples['signalHighMass']+
+                                        #samples['signalMC']+
+                                        samples['ttbar']+#samples['singlet']+
+                                        #samples['wjets']+
+                                        samples['zjets']+
+                                        samples['dibosonIncl']+#samples['triboson']+
+                                        #samples['ewk']+                                        
+                                        #samples['HiggsTo2Taus']+
+                                        samples['dataSingleM']
+                                   )
 
 
 $etdir = "plots/#{$jobid}/ETauAnalyzer/et/"
@@ -96,3 +164,117 @@ end
 
 
 task :drawTauFakeRate => get_plotter_results("plotTauFakeRate.py")
+
+$efrfit_dir = "results/#{$jobid}/efakerate_fits"
+directory $efrfit_dir
+pol0 = "const"
+pol0_vars = "const[ 0.5, 0, 1]"
+$fr_binning = "0,30,40,50,60,70,80,100,120,150,200,1000"
+$efr_analyzer = "EEEAnalyzer"
+efr_fits      = Hash.new
+efr_fits["e_os_eLoose_eTight_e3Pt"] = Hash[ 
+  "samples" => Array["dibosonIncl",  "dataSingleE"],
+  "analyzer" => $efr_analyzer,
+  "function" => pol0, 
+  "variables"=>pol0_vars, 
+  "rebin" => "30,50,70,100,150,200,1000",#$fr_binning,
+  "range" => "30 1000",
+  "title" => "e p_{T} (GeV)",
+  "min"=>"0",
+  "max"=>"1.2"
+]
+task :efits => []
+
+efr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    subsample_inputs += samples[sample]
+  end
+  fit_output = $efrfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+  #file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+  file corrected_file do |t|
+    sh "mkdir -p #{$efrfit_dir}"
+    sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+    sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
+    puts ""
+  end
+  
+    
+  task :efits => fit_output
+  
+end
+
+$mmefrfit_dir = "results/#{$jobid}/mmefakerate_fits"
+directory $mmefrfit_dir
+pol0 = "const"
+pol0_vars = "const[ 0.5, 0, 1]"
+$mmefr_binning = "0,30,40,50,60,70,80,100,120,150,200,1000"
+$mmefr_analyzer = "MMEAnalyzer"
+mmefr_fits      = Hash.new
+mmefr_fits["e_os_eLoose_eTight_ePt"] = Hash[ 
+  "samples" => Array["dibosonIncl",  "dataSingleM"],
+  "analyzer" => $mmefr_analyzer,
+  "function" => pol0, 
+  "variables"=>pol0_vars, 
+  "rebin" => "30,50,70,100,150,200,1000",#$mmefr_binning,
+  "range" => "30 1000",
+  "title" => "e p_{T} (GeV)",
+  "min"=>"0",
+  "max"=>"1.2"
+]
+task :mmefits => []
+
+mmefr_fits.each do |fit, fit_info|
+  fit_configuration = fit.split("_")
+  sign = fit_configuration[1]
+  denom = fit_configuration[2]
+  num = fit_configuration[3]
+  var = fit_configuration[4]
+    
+  subsample_inputs = []
+  fit_info['samples'].each do |sample|
+    subsample_inputs += samples[sample]
+  end
+  fit_output = $mmefrfit_dir + "/#{fit}.root"
+  subsamples_inputs_result_list = subsample_inputs.map{|x|  "results/#{$jobid}/#{fit_info['analyzer']}/#{x}.root"}
+  subsample_input_list = subsamples_inputs_result_list.join(" ")
+  
+  # Path to histograms in root files
+  denom_path = Array[sign, denom,var].join("/")
+  num_path = Array[sign, num, var].join("/")
+  
+  corrected_file = fit_output.sub('.root', '.corrected_inputs.root')
+  #file corrected_file => subsamples_inputs_result_list + [fit_info['analyzer'] + '.py', "CorrectFakeRateData.py"] do |t|
+  file corrected_file do |t|
+    sh "mkdir -p #{$efrfit_dir}"
+    sh "python CorrectFakeRateData.py --files #{subsample_input_list} --lumifiles inputs/#{$jobid}/*sum --outputfile #{t.name} --numerator '#{num_path}' --denom '#{denom_path}' --rebin #{fit_info['rebin']}"
+      puts ""
+  end
+  
+  file fit_output => corrected_file do |t|
+    sh "fit_efficiency_chi2.py  #{fit_output} numerator denominator \'#{fit_info['function']}\' \'#{fit_info['variables']}\' #{corrected_file} --plot --xrange #{fit_info['range']} --xtitle \'#{fit_info['title']}\' --min \'#{fit_info['min']}\' --max \'#{fit_info['max']}\' --show-error "
+    puts ""
+  end
+  
+    
+  task :mmefits => fit_output
+  
+end

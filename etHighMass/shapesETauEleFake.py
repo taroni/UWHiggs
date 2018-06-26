@@ -1,3 +1,4 @@
+
 import rootpy.plotting.views as views
 from FinalStateAnalysis.PlotTools.BlindView      import BlindView
 from FinalStateAnalysis.PlotTools.PoissonView    import PoissonView
@@ -19,7 +20,7 @@ import pdb
 import array
 from fnmatch import fnmatch
 from yellowhiggs import xs, br, xsbr
-from BasePlotter import BasePlotter
+from BasePlotterEleFake import BasePlotter
 import optimizer
 from argparse import ArgumentParser
 
@@ -52,16 +53,16 @@ mc_samples = [
 
 
 for x in mc_samples:
-    files.extend(glob.glob('results/%s/ETauAnalyzer/%s.root' % (jobid, x)))
+    files.extend(glob.glob('results/%s/ETauAnalyzerEleFake/%s.root' % (jobid, x)))
     lumifiles.extend(glob.glob('inputs/%s/%s.lumicalc.sum' % (jobid, x)))
     
-outputdir = 'plots/%s/ETauAnalyzer/%s/' % (jobid, channel)
+outputdir = 'plots/%s/ETauAnalyzerEleFake/%s/' % (jobid, channel)
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
 blind   = 'blind' not in os.environ or os.environ['blind'] == True or os.environ['blind']== 'YES'
 print 'blind?', blind
-blind_region = [-1000, 1500] if bool(blind) else None
+blind_region = [-1000, 1000] if bool(blind) else None
 print blind_region
 plotter = BasePlotter(blind_region, -1, False)  #(blind_region, forcelumi, use_embedded)
 plotter.files=files
@@ -108,11 +109,9 @@ plotter.views['ST']={'view' : ST }
 new_mc_samples = ['EWKDiboson', 'TT', 'ST', 'SMH', 'DY', 'DYTT'#,'EWK'
 ]
 
-#as for H->etaumu
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
 #col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,1000,50)))
-#col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,600,50)+range(600,700,100)+range(700,1400,350)))
-#col_vis_mass_binning=array.array('d',(range(0,200,20)+range(200,600,50)+range(600,1000,100)+range(1000,1750,250)))
+col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,600,50)+range(600,700,100)+range(700,1300,300)))
+
 plotter.mc_samples = new_mc_samples
 
 sign=['os']
@@ -139,7 +138,8 @@ for mass in massRanges:
     for njets in jets:
         cat_name = jets_names[njets][0]
         rebin = jets_names[njets][1]
-        output_path = plotter.base_out_dir        
+        #output_path = plotter.base_out_dir
+        output_path=outputdir
         #for njets, cat_name, rebin in jets_names:
         if not args.optimization:
 

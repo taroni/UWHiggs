@@ -147,7 +147,7 @@ class BasePlotter(Plotter):
         self.forceLumi=forceLumi
         print "\nPlotting e tau for %s\n" % jobid
 
-        self.files     = glob.glob('results/%s/ETauAnalyzer/*.root' % jobid)
+        self.files     = glob.glob('results/%s/ETauAnalyzerEleFake/*.root' % jobid)
         self.lumifiles = glob.glob('inputs/%s/*.lumicalc.sum' % jobid)
 
         self.outputdir = 'plots/%s/ETauAnalyzer' % jobid
@@ -434,18 +434,6 @@ class BasePlotter(Plotter):
                 '-' : dir_systematic('etfakeESDown'),
                 'apply_to' : ['Zll'],
             },
-            'shape_FAKES' : { ## to comment in case of optimization study
-                'type' : 'shape',
-                '+' : dir_systematic('Up'),
-                '-' : dir_systematic('Down'),
-                'apply_to' : ['fakes']#,'efakes','etfakes'],
-            },
-            'highPtTau' : { 
-                'type' : 'shape',
-                '+' : dir_systematic('highPtTauUp'),
-                '-' : dir_systematic('highPtTauDown'),
-                'apply_to' : ['realtau'],
-            },
         
 
         }
@@ -456,15 +444,20 @@ class BasePlotter(Plotter):
         print 'making fakes for %s' %obj
         data_view = self.get_view('data')
         tfakes = views.SubdirectoryView(data_view, 'tLoose')
-        #efakes = views.SubdirectoryView(data_view, 'eLoose')
-        #etfakes= views.SubdirectoryView(data_view, 'etLoose')
-        #central_fakes=SubtractionView(views.SumView(tfakes,efakes),etfakes, restrict_positive=True)
+        efakes = views.SubdirectoryView(data_view, 'eLoose')
+        etfakes= views.SubdirectoryView(data_view, 'etLoose')
+        central_fakes=SubtractionView(views.SumView(tfakes,efakes),etfakes, restrict_positive=True)
+        #central_fakes=views.SumView(SubtractionView(tfakes,efakes, restrict_positive=True),etfakes)
         mc_views = self.mc_views()
         if self.use_embedded:            
             mc_views.append(self.get_view('ZetauEmbedded'))
         mc_sum = views.SumView(*mc_views)
         mc_sum_t = views.SubdirectoryView(mc_sum, 'tLoose')
-        fakes_view = SubtractionView(tfakes, mc_sum_t, restrict_positive=True)
+        mc_sum_e = views.SubdirectoryView(mc_sum, 'eLoose')
+        mc_sum_et = views.SubdirectoryView(mc_sum, 'etLoose')
+        allmc=SubtractionView(views.SumView(mc_sum_t,mc_sum_e),mc_sum_et, restrict_positive=True)
+        #allmc=views.SumView(SubtractionView(mc_sum_t,mc_sum_e, restrict_positive=True),mc_sum_et)
+        fakes_view = SubtractionView(central_fakes, allmc, restrict_positive=True)
         style = data_styles['fakes']
         return views.TitleView(
             views.StyleView(
@@ -658,16 +651,13 @@ class BasePlotter(Plotter):
         self.canvas.SetCanvasSize( self.canvas.GetWw(), int(self.canvas.GetWh()*1.3) )
         self.canvas.cd()
         self.pad.SetPad(0, 0.33, 1., 1.)
-        self.pad.SetName('HigherPad')
         self.pad.Draw()
         self.canvas.cd()
         #create lower pad
         self.lower_pad = plotting.Pad(0, 0., 1., 0.33)
-        self.lower_pad.SetName('LowerPad')
         self.lower_pad.Draw()
         self.lower_pad.cd()
 
-        data_hist.Sumw2()
         
         mc_hist    = None
         if isinstance(mc_stack, plotting.HistStack):
@@ -675,18 +665,9 @@ class BasePlotter(Plotter):
         else:
             mc_hist = mc_stack
         data_clone = data_hist.Clone()
-        data_clone.SetName("dataratio")
-        data_clone.Sumw2()
-        mc_hist.Sumw2()
         data_clone.Divide(mc_hist)
-        data_clone.SetLineColor(1)
-        data_clone.SetMarkerStyle(20)
-        for ibin in range(0,data_clone.GetXaxis().GetNbins()+1):
-            if mc_hist.GetBinContent(ibin)<> 0:
-                print ibin, data_hist.GetBinError(ibin), data_hist.GetBinContent(ibin)
-                data_clone.SetBinError(ibin,data_hist.GetBinError(ibin)/mc_hist.GetBinContent(ibin))
+        
         band = err_hist.Clone()
-        band.SetName("bandplot")
         
         err = []
         ibin =1 
@@ -694,12 +675,10 @@ class BasePlotter(Plotter):
             if mc_hist.GetBinContent(ibin) <> 0 : 
                 err.append((ibin, band.GetBinError(ibin)/band.GetBinContent(ibin)))
             ibin+=1
-        band.Sumw2()
+
         band.Divide(mc_hist.Clone())
-        band.SetFillStyle(0)
         #print err
         for ibin in err:
-            #print ibin[0], ibin[1]
             band.SetBinError(ibin[0], ibin[1])
 
         if not x_range:
@@ -715,17 +694,16 @@ class BasePlotter(Plotter):
         ref_function.SetLineStyle(2)
         
         data_clone.Draw()
-        
+ 
         if ratio_range:
             data_clone.GetYaxis().SetRangeUser(1-ratio_range, 1+ratio_range)
-
         ref_function.Draw('same')
         band.SetMarkerStyle(0)
         band.SetLineColor(1)
         band.SetFillStyle('3002')
         band.SetFillColor(1)
 
-        band.Draw('psamee2')
+        band.Draw('samee2')
        
         self.keep.append(data_clone)
         self.keep.append(band)
@@ -898,9 +876,7 @@ class BasePlotter(Plotter):
             fakes_view = preprocess(fakes_view)
         fakes_view = RebinView(fakes_view, rebin)
         fakes = fakes_view.Get(path)
-        fakes.SetName("fakes")
-        
-        fakes = SystematicsView.add_error(fakes, 0.30) 
+        fakes = SystematicsView.add_error(fakes, 0.20) 
 
         #add them to backgrounds
         #set_trace()
@@ -919,7 +895,6 @@ class BasePlotter(Plotter):
 
         mc_stack_view =views.StackView(*mc_views, sorted=sort) 
         mc_stack = mc_stack_view.Get(path)
-        mc_stack.SetName("mc_stack")
         mc_sum_view = views.SumView(*mc_views_nosys )
         mc_err = mc_sum_view.Get( path )
         mc_err.Sumw2()
@@ -954,7 +929,6 @@ class BasePlotter(Plotter):
         mc_err.SetFillStyle('x')
         mc_err.SetFillColor(1)
         mc_err.Draw('pe2 same')
-        mc_err.SetName('error')
         ##self.keep.append(mc_err)
         if DEBUG: print  'draw mc', datetime.datetime.now()
         #Get signal
@@ -977,7 +951,6 @@ class BasePlotter(Plotter):
             #    sig_view = views.ScaleView(sig_view, 100)
             
             histogram = sig_view.Get(path)
-            histogram.SetName(name.replace('*', ''))
             histogram.Draw('same')
             #print name, histogram.Integral()
             ##self.keep.append(histogram)
@@ -997,7 +970,6 @@ class BasePlotter(Plotter):
                 data_view = preprocess( data_view )
             data_view = self.rebin_view(data_view, rebin)
             data = data_view.Get(path)
-            data.SetName("data")
 
             if self.blind_region and not path.startswith('ss'):
                 for bin in range(data.GetNbinsX()+1):
@@ -1008,7 +980,7 @@ class BasePlotter(Plotter):
                         sig_count=histo.GetBinContent(bin)
                         if sig_count<=0: continue
                         #print path, bin,  histo.GetXaxis().GetBinCenter(bin), bg_count, sig_count, float(sig_count)/float(sig_count+bg_count)
-                        if bool(bg_count<0.1 and sig_count>0) or ((float(sig_count)/float(sig_count+bg_count))>0.01):
+                        if bool(bg_count==0 and sig_count>0) or ((float(sig_count)/float(sig_count+bg_count))>0.01):
                             data.SetBinContent(bin,0.)
                             data.SetBinError(bin,0.)
 
@@ -1031,8 +1003,8 @@ class BasePlotter(Plotter):
         else:
             self.add_legend([sig[0], sig[1],sig[2], sig[3],sig[4], sig[5], mc_stack], leftside, entries=len(mc_stack.GetHists())+6)
         if show_ratio and plot_data:
-            #self.add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
-            self.add_ratio_bandplot(data, mc_stack, mc_err,  xrange, ratio_range) # add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
+            self.add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
+            #self.add_ratio_bandplot(data, mc_stack, mc_err,  xrange, ratio_range) # add_ratio_diff(data, mc_stack, mc_err, xrange, ratio_range)
 
         if DEBUG: print  'ratio', datetime.datetime.now()
      

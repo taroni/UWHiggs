@@ -59,15 +59,15 @@ mc_samples = [
     'DYJetsToTT_M-50*','DY1JetsToTT_M-50*','DY2JetsToTT_M-50*','DY3JetsToTT_M-50*','DY4JetsToTT_M-50*'
     ]
 for x in mc_samples:
-    files.extend(glob.glob('results/%s/ETauAnalyzer/%s.root' % (jobid, x)))
+    files.extend(glob.glob('results/%s/ETauAnalyzerpZeta/%s.root' % (jobid, x)))
     lumifiles.extend(glob.glob('inputs/%s/%s.lumicalc.sum' % (jobid, x)))
     
-outputdir = 'plots/%s/ETauAnalyzer/%s/' % (jobid, channel)
+outputdir = 'plots/%s/ETauAnalyzerpZeta/%s/' % (jobid, channel)
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
 
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,600,50)+range(600,700,100)+range(700,1300, 300)))
+col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,1000,50)))
 met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1000,100)))
 pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)+range(500,1000,100)))
 
@@ -78,12 +78,11 @@ histoname = [('ePt', 'e p_{T} (GeV)', pt_vars_binning, False ),
              ('tPt','#tau p_{T} (GeV)',pt_vars_binning, False) ,
              ('tPhi','#tau #phi',1, False), ('tEta','#tau #eta',1, False),
              ('e_t_DPhi','#Delta#phi(e,#tau)',1, True), ('e_t_DR','#DeltaR(e,#tau)',1, True), ('e_t_Mass', 'e-#tau Visible Mass (GeV)',col_vis_mass_binning, False),
-             ('met', 'type1PF MET (GeV)', met_vars_binning, False) ,
+             ('type1_pfMetEt', 'type1PF MET (GeV)', met_vars_binning, False) ,
              ("h_collmass_pfmet", "M_{coll}", col_vis_mass_binning, False),
-             ("visfrac", "x_{vis}", 5, False),
-             #('ePFMET_DeltaPhi','#Delta#phi(e, MET)', 1, True),
+#             ('ePFMET_DeltaPhi','#Delta#phi(e, MET)', 1, True),
              ('eMtToPfMet_type1','M_{T}(e,MET) (GeV) ',5, False),
-             #('tPFMET_DeltaPhi','#Delta#phi(#tau, MET)',2, False),
+#             ('tPFMET_DeltaPhi','#Delta#phi(#tau, MET)',2, False),
              ('tMtToPfMet_type1','M_{T}(#tau, MET) (GeV)',5, False),
              ('e_t_PZeta', 'e_t_PZeta', 1, True), ('e_t_PZetaLess0p85PZetaVis', 'e_t_PZetaLess0p85PZetaVis', 1, True), ('e_t_PZetaVis', 'e_t_PZetaVis', 1, False),
              ("jetVeto30", "Number of jets, p_{T}>30", 1, False)
@@ -123,10 +122,10 @@ EWKDiboson = views.StyleView(views.SumView(
    filter(lambda x : x.startswith('WW') or x.startswith('WZ') or x.startswith('ZZ') or x.startswith('WG'), mc_samples )]), **remove_name_entry(data_styles['WW*']))
 TT = views.StyleView(views.SumView( 
     *[ plotter.get_view(regex) for regex in \
-       filter(lambda x : x.startswith('TT') or x.startswith('ST_'), mc_samples )]), **remove_name_entry(data_styles['TT_*']))
-        #ST = views.StyleView(views.SumView(
-        #    *[ plotter.get_view(regex) for regex in \
-#filter(lambda x :  x.startswith('ST_'), mc_samples )]), **remove_name_entry(data_styles['ST_*']))
+       filter(lambda x : x.startswith('TT_'), mc_samples )]), **remove_name_entry(data_styles['TT_*']))
+ST = views.StyleView(views.SumView( 
+    *[ plotter.get_view(regex) for regex in \
+       filter(lambda x :  x.startswith('ST_'), mc_samples )]), **remove_name_entry(data_styles['ST_*']))
 #TT = views.StyleView(views.SumView( 
 #    *[ plotter.get_view(regex) for regex in \
 #       filter(lambda x : x.startswith('TT_') or x.startswith('ST_'), mc_samples )]), **remove_name_entry(data_styles['TT_*']))
@@ -151,10 +150,10 @@ plotter.views['DY']={'view' : DY }
 plotter.views['DYTT']={'view' : DYTT }
 plotter.views['SMH']={'view' : SMH }
 plotter.views['TT']={'view' : TT }
-#plotter.views['ST']={'view' : ST }
+plotter.views['ST']={'view' : ST }
 
 
-new_mc_samples = ['DYTT','EWKDiboson', 'TT', 'SMH', 'DY' #,'EWK'
+new_mc_samples = ['DYTT','EWKDiboson', 'TT', 'ST', 'SMH', 'DY' #,'EWK'
                   #                  'Wjets'
 ]
 
@@ -166,7 +165,7 @@ for foldername in foldernames:
 
 
     for n,h in enumerate(histoname) :
-        plotter.pad.SetLogy(False)
+        plotter.pad.SetLogy(True)
         if 'DeltaPhi' in h[0] or 'ePhi' in h[0] or 'eEta' in h[0] or 'tPhi' in h[0] or 'tEta' in h[0]: plotter.pad.SetLogy(False)
         #print foldername
         if 'collmass' in h[0] or len(foldername) <= len('os/le1/HighMass') :
@@ -177,6 +176,6 @@ for foldername in foldernames:
                                          sort=True, obj=['e'],  plot_data=True)
                                             
             if 'collmass' not in h[0]:
-                plotter.save(foldername+'/'+h[0], dotroot=True)
+                plotter.save(foldername+'/'+h[0])
             else:
                 plotter.save(foldername+'/'+h[0], dotroot=True)
