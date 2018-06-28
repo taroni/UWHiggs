@@ -43,19 +43,19 @@ jetVeto = 'jetVeto30%s'
 
 @memo
 def jetN(shift=''):
-    if 'jes' in shift:
+    if '_Jet' in shift:
         return jetVeto %shift.replace('jes', '')
     return jetVeto %('')
 
 @memo
 def met(shift=''):
-    if 'jes' in shift or 'UES' in shift:
+    if '_Jet' in shift or 'UES' in shift:
         return ty1met_et %shift
     return met_et
 
 @memo
 def metphi(shift=''):
-    if 'jes' in shift or 'UES' in shift:
+    if '_Jet' in shift or 'UES' in shift:
         return ty1met_phi %shift
     return met_phi
  
@@ -174,37 +174,6 @@ class ETauAnalyzer(MegaBase):
         self.outfile=outfile
         self.histograms = {}
         
-        @memo
-        def tauPt(row, shift=''):
-            if self.is_data or self.is_DY or self.is_DYLowMass:
-                return row.tPt
-            elif not row.tZTTGenMatching==5:
-                return row.tPt
-            else:
-                if  row.tDecayMode==0:
-                    tau_Pt_C=0.982*row.tPt
-                elif  row.tDecayMode==1:
-                    tau_Pt_C=1.01*row.tPt
-                elif  row.tDecayMode==10:
-                    tau_Pt_C=1.004*row.tPt
-            return tau_Pt_C
-        @memo
-        def metTauC(row, shift=''):
-            themet = getattr(row,met(shift))
-            if self.is_data or self.is_DY or self.is_DYLowMass:
-                return themet
-            elif not row.tZTTGenMatching==5:
-                return themet
-            else:
-                #print themet, row.tPt
-                if  row.tDecayMode==0:
-                    MET_tPtC=themet+0.018*row.tPt
-                elif  row.tDecayMode==1:
-                    MET_tPtC=themet-0.01*row.tPt
-                elif  row.tDecayMode==10:
-                    MET_tPtC=themet-0.004*row.tPt
-            return MET_tPtC
-
         #understand what we are running
         target = os.path.basename(os.environ['megatarget'])
         self.is_data = target.startswith('data_')
@@ -241,8 +210,8 @@ class ETauAnalyzer(MegaBase):
             'weight'  : lambda row, weight: (weight,None) if weight is not None else (1.,None),
             'Event_ID': lambda row, weight: (array.array("f", [row.run,row.lumi,int(row.evt)/10**5,int(row.evt)%10**5] ), None),
             'h_collmass_pfmet' : lambda row, weight: (syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), weight),
-            'tPt' : lambda row, weight: (tauPt(row), weight),
-            'met' : lambda row, weight: (metTauC(row), weight),
+            'tPt' : lambda row, weight: (self.tauPt(row.tPt, row.tDecayMode), weight),
+            'met' : lambda row, weight: ( self.my_MET.Pt(),weight),
             'h_collmass_vs_dPhi_pfmet' : merge_functions(
                 attr_getter('tDPhiToPfMet_type1'),
                 lambda row, weight: (collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi),weight)
@@ -287,6 +256,39 @@ class ETauAnalyzer(MegaBase):
             'tight'  : 0.95,
             'vtight' : 0.93
         }
+
+    @memo
+    def tauPt(self, tPt, tDecayMode, shift=''):
+        if self.is_data or self.is_DY or self.is_DYLowMass:
+            return tPt
+        elif not row.tZTTGenMatching==5:
+            return tPt
+        else:
+            if  tDecayMode==0:
+                tau_Pt_C=0.982*tPt
+            elif  tDecayMode==1:
+                tau_Pt_C=1.01*tPt
+            elif  tDecayMode==10:
+                tau_Pt_C=1.004*tPt
+            return tau_Pt_C
+    @memo
+    def metTauC(self, tPt, tDecayMode, mymet, shift=''):
+        themet = mymet
+        if self.is_data or self.is_DY or self.is_DYLowMass:
+            return themet
+        elif not row.tZTTGenMatching==5:
+            return themet
+        else:
+            #print themet, row.tPt
+            if  tDecayMode==0:
+                MET_tPtC=themet+0.018*tPt
+            elif  tDecayMode==1:
+                MET_tPtC=themet-0.01*tPt
+            elif  tDecayMode==10:
+                MET_tPtC=themet-0.004*tPt
+            return MET_tPtC
+
+
 
     def fakerate_weights(self, tPt, tDecay):
         fTauIso=1.
@@ -393,10 +395,10 @@ class ETauAnalyzer(MegaBase):
                 mcweight_tight=mcweight*puweight_sys/puweight
 
             if shift=='highPtTauUp':
-                mcweight_tight=mcweight_tight*(1.+0.05*(row.tPt/1000.))
+                mcweight_tight=mcweight_tight*(1.+0.05*(self.tauPt(row.tPt, row.tDecayMode)/1000.))
             elif shift=='highPtTauDown':
                 #print shift, row.tPt, mcweight, mcweight*(1.-0.35*(row.tPt/1000.))
-                mcweight_tight=mcweight_tight*(1.-0.35*(row.tPt/1000.))
+                mcweight_tight=mcweight_tight*(1.-0.35*(self.tauPt(row.tPt, row.tDecayMode)/1000.))
 
             weights[shift] =  mcweight_tight
 
@@ -619,20 +621,20 @@ class ETauAnalyzer(MegaBase):
             etau_category = ['']                
             if not isTauTight :
                 mc_weight = weight_map['']
-                tweight=self.fakerate_weights(row.tPt, row.tDecayMode)['tLoose']*mc_weight
+                tweight=self.fakerate_weights(self.tauPt(row.tPt, row.tDecayMode), row.tDecayMode)['tLoose']*mc_weight
                 tLoose_weight = {'tLoose': tweight}
                 weight_map.update(tLoose_weight )
                 sys_directories.extend(['tLoose'])
                 sys_directories=remove_element(sys_directories, '')
                 myrand=random.random()
                 if myrand<0.5:
-                    tweightDown=self.fakerate_weights(row.tPt, row.tDecayMode)['tLoose/Down']*mc_weight
+                    tweightDown=self.fakerate_weights(self.tauPt(row.tPt, row.tDecayMode), row.tDecayMode)['tLoose/Down']*mc_weight
                     tLooseDown_weight = {'tLoose/Down': tweightDown}
                     weight_map.update(tLooseDown_weight )
                     tLooseUp_weight = {'tLoose/Up': tweight}
                     weight_map.update(tLooseUp_weight )
                 else:
-                    tweightUp=self.fakerate_weights(row.tPt, row.tDecayMode)['tLoose/Up']*mc_weight
+                    tweightUp=self.fakerate_weights(self.tauPt(row.tPt, row.tDecayMode), row.tDecayMode)['tLoose/Up']*mc_weight
                     tLooseUp_weight = {'tLoose/Up': tweightUp}
                     weight_map.update(tLooseUp_weight )
                     tLooseDown_weight = {'tLoose/Down': tweight}
@@ -662,8 +664,8 @@ class ETauAnalyzer(MegaBase):
             jetDir = ['le1', '0', '1']
             
             self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,  0.000511)
-            self.my_tau.SetPtEtaPhiM(row.tPt, row.tEta, row.tPhi, 1.77686)
-            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
+            self.my_tau.SetPtEtaPhiM(self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+            self.my_MET.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt),0,row.type1_pfMetPhi,0)
 
             myEle = {}
             myTau = {}
@@ -671,136 +673,204 @@ class ETauAnalyzer(MegaBase):
             #print sys_directories
             
             for sys in sys_directories :
-                self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,  0.000511)
-                self.my_tau.SetPtEtaPhiM(row.tPt, row.tEta, row.tPhi, 1.77686)
-                self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
-
+                mytau= ROOT.TLorentzVector()
+                myele= ROOT.TLorentzVector()
+                mymet= ROOT.TLorentzVector()
+                #print '-------------------'
                 if 'ees' in sys:
                     if 'eesUp' in sys:
-                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronScaleUp,row.eEta,row.ePhi, 0.000511)
-                        myEle[sys] = self.my_ele
+                        temp = ROOT.TLorentzVector()
+                        temp.SetPtEtaPhiM(row.ePt_ElectronScaleUp,row.eEta,row.ePhi, 0.000511)
+                        myEle[sys] = temp
+                    
                     if 'eesDown' in sys:
-                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronScaleDown,row.eEta,row.ePhi,  0.000511)
-                        myEle[sys] = self.my_ele
-                    if 'eresrhoUp' in sys:
-                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResRhoUp, row.eEta,row.ePhi,  0.000511)
-                        myEle[sys] = self.my_ele
-                    if 'eresrhoDown' in sys:
-                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResRhoDown, row.eEta,row.ePhi,  0.000511)
-                        myEle[sys] = self.my_ele
-                    if 'eresphiDown' in sys:
-                        self.my_ele.SetPtEtaPhiM(row.ePt_ElectronResPhiDown, row.eEta,row.ePhi,  0.000511)
-                        myEle[sys] = self.my_ele
-
+                        temp = ROOT.TLorentzVector()
+                        temp.SetPtEtaPhiM(row.ePt_ElectronScaleDown,row.eEta,row.ePhi,  0.000511)
+                        myEle[sys] = temp                        
+                    
+                    if 'eesresrhoUp' in sys:
+                        temp = ROOT.TLorentzVector()
+                        temp.SetPtEtaPhiM(row.ePt_ElectronResRhoUp, row.eEta,row.ePhi,  0.000511)
+                        myEle[sys] = temp
+                    
+                    if 'eesresrhoDown' in sys:
+                        temp = ROOT.TLorentzVector()
+                        temp.SetPtEtaPhiM(row.ePt_ElectronResRhoDown, row.eEta,row.ePhi,  0.000511)
+                        myEle[sys] = temp
+                    
+                    if 'eesresphiDown' in sys:
+                        temp = ROOT.TLorentzVector()
+                        temp.SetPtEtaPhiM(row.ePt_ElectronResPhiDown, row.eEta,row.ePhi,  0.000511)
+                        myEle[sys] = temp
+                    
+                    #print sys, myEle[sys].Pt(), myTau[sys].Pt(), myMET[sys].Pt(), row.ePt, self.tauPt(row.tPt, row.tDecayMode),self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)
                 if 'prong' in sys:
-                    if row.tDecayMode == 0 and '_1prong_' in sys:
-                        if 'Up' in sys:
-                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
-                        if 'Down' in sys:
-                            self.my_tau.SetPtEtaPhiM(0.988*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
-                    elif row.tDecayMode ==1 and '1prong1pizero' in sys:
-                        if 'Up' in sys:
-                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
-                        if 'Down' in sys:
-                            self.my_tau.SetPtEtaPhiM(0.988*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
+                    if row.tDecayMode == 0:
+                        if '_1prong_' in sys:
+                            if 'Up' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(1.012*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] = temp
+                                myMET[sys] = temp2
+                    
+                            if 'Down' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(0.988*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)+0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] = temp
+                                myMET[sys] = temp2
+                    
+                                  
+                        #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), row.tPt, row.type1_pfMetEt, row.ePt
+                    elif row.tDecayMode ==1:
+                        if '1prong1pizero' in sys:
+                            if 'Up' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(1.012*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] =temp
+                                myMET[sys] = temp2
+                    
+                            if 'Down' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(0.988*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)+0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] = temp
+                                myMET[sys] = temp2
+                                             #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), row.tPt, row.type1_pfMetEt, row.ePt
 
-                    elif row.tDecayMode ==10 and '_3prong_' in sys:
-                        if 'Up' in sys:
-                            self.my_tau.SetPtEtaPhiM(1.012*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
-                        if 'Down' in sys:
-                            self.my_tau.SetPtEtaPhiM(0.988*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.012*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
+                    elif row.tDecayMode ==10:
+                        if '_3prong_' in sys:
+                            if 'Up' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(1.012*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] = temp
+                                myMET[sys] = temp2
+                                                    
+                            if 'Down' in sys:
+                                temp = ROOT.TLorentzVector()
+                                temp2 = ROOT.TLorentzVector()
+                                temp.SetPtEtaPhiM(0.988*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                                temp2.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)+0.012*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                                myTau[sys] = temp
+                                myMET[sys] = temp2
+                    
                             #print self.my_MET.Pt(), self.my_MET.Phi(), row.type1_pfMetEt, row.tPt,  row.type1_pfMetPhi
 
-                if '_jes_' in sys:
-                    self.my_MET.SetPtEtaPhiM(getattr(row,met(sys.replace('jes_','_'))), 0,
+                if 'jes_' in sys:
+                    mymet.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, getattr(row,met(sys.replace('jes_','_')))), 0,
                                              getattr(row,metphi(sys.replace('jes_','_'))),0)
-                    myMET[sys] = self.my_MET
+                    #if (getattr(row,met(sys.replace('jes_','_')))-row.type1_pfMetEt)!=0 : print 'met info', sys, sys.replace('jes_','_'), getattr(row,met(sys.replace('jes_','_'))), getattr(row,metphi(sys.replace('jes_','_'))), row.type1_pfMetEt, row.type1_pfMetPhi
+                    myMET[sys] = mymet
+                    
+                    #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), row.tPt, row.type1_pfMetEt, row.ePt, collmass(row, row.type1_pfMetEt, row.type1_pfMetPhi)
                 if 'UES' in sys:
-                    self.my_MET.SetPtEtaPhiM(getattr(row,met(sys.replace('ues_', '_'))), 0,
-                                             getattr(row,metphi(sys.replace('ues_', '_'))),0)
-                    myMET[sys] = self.my_MET
+                    mymet.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, getattr(row,met(sys.replace('ues_', '_')))), 0,
+                                             self.metTauC(row.tPt, row.tDecayMode, getattr(row,metphi(sys.replace('ues_', '_')))),0)
+                    myMET[sys] = mymet
+                    
+                    #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), row.tPt, row.type1_pfMetEt, row.ePt
 
                 if bool(self.is_DY or self.is_DYLowMass) and row.isZee and row.tZTTGenMatching<5 and row.tDecayMode==1:
                     if 'etfakeES' in sys:
                         if 'Up' in sys:
-                            self.my_tau.SetPtEtaPhiM(1.03*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt-0.03*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
+                            mytau.SetPtEtaPhiM(1.03*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                            mymet.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.type1_pfMetEt)-0.03*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                            myTau[sys] = mytau
+                            myMET[sys] = mymet
+                            
 
                         if 'Down' in sys:
-                            self.my_tau.SetPtEtaPhiM(0.97*row.tPt, row.tEta, row.tPhi, 1.77686)
-                            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt+0.03*row.tPt,0,row.type1_pfMetPhi,0)
-                            myTau[sys] = self.my_tau
-                            myMET[sys] = self.my_MET
+                            mytau.SetPtEtaPhiM(0.97*self.tauPt(row.tPt, row.tDecayMode), row.tEta, row.tPhi, 1.77686)
+                            mymet.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt)+0.03*self.tauPt(row.tPt, row.tDecayMode),0,row.type1_pfMetPhi,0)
+                            myTau[sys] = mytau
+                            myMET[sys] = mymet
                             
+                        #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), row.tPt, row.type1_pfMetEt, row.ePt
+                #print sys, len(myTau)
+                if sys in myMET: print sys, "MET",  myMET[sys].Pt() , self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt)
+                
+                if sys in myTau: print sys, 'Tau', myTau[sys].Pt(),  self.tauPt(row.tPt, row.tDecayMode)
+                
+                if sys in myEle: print sys, 'Ele',  myEle[sys].Pt(),   row.ePt
+                
+
+                
                 jets = min(int(getattr(row,jetN(sys))), 2)
                 if sys=='' and getattr(row,jetN(sys))!=row.jetVeto30 : print sys, getattr(row,jetN(sys)), row.jetVeto30
                 if jets==2 : continue
+                #print sys, myTau[sys].Pt(), myMET[sys].Pt() , myEle[sys].Pt(),  self.tauPt(row.tPt, row.tDecayMode), self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt), row.ePt
 
-                totalEt = self.my_tau.Et() + self.my_MET.Et();
-                totalPt = (self.my_tau + self.my_MET).Pt()
+                my_tau=myTau[sys] if sys in myTau else self.my_tau
+                my_met=myMET[sys] if sys in myMET else self.my_MET
+                my_ele=myEle[sys] if sys in myEle else self.my_ele
+                
+                totalEt = my_tau.Et() + my_met.Et();
+                totalPt = (my_tau+my_met).Pt()
                 mytMtMet = sqrt(abs(totalEt*totalEt - totalPt*totalPt))
                 if not (sys=='tLoose' or sys=='tLoose/Up' or sys=='tLoose/Down') and isTauTight==False: continue
                 ## if sys=='' : print self.my_ele.Pt(), row.ePt, self.my_tau.Pt(), row.tPt
                 selection_categories.extend([(sys, '', 'le1', '')])
                 selection_categories.extend([(sys, '', str(jets), '')])
-                if self.my_ele.Pt() > 60 and self.my_tau.Pt() >30 :
+                if my_ele.Pt() > 60 and my_tau.Pt() >30 :
                     if (jets<=1 and mytMtMet<120):
                         selection_categories.extend([(sys,'LowMass', 'le1', '')])
                     if (jets==0 and mytMtMet < 105) or (jets==1 and mytMtMet < 120):
                         selection_categories.extend([(sys,'LowMass',str(jets), '')])
-                    if self.my_ele.Pt() > 150 and self.my_tau.Pt()>45:
+                    if my_ele.Pt() > 150 and my_tau.Pt()>45:
                         if (jets<=1 and mytMtMet < 230):
                             selection_categories.extend([(sys, 'HighMass', 'le1','')])
                         if (jets==0 and mytMtMet < 200) or (jets==1 and mytMtMet < 230):
                             selection_categories.extend([(sys, 'HighMass', str(jets),'')])
                          
-                
-
-
+            my_tau=myTau[sys] if sys in myTau else self.my_tau
+            my_met=myMET[sys] if sys in myMET else self.my_MET
+            my_ele=myEle[sys] if sys in myEle else self.my_ele
+            for sys in myMET:
+                #print sys, myTau[sys].Pt(), myMET[sys].Pt() , myEle[sys].Pt(),  self.tauPt(row.tPt, row.tDecayMode), self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt), row.ePt
+                print sys, my_tau.Pt(), my_met.Pt(), my_ele.Pt(), self.tauPt(row.tPt, row.tDecayMode), self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt), row.ePt
             for selection in selection_categories:
                 
                 selection_sys, massRange, jet_dir,  selection_step = selection
+                #print selection_sys, massRange, jet_dir,  selection_step
                 dirname =  os.path.join(selection_sys, sign, massRange, jet_dir, selection_step)
                 if sign=='os': cut_flow_trk.Fill('sign')
+
+                
+                #mytau=myTau[sys] if sys in myTau else self.my_tau
+                #mymet=myMET[sys] if sys in myMET else self.my_MET
+                #myele=myEle[sys] if sys in myEle else self.my_ele
+                print 'I am filling', selection_sys, myTau[sys].Pt(), myMET[sys].Pt(), myEle[sys].Pt(), self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt()
+
                 if dirname[-1] == '/':
                     dirname = dirname[:-1]
                 weight_to_use = weight_map[selection_sys] if selection_sys in weight_map else weight_map['']
                 #print dirname, evt_id
-                if selection_sys in myEle :
-                    self.my_ele = myEle[selection_sys]
-                else:
-                    self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,  0.000511)
-                if selection_sys in myTau:
-                    self.my_tau = myTau[selection_sys]
-                else:
-                    self.my_tau.SetPtEtaPhiM(row.tPt, row.tEta, row.tPhi, 1.77686)
-                if selection_sys in myMET:
-                    self.my_MET = myMET[selection_sys]
-                else:
-                    self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
+                #self.my_ele = myele
+                #self.my_tau = mytau
+                #self.my_MET = mymet
+                #if selection_sys in myEle :
+                #    self.my_ele = myEle[selection_sys]
+                #else:
+                #    self.my_ele.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,  0.000511)
+                #if selection_sys in myTau:
+                #    self.my_tau = myTau[selection_sys]
+                #else:
+                #    self.my_tau.SetPtEtaPhiM(row.tPt, row.tEta, row.tPhi, 1.77686)
+                #if selection_sys in myMET:
+                #    self.my_MET = myMET[selection_sys]
+                #else:
+                #    self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
 
                 #print dirname, evt_id
-                 #print 'collinear mass', row.e_t_collinearmass, syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), row.ePt, row.tPt, row.eMass, row.tMass
+                #print 'sys %s: collinear mass: %.2f %.2f , ele Pt %.2f %.2f, tau Pt %.2f %.2f, met %.2f %.2f' %(selection_sys, row.e_t_collinearmass, syst_collmass(self.my_MET.Pt(),self.my_MET.Phi(), self.my_ele, self.my_tau), row.ePt, self.my_ele.Pt(),  self.tauPt(row.tPt, row.tDecayMode), self.my_tau.Pt(), self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt), self.my_MET.Pt())
                 #print selection_sys, massRange, jet_dir, selection_step, weight_map, weight_to_use
                 self.fill_histos(dirname, row, weight_to_use)
 
