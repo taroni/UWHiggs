@@ -227,19 +227,19 @@ class BasePlotter(Plotter):
                 'type' : 'shape',
                 '+' : dir_systematic('scale_t_1prong_13TeVUp'),
                 '-' : dir_systematic('scale_t_1prong_13TeVDown'),
-                'apply_to' : ['realtau'],
+                'apply_to' : ['fullsimbkg'],
             },
             'TES1p10' : {
                 'type' : 'shape',
                 '+' : dir_systematic('scale_t_1prong1pizero_13TeVUp'),
                 '-' : dir_systematic('scale_t_1prong1pizero_13TeVDown'),
-                'apply_to' : ['realtau'],
+                'apply_to' : ['fullsimbkg'],
             },
             'TES3p' : {
                 'type' : 'shape',
                 '+' : dir_systematic('scale_t_3prong_13TeVUp'),
                 '-' : dir_systematic('scale_t_3prong_13TeVDown'),
-                'apply_to' : ['realtau'],
+                'apply_to' : ['fullsimbkg'],
             },
             'uesCharged':{
                 'type' : 'shape',
@@ -444,7 +444,7 @@ class BasePlotter(Plotter):
                 'type' : 'shape',
                 '+' : dir_systematic('highPtTauUp'),
                 '-' : dir_systematic('highPtTauDown'),
-                'apply_to' : ['realtau'],
+                'apply_to' : ['fullsimbkg'],
             },
         
 

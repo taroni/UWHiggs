@@ -560,6 +560,7 @@ class ETauAnalyzer(MegaBase):
         
         for row in self.tree:
             if (ievt % 1000) == 0:
+                
                 #print 'new event', ievt
                 logging.debug('New event')
             ievt += 1
@@ -570,7 +571,7 @@ class ETauAnalyzer(MegaBase):
                 logging.info('Removing duplicate of event: %d %d %d' % evt_id)
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
-            #print row.run,row.lumi,row.evt
+            print row.run,row.lumi,row.evt
             if (self.is_DYTT and not bool(row.isZtautau or row.isGtautau)):
                 continue
             if (self.is_DY and bool(row.isZtautau or row.isGtautau) ):
@@ -840,11 +841,13 @@ class ETauAnalyzer(MegaBase):
                 tmpEle=ROOT.TLorentzVector()
                 tmpMET=ROOT.TLorentzVector()
                 tmpTau.SetPtEtaPhiM(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), row.tEta, row.tPhi, 1.77686)
-                tmpEle.SetPtEtaPhiM(row.ePt, row.eEta, row.tPhi,  0.000511)
+                tmpEle.SetPtEtaPhiM(row.ePt, row.eEta, row.ePhi,  0.000511)
                 tmpMET.SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.tZTTGenMatching,row.type1_pfMetEt),0,row.type1_pfMetPhi,0)
                 mytau=myTau[selection_sys] if selection_sys in myTau else tmpTau
                 mymet=myMET[selection_sys] if selection_sys in myMET else tmpMET
                 myele=myEle[selection_sys] if selection_sys in myEle else tmpEle
+
+                #print 'collmass ', syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), syst_collmass(mymet.Pt(), mymet.Phi(), myele, mytau)
                 #print 'I am filling %s, tau pt %f, ele pt %f , MET %f;' %(selection_sys,mytau.Pt(), myele.Pt(), mymet.Pt()) ,  tmpTau.Pt(), tmpEle.Pt() , tmpMET.Pt()
 
                 if dirname[-1] == '/':
@@ -854,6 +857,7 @@ class ETauAnalyzer(MegaBase):
                 self.my_ele = myele
                 self.my_tau = mytau
                 self.my_MET = mymet
+                
                 #print 'I am filling %s, tau pt %f, ele pt %f , MET %f;' %(selection_sys,mytau.Pt(), myele.Pt(), mymet.Pt()) ,  self.my_tau.Pt(), self.my_ele.Pt() , self.my_MET.Pt()
 
                 #if selection_sys in myEle :
