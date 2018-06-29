@@ -26,7 +26,7 @@ mv QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_v6-v1.root QCD_mc.ro
 #mv GluGlu_LFV_HToMuTau_M125_13TeV*.root LFVGG125.root
 #mv VBF_LFV_HToMuTau_M125_13TeV*.root LFVVBF125.root
 
-hadd -f SMH.root ggH_htt.root qqH_htt.root
+hadd -f SMH.root ggH_htt.root qqH_htt.root W*HToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root ZHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root GluGluHToWWTo2L2Nu_M125_13TeV_powheg_pythia8_v6-v1.root
 
 hadd -f Diboson.root VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8*.root WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8*.root WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8_v6-v1*.root WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_v6-v3.root  WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_v6-v1.root WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_v6-v1.root ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_v6-v1.root ZZTo4L_13TeV-amcatnloFXFX-pythia8_v6_ext1-v1.root
 
@@ -46,6 +46,7 @@ hadd -f T.root ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_*.root ST_t
 #rm WZ_TuneCUETP8M1_13TeV*.root
 #rm ZZ_TuneCUETP8M1_13TeV*.root
 rm *HToTauTau*
+rm *HToWW*
 rm ttHJetToTT_M125_13TeV_amcatnloFXFX_madspin_pythia8_v6_ext4-v1.root
 rm *HToWW*
 rm WG*mad*
