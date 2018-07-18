@@ -22,6 +22,7 @@ import mcCorrections
 from cutflowtracker import cut_flow_tracker
 import bTagSF
 import random
+from memory_profiler import profile
 cut_flow_step = ['allEvents', 'jets','trigger', 'esel', 'tsel', 'tdisc', 'eiso', 'vetoes','sign']
 
 et_collmass = 'e_t_collinearmass'
@@ -331,7 +332,7 @@ class ETauAnalyzer(MegaBase):
         return frweight
 
  
-    
+#    @profile
     def event_weight(self, row, sys_shifts):
         nbtagged=row.bjetCISVVeto30Medium
         if nbtagged>2:
@@ -379,28 +380,32 @@ class ETauAnalyzer(MegaBase):
                 mcweight = mcweight*self.Wweight[0]
                 
         mcweight_tight = mcweight*self.tauSF['vtight']/self.tauSF['loose']
+        #print '----------------'
+        #print 'weight', mcweight_tight
         if self.is_DY and row.isZee  and row.tZTTGenMatching<5 :
             mcweight_tight=mcweight_tight*genEfakeTSF(abs(row.tEta))
 
         
         for shift in sys_shifts:
+            syst_mcweight_tight=-999.
             if shift=='trUp':
-                mcweight_tight=(mcweight_tight/self.triggerEff(row.ePt, row.eAbsEta)[0])*self.triggerEff(row.ePt, row.eAbsEta)[0]*1.02
+                syst_mcweight_tight=(mcweight_tight/self.triggerEff(row.ePt, row.eAbsEta)[0])*self.triggerEff(row.ePt, row.eAbsEta)[0]*1.02
  
             elif shift=='trDown':
-                mcweight_tight=(mcweight_tight/self.triggerEff(row.ePt, row.eAbsEta)[0])*self.triggerEff(row.ePt, row.eAbsEta)[0]*0.98
+                syst_mcweight_tight=(mcweight_tight/self.triggerEff(row.ePt, row.eAbsEta)[0])*self.triggerEff(row.ePt, row.eAbsEta)[0]*0.98
                 ##    print 'trig eff dw' , mcweight 
             if shift=='puUp' or shift=='puDown':
                 puweight_sys = pucorrector[shift](row.nTruePU)
-                mcweight_tight=mcweight*puweight_sys/puweight
+                syst_mcweight_tight=mcweight*puweight_sys/puweight
 
             if shift=='highPtTauUp':
-                mcweight_tight=mcweight_tight*(1.+0.05*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
+                syst_mcweight_tight=mcweight_tight*(1.+0.05*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
             elif shift=='highPtTauDown':
                 #print shift, row.tPt, mcweight, mcweight*(1.-0.35*(row.tPt/1000.))
-                mcweight_tight=mcweight_tight*(1.-0.35*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
-
-            weights[shift] =  mcweight_tight
+                syst_mcweight_tight=mcweight_tight*(1.-0.35*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
+            
+            #print 'weight', shift, mcweight_tight, syst_mcweight_tight
+            weights[shift] =  syst_mcweight_tight if syst_mcweight_tight!=-999. else mcweight_tight
 
         
         return weights
@@ -412,7 +417,7 @@ class ETauAnalyzer(MegaBase):
                      +  self.systematics['ees'] + self.systematics['tes'] + self.systematics['ues'] + self.systematics['jes'] + self.systematics['etfakeES']+self.systematics['highTau']
         #remove double dirs
         sys_shifts = list(set(sys_shifts))
-        signs =['os', 'ss']
+        signs =['os']
         jetN = ['le1','0', '1']
         massRange = ['','LowMass', 'HighMass']
         folder=[]
@@ -563,6 +568,7 @@ class ETauAnalyzer(MegaBase):
                 
                 #print 'new event', ievt
                 logging.debug('New event')
+            if ievt==1000: return
             ievt += 1
             #avoid double counting events!
             evt_id = (row.run, row.lumi, row.evt)
@@ -571,7 +577,7 @@ class ETauAnalyzer(MegaBase):
                 logging.info('Removing duplicate of event: %d %d %d' % evt_id)
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
-            print row.run,row.lumi,row.evt
+            ##print row.run,row.lumi,row.evt
             if (self.is_DYTT and not bool(row.isZtautau or row.isGtautau)):
                 continue
             if (self.is_DY and bool(row.isZtautau or row.isGtautau) ):
@@ -614,6 +620,7 @@ class ETauAnalyzer(MegaBase):
             if not isEVTight: continue
             weight_sys_shifts=sys_shifts
             weight_sys_shifts.append('')
+            weight_sys_shifts=list(set(weight_sys_shifts))
             weight_map = self.event_weight(row, weight_sys_shifts)
             #print weight_map
             #if not row.e_t_SS: #Fill embedded sample normalization BEFORE the vetoes
@@ -649,8 +656,9 @@ class ETauAnalyzer(MegaBase):
             passes_full_selection = False
             
             sign = 'os'
-            if bool(row.e_t_SS)==True: sign='ss'
-            
+            if bool(row.e_t_SS)==True:
+                sign='ss'
+                continue
             if row.tauVetoPt20Loose3HitsVtx : continue
             if row.muVetoPt5IsoIdVtx : continue
             if row.eVetoMVAIso : continue
@@ -674,6 +682,11 @@ class ETauAnalyzer(MegaBase):
             #print sys_directories
             
             for sys in sys_directories :
+                #if sys=='' :
+                     #print 'central value', self.my_tau.Pt(), self.my_MET.Pt(), 'evtid', row.evt
+                     #print 'up', 1.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), self.metTauC(row.tPt, row.tDecayMode, row.tZTTGenMatching,row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)
+                     #print 'down', 0.988*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), self.metTauC(row.tPt, row.tDecayMode, row.tZTTGenMatching,row.type1_pfMetEt)+0.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)
+                     #print weight_map[sys] if sys in weight_map else weight_map[''], (sys in weight_map)
                 #print '-------------------'
                 if 'ees' in sys:
                     if 'eesUp' in sys:
@@ -735,18 +748,21 @@ class ETauAnalyzer(MegaBase):
 
                     elif row.tDecayMode ==10:
                         if '_3prong_' in sys:
+                            #print 'central (check)', self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), self.metTauC(row.tPt, row.tDecayMode,row.tZTTGenMatching, row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching),  'evtid', row.evt
                             if 'Up' in sys:
                                 myTau[sys]  = ROOT.TLorentzVector()
                                 myMET[sys]  = ROOT.TLorentzVector()
                                 myTau[sys].SetPtEtaPhiM(1.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), row.tEta, row.tPhi, 1.77686)
                                 myMET[sys].SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode,row.tZTTGenMatching, row.type1_pfMetEt)-0.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching),0,row.type1_pfMetPhi,0)
-                                                    
+                                #print sys, myTau[sys].Pt(), myMET[sys].Pt()
+                                #print weight_map[sys] if sys in weight_map else weight_map[''], (sys in weight_map)
                             if 'Down' in sys:
                                 myTau[sys] = ROOT.TLorentzVector()
                                 myMET[sys] = ROOT.TLorentzVector()
                                 myTau[sys].SetPtEtaPhiM(0.988*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching), row.tEta, row.tPhi, 1.77686)
                                 myMET[sys].SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode,row.tZTTGenMatching, row.type1_pfMetEt)+0.012*self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching),0,row.type1_pfMetPhi,0)
-                    
+                                #print sys, myTau[sys].Pt(), myMET[sys].Pt()
+                                #print weight_map[sys] if sys in weight_map else weight_map[''], (sys in weight_map)
                             #print self.my_MET.Pt(), self.my_MET.Phi(), row.type1_pfMetEt, row.tPt,  row.type1_pfMetPhi
 
                 if 'jes_' in sys:
@@ -760,10 +776,10 @@ class ETauAnalyzer(MegaBase):
                 if 'UES' in sys:
                     myMET[sys] =  ROOT.TLorentzVector()
                     myMET[sys].SetPtEtaPhiM(self.metTauC(row.tPt, row.tDecayMode, row.tZTTGenMatching,getattr(row,met(sys.replace('ues_', '_')))), 0,
-                                             self.metTauC(row.tPt, row.tDecayMode, row.tZTTGenMatching,getattr(row,metphi(sys.replace('ues_', '_')))),0)
+                                             getattr(row,metphi(sys.replace('ues_', '_'))),0)
                     
                     
-                    #print sys, self.my_tau.Pt(), self.my_MET.Pt(), self.my_ele.Pt(), row.tPt, row.type1_pfMetEt, row.ePt
+                    #print sys, self.my_MET.Pt(),myMET[sys].Pt(), self.my_MET.Phi(),myMET[sys].Phi(), weight_map[sys] if sys in weight_map else -999., weight_map['']
 
                 if bool(self.is_DY or self.is_DYLowMass) and row.isZee and row.tZTTGenMatching<5 and row.tDecayMode==1:
                     if 'etfakeES' in sys:
@@ -847,7 +863,7 @@ class ETauAnalyzer(MegaBase):
                 mymet=myMET[selection_sys] if selection_sys in myMET else tmpMET
                 myele=myEle[selection_sys] if selection_sys in myEle else tmpEle
 
-                #print 'collmass ', syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), syst_collmass(mymet.Pt(), mymet.Phi(), myele, mytau)
+                #print 'collmass ', selection_sys, syst_collmass(self.my_MET.Pt(), self.my_MET.Phi(), self.my_ele, self.my_tau), syst_collmass(mymet.Pt(), mymet.Phi(), myele, mytau)
                 #print 'I am filling %s, tau pt %f, ele pt %f , MET %f;' %(selection_sys,mytau.Pt(), myele.Pt(), mymet.Pt()) ,  tmpTau.Pt(), tmpEle.Pt() , tmpMET.Pt()
 
                 if dirname[-1] == '/':
@@ -876,6 +892,7 @@ class ETauAnalyzer(MegaBase):
                 #print dirname, evt_id
                 #print 'sys %s: collinear mass: %.2f %.2f , ele Pt %.2f %.2f, tau Pt %.2f %.2f, met %.2f %.2f' %(selection_sys, row.e_t_collinearmass, syst_collmass(self.my_MET.Pt(),self.my_MET.Phi(), self.my_ele, self.my_tau), row.ePt, self.my_ele.Pt(),  self.tauPt(row.tPt, row.tDecayMode), self.my_tau.Pt(), self.metTauC(row.tPt, row.tDecayMode,row.type1_pfMetEt), self.my_MET.Pt())
                 #print selection_sys, massRange, jet_dir, selection_step, weight_map, weight_to_use
+                #print 'filling histo in', dirname
                 self.fill_histos(dirname, row, weight_to_use)
 
                 
