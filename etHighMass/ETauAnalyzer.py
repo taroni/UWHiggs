@@ -17,7 +17,7 @@ import traceback
 from FinalStateAnalysis.Utilities.struct import struct
 from FinalStateAnalysis.PlotTools.decorators import memo
 from FinalStateAnalysis.PlotTools.decorators import memo_last
-import optimizer
+#import optimizer
 import mcCorrections
 from cutflowtracker import cut_flow_tracker
 import bTagSF
@@ -334,6 +334,8 @@ class ETauAnalyzer(MegaBase):
  
 #    @profile
     def event_weight(self, row, sys_shifts):
+#    def event_weight(self, bjetCISVVeto30Medium, ePt, eAbsEta,tEta, tDecayMode, tZTTGenMatching, genMass, genpT, jb1pt,jb1hadronflavor,jb2pt,jb2hadronflavor, nTruePU, numGenJets, isZee, sys_shifts):
+        
         nbtagged=row.bjetCISVVeto30Medium
         if nbtagged>2:
             nbtagged=2
@@ -381,7 +383,7 @@ class ETauAnalyzer(MegaBase):
                 
         mcweight_tight = mcweight*self.tauSF['vtight']/self.tauSF['loose']
         #print '----------------'
-        #print 'weight', mcweight_tight
+        print 'weight %s, puweight %s' %(mcweight_tight, puweight)
         if self.is_DY and row.isZee  and row.tZTTGenMatching<5 :
             mcweight_tight=mcweight_tight*genEfakeTSF(abs(row.tEta))
 
@@ -396,7 +398,8 @@ class ETauAnalyzer(MegaBase):
                 ##    print 'trig eff dw' , mcweight 
             if shift=='puUp' or shift=='puDown':
                 puweight_sys = pucorrector[shift](row.nTruePU)
-                syst_mcweight_tight=mcweight*puweight_sys/puweight
+                syst_mcweight_tight=mcweight_tight*puweight_sys/puweight
+                print  '%s, original weight %s, puweight %s, puweightShifted %s, finale weight %s' %(shift, mcweight_tight,  puweight, puweight_sys, syst_mcweight_tight)
 
             if shift=='highPtTauUp':
                 syst_mcweight_tight=mcweight_tight*(1.+0.05*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
@@ -404,7 +407,7 @@ class ETauAnalyzer(MegaBase):
                 #print shift, row.tPt, mcweight, mcweight*(1.-0.35*(row.tPt/1000.))
                 syst_mcweight_tight=mcweight_tight*(1.-0.35*(self.tauPt(row.tPt, row.tDecayMode, row.tZTTGenMatching)/1000.))
             
-            #print 'weight', shift, mcweight_tight, syst_mcweight_tight
+            print 'weight', shift, mcweight_tight, syst_mcweight_tight
             weights[shift] =  syst_mcweight_tight if syst_mcweight_tight!=-999. else mcweight_tight
 
         
@@ -568,7 +571,7 @@ class ETauAnalyzer(MegaBase):
                 
                 #print 'new event', ievt
                 logging.debug('New event')
-            if ievt==1000: return
+            #if ievt==1000: return
             ievt += 1
             #avoid double counting events!
             evt_id = (row.run, row.lumi, row.evt)
