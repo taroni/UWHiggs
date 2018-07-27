@@ -273,7 +273,8 @@ syst_names_datacard=['',
 print len(syst_names_datacard)
 print len(syst_names_analyzer)
 
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+col_vis_mass_binning=array.array('d', (range(0, 1000, 50)+range(1000,1500,100)))
+#col_vis_mass_binning=array.array('d',(range(0,180,30)+range(180,980,50)+range(980,1580,100)))
 #met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 #pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
@@ -332,10 +333,11 @@ for var in variable_list:
    for i_cat in range(len(category_names)):
       histos[category_names[i_cat]]=[]
       for filename in os.listdir('Simple'+args.analyzer_name+str(args.Lumi)):
-         if "FAKES" in filename or "ETau" in filename or filename=='QCD.root':continue
+
          file=ROOT.TFile('Simple'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          title=filename.split('.')[0].replace("_with_shapes","")
          for k in range(len(syst_names_analyzer)):
+            if syst_names_analyzer[k]!='' and ( "FAKES" in filename or "ETau" in filename or filename=='QCD.root'):continue
             hist_path="os/"+str(i_cat)+"/selected/"+syst_names_analyzer[k]+"/"+var[0]
             histo=file.Get(hist_path)
 
@@ -349,13 +351,13 @@ for var in variable_list:
                print "Couldn't find histo: ", title+" "+syst_names_analyzer[k], "in ", filename
                continue
 
-            if 'QCD'!=title:
-               try:
-                  histo.Rebin(binning*2)
-               except TypeError:
-                  histo=histo.Rebin(len(binning)-1,"",binning)
-               except:
-                  print "Please fix your binning"
+            #if 'QCD'!=title:
+            try:
+               histo.Rebin(binning*2)
+            except TypeError:
+               histo=histo.Rebin(len(binning)-1,"",binning)
+            except:
+               print "Please fix your binning"
 
             #print 'no rescale %s' %title , histo.Integral(), lumidict['data_obs']/lumidict[title]
             if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename and "_with_shapes" not in filename:
