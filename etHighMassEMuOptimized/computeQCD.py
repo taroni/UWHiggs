@@ -58,7 +58,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+#col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+col_vis_mass_binning=array.array('d',(range(0, 800, 50)+range(800, 1500, 100)))
+
 met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
@@ -136,6 +138,7 @@ class GetQCD(object):
 						self.histomc=None
 						self.histodata=None
 						self.histoQCD=None
+                                                
 	        				for filename in os.listdir(Analyzer+str(args.Lumi)):
 							if "FAKES" in filename or "QCD" in filename or 'LFV' in filename: continue
 	        					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
@@ -143,7 +146,7 @@ class GetQCD(object):
 							
 							if not histo:
 								continue
-						
+						        histo.Sumw2()
 							try:
 								histo.Rebin(binning*2)
 							except TypeError:
@@ -204,9 +207,10 @@ class GetQCD(object):
 					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
 					
 					histo=file.Get(hist_path)
+                                        
 					if not histo:
 						continue
-
+                                        histo.Sumw2()
 					try:
 						histo.Rebin(binning*2)
 					except TypeError:
@@ -237,9 +241,25 @@ class GetQCD(object):
 #						print "data",self.histodata.Integral()
 #						print "MC",self.histomc.Integral()
 				self.histoQCD=self.histodata.Clone()
+                                errors=[]
+                                for ibin in range(0,self.histoQCD.GetXaxis().GetNbins()+1):
+                                        err=math.sqrt(self.histoQCD.GetBinError(ibin)*self.histoQCD.GetBinError(ibin)+self.histomc.GetBinError(ibin)*self.histomc.GetBinError(ibin))
+                                        errors.append(err)
 				self.histoQCD.Add(self.histomc,-1)
-				self.histoQCD.Scale(2.2)
+                                for ibin in range(0,self.histoQCD.GetXaxis().GetNbins()+1):
+                                        print 'qcd bin %s, error %s, dataerror %s, mc error %s, old final %s, bin content qcd %s, data %s, mc %s'  %(str(ibin), str(errors[ibin]), str(self.histodata.GetBinError(ibin)), str(self.histomc.GetBinError(ibin)), str(self.histoQCD.GetBinError(ibin)), str(self.histoQCD.GetBinContent(ibin)), str(self.histodata.GetBinContent(ibin)), str(self.histomc.GetBinContent(ibin)))
+                                        if self.histoQCD.GetBinContent(ibin) <=0:
+                                                self.histoQCD.SetBinContent(ibin,0)
+                                                errors[ibin]=0
 
+                                        
+				self.histoQCD.Scale(2.2)
+                                for ibin in range(0,self.histoQCD.GetXaxis().GetNbins()+1):
+
+                                        self.histoQCD.SetBinError(ibin, math.sqrt(self.histoQCD.GetBinContent(ibin)))
+                                        print self.histoQCD.GetBinContent(ibin), self.histoQCD.GetBinError(ibin)
+
+                                        
 				new_histo=copy.copy(self.histoQCD) #MAKE DEEP COPY 
 					#replace ss in pathname by os
 				path_name_original=hist_path.split('/')

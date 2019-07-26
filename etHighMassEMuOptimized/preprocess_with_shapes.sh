@@ -59,6 +59,11 @@ python computeQCD_with_shapes.py --aName $analyzer --lumi $luminosity --jobid $j
 mv QCD$analyzer.root Simple$analyzer$luminosity/QCD.root
 
 mv QCD${analyzer}_with_shapes.root Simple$analyzer$luminosity/QCD_with_shapes.root
+
+#python mergeQCDandW.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+
+#mv WQCD${analyzer}_with_shapes.root Simple$analyzer$luminosity/WQCD_with_shapes.root
+
 ####compute TTBar from CR data
 ####if [ "X"${isTT_DD} != "X" ]  
 ####    then

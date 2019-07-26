@@ -57,16 +57,16 @@ echo Signal smaples are : $my_signals
 
 #make preselection plots
 python plotter.py --lumi $luminosity --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals  --higgsSF 5
-python plotter.py --lumi $luminosity --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var vismass  --higgsSF 5
+##python plotter.py --lumi $luminosity --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var vismass  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile mPt.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var mPt  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile ePt.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var ePt  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile mPFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var mtMuMet  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile ePFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var mtEMet  --higgsSF 5
-python plotter.py --lumi $luminosity --inputFile Met.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var met  --higgsSF 5
+##python plotter.py --lumi $luminosity --inputFile Met.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var met  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile ePFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var dphiEMet  --higgsSF 5
 python plotter.py --lumi $luminosity --inputFile mPFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --var dphiMuMet  --higgsSF 5
-python plotter.py --lumi $luminosity --inputFile em_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0  --isLog 1 --signals $my_signals --var dphiemu --higgsSF 5
-
+##python plotter.py --lumi $luminosity --inputFile em_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0  --isLog 1 --signals $my_signals --var dphiemu --higgsSF 5
+##
 #####make preselection plots
 ##python plotter.py --lumi $luminosity --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --region ss
 ##python plotter.py --lumi $luminosity --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "em"  --suffix "presel" --blind 0 --isLog 1 --signals $my_signals --region ss --var vismass

@@ -144,8 +144,9 @@ if 'SimpleEMAnalyzer450' in args.analyzer_name:
    lumidict3['LFV600']=1.
    lumidict3['LFV750']=1.
    lumidict3['LFV900']=1.
-
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+   
+col_vis_mass_binning=array.array('d',(range(0, 500, 50)+range(500, 800, 100)+range(800,1000,200)+range(1000,1800,400)))
+#col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
 #met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 #pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 

@@ -340,18 +340,18 @@ for histo in signal_histos:
         sig_count=histo[0].GetBinContent(bin)
         if sig_count<=0:
             continue
-        if (float(sig_count)/float(sig_count+bg_count)>0.0050):#blind if if s/(s+b)>0.5%
-            hist_data.SetBinContent(bin,0)
-            hist_data.SetBinError(bin,0)
+        #if (float(sig_count)/float(sig_count+bg_count)>0.0050):#blind if if s/(s+b)>0.5%
+        #    hist_data.SetBinContent(bin,0)
+        #    hist_data.SetBinError(bin,0)
 
 #always blind discriminating mass histos after a certain value excpet when plotting CRs 
-if args.region!='ss':
-    start_blinding_at=160 #(GeV)
-    if 'mass' in variable and "CR" not in args.analyzer:
-        start_bin=hist_data.FindFixBin(start_blinding_at)
-        for bin in range(start_bin,hist_data.GetNbinsX()+1):
-            hist_data.SetBinContent(bin,0)
-            hist_data.SetBinError(bin,0)
+#if args.region!='ss':
+#    start_blinding_at=160 #(GeV)
+#    if 'mass' in variable and "CR" not in args.analyzer:
+#        start_bin=hist_data.FindFixBin(start_blinding_at)
+#        for bin in range(start_bin,hist_data.GetNbinsX()+1):
+#            hist_data.SetBinContent(bin,0)
+#            hist_data.SetBinError(bin,0)
 
 ##mystack.SetMaximum(1000*mystack.GetMaximum())
 #if args.isLog:

@@ -119,7 +119,8 @@ syst_names_analyzer=['mesup','mesdown','eesup','eesdown','eresrhoup','eresrhodow
                 'jes_JetTimePtEtaUp']      #sysfolder names in analyzer
 
 
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+#col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+col_vis_mass_binning=array.array('d', (range(0,1520, 10)))
 met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
@@ -169,7 +170,12 @@ class GetQCD(object):
 								histo=file.Get(hist_path)
 								if not histo:
 									continue
-						
+								for ibin in (0,histo.GetXaxis().GetNbins()+1):
+									bincontent=histo.GetBinContent(ibin)
+									if bincontent<=0. :
+										histo.SetBinContent(ibin,0)
+										histo.SetBinError(ibin,0)
+
 								try:
 									histo.Rebin(binning*2)
 								except TypeError:
@@ -206,7 +212,14 @@ class GetQCD(object):
 								self.histoQCD.Scale(2.86)
 							else:
 								self.histoQCD.Scale(2.26)
-
+							for ibin in range(0,self.histoQCD.GetXaxis().GetNbins()+1):
+								bincontent=self.histoQCD.GetBinContent(ibin)
+								if bincontent <=0. :
+									self.histoQCD.SetBinContent(ibin,0)
+									self.histoQCD.SetBinError(ibin,0)
+                                                                self.histoQCD.SetBinError(ibin, math.sqrt(self.histoQCD.GetBinContent(ibin)))
+                                                                print ibin, self.histoQCD.GetBinContent(ibin),math.sqrt(self.histoQCD.GetBinContent(ibin))
+                                       
 							new_histo=copy.copy(self.histoQCD) #MAKE DEEP COPY 
 						
 						#replace ss in pathname by os
@@ -220,13 +233,26 @@ class GetQCD(object):
 		self.outputfile.cd()
 		for key in self.histos.keys():
 			print key
-
+                        
 #			self.outputfile.cd()
 			self.dir0 = self.outputfile.mkdir(key[0])
 #			print self.dir0
 			self.dir0.Cd("QCD"+args.analyzer_name+"_with_shapes.root:/"+key[0])
-#    print dir0
-#			print histos[key]
+                        firstbin=-99
+                        lastbin=-99
+                        for ibin in (0,self.histos[key].GetXaxis().GetNbins()+1):
+                                bincontent=self.histos[key].GetBinContent(ibin)
+                                if bincontent >0 and firstbin<0: firstibin=ibin
+                                if firstbin>0 and bincontent>0: lastbin=ibin
+
+                        if lastbin!=firstbin:
+                                for ibin in (0,self.histos[key].GetXaxis().GetNbins()+1):
+                                        bincontent=self.histos[key].GetBinContent(ibin)
+                                        if ibin > firstbin and ibin < lastbin and bincontent <=0:
+                                                self.histos[key].SetBinContent(ibin, 0.000001)
+                                                if self.histos[key].GetBinError(ibin)<0.001:
+                                                        self.histos[key].SetError(ibin, 0.001)
+                                                
 			self.histos[key].SetDirectory(self.dir0)
 			self.histos[key].Write()
 		self.outputfile.Close()

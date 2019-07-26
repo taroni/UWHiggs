@@ -323,7 +323,7 @@ for cat in categories:
     # Make the final hists, some initial shapes need to be merged
     hists = {}
     for name, val in infoMap.iteritems() :
- #       print name, val
+        print name, val
         #hists[ name ] = ROOT.TH1F( name+cat, val[1], nBins, 0, nBins*binWidth )
 	hists[ name ] = initHists["data_obs"].Clone()
 	hists[ name ].Scale(0)
@@ -334,7 +334,7 @@ for cat in categories:
                 print toAdd," not in your file: %s, analyzertory, %s" % (file, cat)
                 continue
             hists[ name ].Add( initHists[ toAdd ] )
-    
+            
         if name not in signals  :
             hists[ name ].SetFillColor(ROOT.TColor.GetColor( val[3] ) )
             hists[ name ].SetLineColor(1)
@@ -423,26 +423,26 @@ for cat in categories:
             b += hists[bkg].GetBinContent(k)
         for sig in signals :
             s = hists[sig].GetBinContent(k)
-
+        print 'binning ', k, b, s
 	# commenting this because this should be done before
 #        if (b<0):
 #            b=0.000001
 #        #if (10*s/((b+0.09*b*0.09*b)**0.5) > 0.5):
 
-            if (forceBlinding>0 and s/(0.00000001+s+b) > 0.005):
-                hists["data_obs"].SetBinContent(k,0)#100000000)
-                hists["data_obs"].SetBinError(k,0)#100000000)
+            #if (forceBlinding>0 and s/(0.00000001+s+b) > 0.005):
+            #    hists["data_obs"].SetBinContent(k,0)#100000000)
+            #    hists["data_obs"].SetBinError(k,0)#100000000)
 
 
-    if args.region!='ss':            
-        start_blinding_at=160#gev
-#   always blind discriminating mass histos after a certain value except when plotting CRs 
-        if 'mass' in variable and 'CR' not in args.analyzer:
-            start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
-            for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
-                hists["data_obs"].SetBinContent(bin,0)
-                hists["data_obs"].SetBinError(bin,0)
-
+##    if args.region!='ss':            
+##        start_blinding_at=160#gev
+###   always blind discriminating mass histos after a certain value except when plotting CRs 
+##        if 'mass' in variable and 'CR' not in args.analyzer:
+##            start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
+##            for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
+##                hists["data_obs"].SetBinContent(bin,0)
+##                hists["data_obs"].SetBinError(bin,0)
+##
     hists["data_obs"].Draw("ep")
     stack.Draw("histsame")
     errorBand.Draw("e2same")

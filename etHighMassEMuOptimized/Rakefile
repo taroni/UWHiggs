@@ -1,5 +1,3 @@
-
-
 # Get common recipes
 recipes = ENV['fsa'] + '/PlotTools/rake/recipes.rake'
 import recipes
@@ -44,7 +42,7 @@ samples = Hash[
                "signalMC" => get_sample_names('HToETau_M125'),
                "signalHighMass" => get_sample_names('GluGlu_LFV_HToETau_M'),
                #"signalHighMass" => get_sample_names('ggM200ETau')+get_sample_names('ggM300ETau')+get_sample_names('ggM450ETau')+get_sample_names('ggM600ETau')+get_sample_names('ggM750ETau')+get_sample_names('ggM900ETau')+get_sample_names('GluGlu_LFV_HToETau_M200'),
-               "HiggsTo2Taus" => get_sample_names('HToTauTau_M125_'),
+               "HiggsTo2Taus" => get_sample_names('HToTauTau_M125_')+get_sample_names('ttHJetToTT_M125'),
                "dataSingleE" => get_sample_names('data_SingleElectron'),
                "dataSingleM" => get_sample_names('data_SingleMuon'),
                "dataMuonEG" => get_sample_names('data_MuonEG')
@@ -109,30 +107,30 @@ task :recoTopCR => get_analyzer_results("EMTopCRAnalyzer.py",
                                       )
 
 task :fromNab => get_analyzer_results("SimpleEMAnalyzer.py",
-                                        #samples['signalHighMass']+
-                                        #samples['signalMC']+
-                                        #samples['ttbar']+
-					#samples['singlet']+
-                                        #samples['wjets']+
-                                        #samples['zjets']+
-                                        #samples['diboson']+samples['triboson']+
-                                        #samples['WG']+
-                                        #samples['ewk']+                                        
+                                        samples['signalHighMass']+
+                                        samples['signalMC']+
+                                        samples['ttbar']+
+					samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['WG']+
+                                        samples['ewk']+                                        
                                         samples['HiggsTo2Taus']#+
-                                        #samples['dataMuonEG']
+                                       #samples['dataMuonEG']
                                      )
 task :fromNab450 => get_analyzer_results("SimpleEMAnalyzer450.py",
                                         #samples['signalHighMass']+
-                                        #samples['signalMC']+
-                                        #samples['ttbar']+
-					#samples['singlet']+
-                                        #samples['wjets']+
-                                        #samples['zjets']+
-                                        #samples['diboson']+samples['triboson']+
-                                        #samples['WG']+
-                                        #samples['ewk']+                                        
+                                        samples['signalMC']+
+                                        samples['ttbar']+
+					samples['singlet']+
+                                        samples['wjets']+
+                                        samples['zjets']+
+                                        samples['diboson']+samples['triboson']+
+                                        samples['WG']+
+                                        samples['ewk']+                                        
                                         samples['HiggsTo2Taus']#+
-                                        #samples['dataMuonEG']
+                                        # samples['dataMuonEG']
                                      )
      
 task :fakee => get_analyzer_results("EEEAnalyzer.py", #samples['signalHighMass']+

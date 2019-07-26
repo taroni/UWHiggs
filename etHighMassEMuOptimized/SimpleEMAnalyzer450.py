@@ -321,11 +321,13 @@ class SimpleEMAnalyzer450(MegaBase):
 #0.119211763,0.016249863,0.016824004,0.017799422,0.014957552]
 
         elif self.is_DYlowmass:
-            self.binned_weight=[0.641343812,
-                                0.025325281,
-                                0.002928175,
-                                0.641343812,
-                                0.641343812]
+            self.binned_weight=[0.527321457,0.01037153,0.009311641,0.527321457,0.527321457]
+
+            #self.binned_weight=[0.641343812,
+            #                    0.025325281,
+            #                    0.002928175,
+            #                    0.641343812,
+            #                    0.641343812]
             #[0.527321457,0.01037153,0.009311641,0.527321457,0.527321457]
 #0.527321457,0.011589863,0.009311641,0.527321457,0.527321457]
 
@@ -618,20 +620,20 @@ class SimpleEMAnalyzer450(MegaBase):
                     #self.histograms[sign+'/NUP'].Fill(row.NUP,weight)
                     #self.histograms[sign+'/numGenJets'].Fill(row.numGenJets,weight)
                     #self.histograms[sign+'/numVertices'].Fill(row.nvtx,weight)
-                    self.histograms[sign+'/h_collmass_pfmet'].Fill(collmass(row.type1_pfMetEt,row.type1_pfMetPhi,self.my_elec,self.my_muon),weight)
+                    #self.histograms[sign+'/h_collmass_pfmet'].Fill(collmass(row.type1_pfMetEt,row.type1_pfMetPhi,self.my_elec,self.my_muon),weight)
                     #self.histograms[sign+'/h_vismass'].Fill(row.e_m_Mass,weight)
-                    self.histograms[sign+'/mPt'].Fill(row.mPt, weight)
-                    self.histograms[sign+'/Met'].Fill(row.type1_pfMetEt, weight)
-                    self.histograms[sign+'/mEta'].Fill(row.mEta, weight)
-                    self.histograms[sign+'/mPhi'].Fill(row.mPhi, weight) 
-                    self.histograms[sign+'/ePt'].Fill(row.ePt, weight)
-                    self.histograms[sign+'/eEta'].Fill(row.eEta, weight)
-                    self.histograms[sign+'/ePhi'].Fill(row.ePhi, weight)
-                    self.histograms[sign+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
-                    self.histograms[sign+'/em_DeltaR'].Fill(row.e_m_DR, weight)
-                    self.histograms[sign+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, weight)
-                    self.histograms[sign+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, weight)
-                    self.histograms[sign+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), weight)
+                    #self.histograms[sign+'/mPt'].Fill(row.mPt, weight)
+                    #self.histograms[sign+'/Met'].Fill(row.type1_pfMetEt, weight)
+                    #self.histograms[sign+'/mEta'].Fill(row.mEta, weight)
+                    #self.histograms[sign+'/mPhi'].Fill(row.mPhi, weight) 
+                    #self.histograms[sign+'/ePt'].Fill(row.ePt, weight)
+                    #self.histograms[sign+'/eEta'].Fill(row.eEta, weight)
+                    #self.histograms[sign+'/ePhi'].Fill(row.ePhi, weight)
+                    #self.histograms[sign+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
+                    #self.histograms[sign+'/em_DeltaR'].Fill(row.e_m_DR, weight)
+                    #self.histograms[sign+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, weight)
+                    #self.histograms[sign+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, weight)
+                    #self.histograms[sign+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), weight)
                     self.histograms[sign+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), weight)
                 else:
                     #self.histograms[sign+'/'+sys+'/BDT_value'].Fill(MVAvalue,weight)
@@ -668,24 +670,24 @@ class SimpleEMAnalyzer450(MegaBase):
                 antiIsolatedWeight= weight*antiIsolatedWeightList[n]
                 folder = l+f
                 if sys=='presel':
-                    histos[folder+'/h_collmass_pfmet'].Fill(collmass(self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),antiIsolatedWeight)
-                    histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
-                    histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
-                    histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
-                    histos[folder+'/mPhi'].Fill(row.mPhi, antiIsolatedWeight) 
-                    histos[folder+'/ePt'].Fill(row.ePt, antiIsolatedWeight)
-                    histos[folder+'/eEta'].Fill(row.eEta, antiIsolatedWeight)
-                    histos[folder+'/ePhi'].Fill(row.ePhi, antiIsolatedWeight)
-                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), antiIsolatedWeight)
-                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, antiIsolatedWeight)
-                    histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), antiIsolatedWeight)
-                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, antiIsolatedWeight)
-                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, antiIsolatedWeight)
-                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), antiIsolatedWeight)
-                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), antiIsolatedWeight)
-#                    histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , antiIsolatedWeight)
-                    histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
-                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
+                    #histos[folder+'/h_collmass_pfmet'].Fill(collmass(self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),antiIsolatedWeight)
+                    #histos[folder+'/mPt'].Fill(row.mPt, antiIsolatedWeight)
+                    #histos[folder+'/Met'].Fill(row.type1_pfMetEt, antiIsolatedWeight)
+                    #histos[folder+'/mEta'].Fill(row.mEta, antiIsolatedWeight)
+                    #histos[folder+'/mPhi'].Fill(row.mPhi, antiIsolatedWeight) 
+                    #histos[folder+'/ePt'].Fill(row.ePt, antiIsolatedWeight)
+                    #histos[folder+'/eEta'].Fill(row.eEta, antiIsolatedWeight)
+                    #histos[folder+'/ePhi'].Fill(row.ePhi, antiIsolatedWeight)
+                    #histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), antiIsolatedWeight)
+                    #histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, antiIsolatedWeight)
+                    #histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), antiIsolatedWeight)
+                    #histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, antiIsolatedWeight)
+                    #histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, antiIsolatedWeight)
+                    #histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), antiIsolatedWeight)
+                    #histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), antiIsolatedWeight)
+#                   # histos[folder+'/mPFMETDeltaPhi_vs_ePFMETDeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1),abs(row.eDPhiToPfMet_type1) , antiIsolatedWeight)
+                    #histos[folder+'/vbfMass'].Fill(row.vbfMass, antiIsolatedWeight)
+                    #histos[folder+'/vbfDeta'].Fill(row.vbfDeta, antiIsolatedWeight)
                     histos[folder+'/jetN_30'].Fill(row.jetVeto30, antiIsolatedWeight) 
                 elif sys=='nosys':
                     histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), antiIsolatedWeight)
@@ -699,26 +701,26 @@ class SimpleEMAnalyzer450(MegaBase):
             for n,d  in enumerate(pudir) :
                 folder = d+f                
                 if sys=='presel':
-                    ##histos[folder+'/mPt'].Fill(row.mPt, weight)
-                    ##histos[folder+'/mEta'].Fill(row.mEta, weight)
-                    ##histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
-                    ##histos[folder+'/ePt'].Fill(row.ePt, weight)
-                    ##histos[folder+'/eEta'].Fill(row.eEta, weight)
-                    ##histos[folder+'/ePhi'].Fill(row.ePhi, weight)
-                    ##histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
-                    ##histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
+                    histos[folder+'/mPt'].Fill(row.mPt, weight)
+                    histos[folder+'/mEta'].Fill(row.mEta, weight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, weight)
+                    histos[folder+'/eEta'].Fill(row.eEta, weight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, weight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
                     histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)
  
                     ##histos[folder+'/Met'].Fill(row.type1_pfMetEt, weight)
-                    ##
-                    ##histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, weight)
-                    ##histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, weight)
-                    ##histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), weight)
-                    ##histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), weight)
-                    ##histos[folder+'/vbfMass'].Fill(row.vbfMass, weight)
-                    ##histos[folder+'/vbfDeta'].Fill(row.vbfDeta, weight)
-                    ##histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight) 
+                    
+                    histos[folder+'/ePFMET_Mt'].Fill(row.eMtToPfMet_type1, weight)
+                    histos[folder+'/mPFMET_Mt'].Fill(row.mMtToPfMet_type1, weight)
+                    histos[folder+'/ePFMET_DeltaPhi'].Fill(abs(row.eDPhiToPfMet_type1), weight)
+                    histos[folder+'/mPFMET_DeltaPhi'].Fill(abs(row.mDPhiToPfMet_type1), weight)
+                    histos[folder+'/vbfMass'].Fill(row.vbfMass, weight)
+                    histos[folder+'/vbfDeta'].Fill(row.vbfDeta, weight)
+                    histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight) 
 
                 elif sys=='nosys':
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)                     
@@ -748,7 +750,7 @@ class SimpleEMAnalyzer450(MegaBase):
         elif self.isVBFHToTT:
             weight = self.VBFHToTT_weight*weight
         elif self.isttHToTT:
-            weight = self.isttHToTT_weight*weight
+            weight = self.ttHToTT_weight*weight
         
 
         elif self.isWGToLNuG:
@@ -826,14 +828,14 @@ class SimpleEMAnalyzer450(MegaBase):
             for n,d  in enumerate(pudir) :
                 folder = d+f                
                 if sys=='presel':
-                    ##histos[folder+'/mPt'].Fill(row.mPt, weight)
-                    ##histos[folder+'/mEta'].Fill(row.mEta, weight)
-                    ##histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
-                    ##histos[folder+'/ePt'].Fill(row.ePt, weight)
-                    ##histos[folder+'/eEta'].Fill(row.eEta, weight)
-                    ##histos[folder+'/ePhi'].Fill(row.ePhi, weight)
-                    ##histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
-                    ##histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
+                    histos[folder+'/mPt'].Fill(row.mPt, weight)
+                    histos[folder+'/mEta'].Fill(row.mEta, weight)
+                    histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
+                    histos[folder+'/ePt'].Fill(row.ePt, weight)
+                    histos[folder+'/eEta'].Fill(row.eEta, weight)
+                    histos[folder+'/ePhi'].Fill(row.ePhi, weight)
+                    histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
+                    histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
                     histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)
  

@@ -69,8 +69,8 @@ mv QCD$analyzer.root Simple$analyzer$luminosity/QCD.root
 echo 'Runnning lumiweight'
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . INCLUSIVE
-python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype 
-python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype --region ss
+#python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype 
+#python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype --region ss
 
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . PRESEL_CATEGORY_WISE
