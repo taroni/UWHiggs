@@ -179,6 +179,7 @@ class GetQCD(object):
 
 								try:
 									self.histomc.Add(histo)
+                                                                        #print filename
 								except AttributeError:
 									self.histomc=histo.Clone()
 									self.histomc.SetDirectory(0)
@@ -193,7 +194,14 @@ class GetQCD(object):
 #						print "data",self.histodata.Integral()
 #						print "MC",self.histomc.Integral()
 							self.histoQCD=self.histodata.Clone()
+                                                        try:
+								self.histoQCD.Rebin(binning*2)
+							except TypeError:
+								self.histoQCD=self.histoQCD.Rebin(len(binning)-1,"",binning)
+							except:
+								print "Please fix your binning"
 							self.histoQCD.Add(self.histomc,-1)
+                                                        #print 'histo QCD and histo mc', self.histoQCD.GetXaxis().GetNbins(), self.histomc.GetXaxis().GetNbins()
 							if i==2 or i==3:
 								self.histoQCD.Scale(2.86)
 							else:

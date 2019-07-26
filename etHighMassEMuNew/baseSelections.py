@@ -80,6 +80,7 @@ def lepton_id_iso(row, name, label,eIDwp='WP80',dataperiod=None): #label in the 
             LEPTON_ID=row.mPFIDMedium
     if not LEPTON_ID:
         return False
+    RelPFIsoDB = getattr(row, getVar(name, 'IsoDB03'))
     if name[0]=='e':
      #   RelPFIsoDB   = getattr(row, getVar(name, 'RelPFIsoDB'))
         RelPFIsoDB   = getattr(row, getVar(name, 'IsoDB03'))

@@ -68,29 +68,24 @@ lumidict['data_obs']=args.Lumi
 lumidict['Diboson']=1.0
 lumidict['WG']=1.0
 lumidict['W']=1.0
-lumidict['T']=1.0
-lumidict['TT']=1.0
+lumidict['T']=1.0/0.886
+lumidict['TT']=1.0/0.886
 lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
 lumidict['ZTauTau']=1.0
-lumidict['ggH_htt']=1.0
-lumidict['qqH_htt']=1.0
-lumidict['ggH_hww']=1.0
-lumidict['qqH_hww']=1.0
-lumidict['LFV200']=590318.772137
-lumidict['LFV300']=7160060.69803
-lumidict['LFV450']=20986956.5217
-lumidict['LFV600']=47866333.6663
-lumidict['LFV750']=96544978.869
-lumidict['LFV900']=178613035.382
-##lumidict['LFV200']=1.0
-##lumidict['LFV300']=1.0
-##lumidict['LFV450']=1.0
-##lumidict['LFV600']=1.0
-##lumidict['LFV750']=1.0
-##lumidict['LFV900']=1.0
+lumidict['SMH']=1.0
+#lumidict['ggH_htt']=1.0
+#lumidict['qqH_htt']=1.0
+#lumidict['ggH_hww']=1.0
+#lumidict['qqH_hww']=1.0
+lumidict['LFV200']=1.0
+lumidict['LFV300']=1.0
+lumidict['LFV450']=1.0
+lumidict['LFV600']=1.0
+lumidict['LFV750']=1.0
+lumidict['LFV900']=1.0
 lumidict['QCD_mc']=1.0
 
 
@@ -105,10 +100,11 @@ lumidict2['WJETSMC']=3e-04
 lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
 lumidict2['ZTauTau']=2.1e-05
-lumidict2['ggH_htt']=2.07e-06
-lumidict2['qqH_htt']=4.2e-08
-lumidict2['ggH_hww']=2.07e-06
-lumidict2['qqH_hww']=4.2e-08
+lumidict2['SMH']=2.07e-06
+#lumidict2['ggH_htt']=2.07e-06
+#lumidict2['qqH_htt']=4.2e-08
+#lumidict2['ggH_hww']=2.07e-06
+#lumidict2['qqH_hww']=4.2e-08
 lumidict2['LFV200']=1.694e-06
 lumidict2['LFV300']=1.33345743863e-07 
 lumidict2['LFV450']=4.65541809702e-08
@@ -199,8 +195,8 @@ for var in variable_list:
             break
       for j in range(lowBound, highBound+1):
          if lowBound==0:continue
-         #if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
-         if (histo.GetBinContent(j)<=0) and "data" not in filename:
+         if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
+         #if (histo.GetBinContent(j)<=0) and "data" not in filename:
             histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
             histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
 #            print "found neg bin  ",j

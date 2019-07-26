@@ -137,7 +137,7 @@ class GetQCD(object):
 						self.histodata=None
 						self.histoQCD=None
 	        				for filename in os.listdir(Analyzer+str(args.Lumi)):
-							if "FAKES" in filename or "QCD" in filename: continue
+							if "FAKES" in filename or "QCD" in filename or 'LFV' in filename: continue
 	        					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
 							histo=file.Get(hist_path)
 							

@@ -34,11 +34,12 @@ echo Current Jobid is: $jobid
 echo Type of Analyzer: $analtype
 
 #remove earlier preprocessed files with analyzer of same name
-rm -r Simple$analyzer$luminosity*
+rm -r Simple$analyzer$luminosity/*
 
 
 #copy results into current directory in the form wanted
-cp -r results/$jobid/Simple$analyzer Simple$analyzer$luminosity
+mkdir Simple$analyzer$luminosity/
+cp -r results/$jobid/Simple$analyzer/* Simple$analyzer$luminosity/.
 
 #combine relevant backgrounds
 cp combine_backgrounds.sh Simple$analyzer$luminosity
@@ -47,38 +48,38 @@ source combine_backgrounds.sh
 rm combine_backgrounds.sh
 cd -
 
-
+echo "computing QCD"
 #get QCD (data-MC) in ss *2.30(SF)
 python computeQCD.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
-
+echo "computing QCD with shapes"
 python computeQCD_with_shapes.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
 
-
+#
 #folder for plotting
 mv QCD$analyzer.root Simple$analyzer$luminosity/QCD.root
 
 mv QCD${analyzer}_with_shapes.root Simple$analyzer$luminosity/QCD_with_shapes.root
-#compute TTBar from CR data
-#if [ "X"${isTT_DD} != "X" ]  
-#    then
-#    echo computing ttbar from CR data
-#    python computeTTbar.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
-#    mv TT_DD_$analyzer.root Analyzer_MuE_$analyzer$luminosity/TT_DD.root #folder for plotting
-#fi
+####compute TTBar from CR data
+####if [ "X"${isTT_DD} != "X" ]  
+####    then
+####    echo computing ttbar from CR data
+####    python computeTTbar.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+####    mv TT_DD_$analyzer.root Analyzer_MuE_$analyzer$luminosity/TT_DD.root #folder for plotting
+####fi
+###
+###
 
 
-
-
-#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . INCLUSIVE
-python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype 
-
-
-#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . PRESEL_CATEGORY_WISE
-python do_lumiweight_presel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
-
-
-#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE
-python do_lumiweight_sel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+###final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . INCLUSIVE
+##python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype 
+##
+##
+###final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . PRESEL_CATEGORY_WISE
+##python do_lumiweight_presel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+##
+##
+###final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE
+##python do_lumiweight_sel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
 
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE

@@ -25,6 +25,7 @@ from inspect import currentframe
 import FinalStateAnalysis.TagAndProbe.muonTrigEff as muonTrigEff
 import FinalStateAnalysis.TagAndProbe.eleTrigEff as eleTrigEff
 
+import gc
 
 
 cut_flow_step=['allEvents','HLTIsoPasstrg','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','bjetveto','mu_ptid','mulooseiso','e_ptid','elooseiso','ecalgap','DR_e_mu','muiso','eiso','full_presel','sel_mupt','sel_dphiemu','sel_dphiemet']
@@ -43,10 +44,11 @@ def transMass(myparticle1,myparticle2):
     return sqrt(2*myparticle1.Pt()*myparticle2.Pt()*(1-cos(dphi12)))
 
 def collmass(row, met, metPhi,my_elec,my_muon):
-    ptnu =abs(met*cos(deltaPhi(metPhi,my_elec.Phi())))
-    visfrac = my_elec.Pt()/(my_elec.Pt()+ptnu)
+    ptnu =abs(met*cos(deltaPhi(metPhi,my_muon.Phi())))
+    visfrac = my_muon.Pt()/(my_muon.Pt()+ptnu)
     #print met, cos(deltaPhi(metPhi, row.tPhi)), ptnu, visfrac
     return ((my_elec+my_muon).M()) / (sqrt(visfrac))
+
 
 
 def deltaR(phi1, phi2, eta1, eta2):
@@ -137,12 +139,12 @@ class SimpleEMAnalyzer450(MegaBase):
         self.isTTevtgen=('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen_v6-v1' in target)
 
 
-        self.isGluGlu_LFV_HToMuTau_M200=('GluGlu_LFV_HToMuTau_M200' in target )
-        self.isGluGlu_LFV_HToMuTau_M300=('GluGlu_LFV_HToMuTau_M300' in target )
-        self.isGluGlu_LFV_HToMuTau_M450=('GluGlu_LFV_HToMuTau_M450' in target )
-        self.isGluGlu_LFV_HToMuTau_M600=('GluGlu_LFV_HToMuTau_M600' in target )
-        self.isGluGlu_LFV_HToMuTau_M750=('GluGlu_LFV_HToMuTau_M750' in target )
-        self.isGluGlu_LFV_HToMuTau_M900=('GluGlu_LFV_HToMuTau_M900' in target )
+        self.isGluGlu_LFV_HToETau_M200=('GluGlu_LFV_HToETau_M200' in target )
+        self.isGluGlu_LFV_HToETau_M300=('GluGlu_LFV_HToETau_M300' in target )
+        self.isGluGlu_LFV_HToETau_M450=('GluGlu_LFV_HToETau_M450' in target )
+        self.isGluGlu_LFV_HToETau_M600=('GluGlu_LFV_HToETau_M600' in target )
+        self.isGluGlu_LFV_HToETau_M750=('GluGlu_LFV_HToETau_M750' in target )
+        self.isGluGlu_LFV_HToETau_M900=('GluGlu_LFV_HToETau_M900' in target )
 
 
         self.isQCD_mc=('QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_v6-v1' in target)
@@ -199,12 +201,12 @@ class SimpleEMAnalyzer450(MegaBase):
         self.GluGlu_LFV_HToMuTau_M130_weight=4.531e-06            #1.9432e-06 
         self.GluGlu_LFV_HToMuTau_M150_weight=3.2458506224e-06            #1.9432e-06 
 
-        self.GluGlu_LFV_HToMuTau_M200_weight=1.694e-06            #1.9432e-06 
-        self.GluGlu_LFV_HToMuTau_M300_weight=1.33345743863e-07 #7.32222222221e-07            #1.9432e-06 
-        self.GluGlu_LFV_HToMuTau_M450_weight=4.65541809702e-08 #2.70588235294e-07            #1.9432e-06 
-        self.GluGlu_LFV_HToMuTau_M600_weight=2.04664734848e-08  #1.2625e-07    #1.9432e-06 
-        self.GluGlu_LFV_HToMuTau_M750_weight=9.93800000005e-09            #1.9432e-06 
-        self.GluGlu_LFV_HToMuTau_M900_weight=5.37000000001e-09            #1.9432e-06 
+        self.GluGlu_LFV_HToETau_M200_weight=1.694e-06            #1.9432e-06 
+        self.GluGlu_LFV_HToETau_M300_weight=0.00000013966362
+        self.GluGlu_LFV_HToETau_M450_weight=0.000000047648643
+        self.GluGlu_LFV_HToETau_M600_weight=0.00000002089151
+        self.GluGlu_LFV_HToETau_M750_weight=0.000000010357866
+        self.GluGlu_LFV_HToETau_M900_weight=0.000000005598696
         self.QCD_mc_weight=0.013699241892  
 
 
@@ -561,18 +563,18 @@ class SimpleEMAnalyzer450(MegaBase):
         
         elif self.isTT:
             weight=self.TT_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M200:
-            weight=self.GluGlu_LFV_HToMuTau_M200_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M300:
-            weight=self.GluGlu_LFV_HToMuTau_M300_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M450:
-            weight=self.GluGlu_LFV_HToMuTau_M450_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M600:
-            weight=self.GluGlu_LFV_HToMuTau_M600_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M750:
-            weight=self.GluGlu_LFV_HToMuTau_M750_weight*self.event_weight(row,region,pileup) 
-        elif self.isGluGlu_LFV_HToMuTau_M900:
-            weight=self.GluGlu_LFV_HToMuTau_M900_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M200:
+            weight=self.GluGlu_LFV_HToETau_M200_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M300:
+            weight=self.GluGlu_LFV_HToETau_M300_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M450:
+            weight=self.GluGlu_LFV_HToETau_M450_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M600:
+            weight=self.GluGlu_LFV_HToETau_M600_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M750:
+            weight=self.GluGlu_LFV_HToETau_M750_weight*self.event_weight(row,region,pileup) 
+        elif self.isGluGlu_LFV_HToETau_M900:
+            weight=self.GluGlu_LFV_HToETau_M900_weight*self.event_weight(row,region,pileup) 
         else:
             weight = self.event_weight(row,region,pileup) 
             
@@ -806,9 +808,12 @@ class SimpleEMAnalyzer450(MegaBase):
                     histos[folder+'/mPt'].Fill(row.mPt, weight)
                     histos[folder+'/mEta'].Fill(row.mEta, weight)
                     histos[folder+'/mPhi'].Fill(row.mPhi, weight) 
+                    histos[folder+'/mRelPFIsoDBDefaultR04'].Fill(row.mRelPFIsoDBDefaultR04, weight) 
                     histos[folder+'/ePt'].Fill(row.ePt, weight)
                     histos[folder+'/eEta'].Fill(row.eEta, weight)
                     histos[folder+'/ePhi'].Fill(row.ePhi, weight)
+                    histos[folder+'/eIsoDB03'].Fill(row.eIsoDB03, weight)
+                    
                     histos[folder+'/em_DeltaPhi'].Fill(deltaPhi(row.ePhi, row.mPhi), weight)
                     histos[folder+'/em_DeltaR'].Fill(row.e_m_DR, weight)
                     histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
@@ -829,6 +834,7 @@ class SimpleEMAnalyzer450(MegaBase):
                     histos[folder+'/jetN_30'].Fill(row.jetVeto30, weight) 
 
                 elif sys=='nosys':
+                    
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)                     
                     histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
                 else:
@@ -841,7 +847,12 @@ class SimpleEMAnalyzer450(MegaBase):
         myevent=()
         frw = []
         curr_event=0
+        ievt=0
         for row in self.tree:
+            ievt+=1
+            if (ievt % 10000) == 0:
+                gc.collect()
+
             sign = 'ss' if row.e_m_SS else 'os'
 
             cut_flow_trk.new_row(row.run,row.lumi,row.evt)
@@ -1219,6 +1230,7 @@ class SimpleEMAnalyzer450(MegaBase):
 
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
+                    continue
                     category=2
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
@@ -1239,7 +1251,7 @@ class SimpleEMAnalyzer450(MegaBase):
                 if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
                 if sys=='nosys':
                     cut_flow_trk.Fill('sel_dphiemu')
-                if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
+                if abs(self.shifted_mDPhiToPfMet) > 0.3 : continue
                 if sys=='nosys':
                     cut_flow_trk.Fill('sel_dphiemet')
 
@@ -1333,12 +1345,14 @@ class SimpleEMAnalyzer450(MegaBase):
                 if self.my_muon.Pt() < 26: continue 
                 if self.my_elec.Pt() < 150: continue
                 if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
-                if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
+                if abs(self.shifted_mDPhiToPfMet) > 0.3 : continue
 
 
                 folder = sign+'/'+str(int(category))+'/selected/'+jetsys
                 self.fill_histos(row,sign,folder,False,region,btagweight,jetsys,qcdshaperegion,self.pileup)
-
+                gc.collect()
+                
+        gc.collect()
         cut_flow_trk.flush()        
     def finish(self):
         self.write_histos()

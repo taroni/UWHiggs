@@ -434,14 +434,14 @@ for cat in categories:
                 hists["data_obs"].SetBinError(k,0)#100000000)
 
 
-    if args.region!='ss':            
-        start_blinding_at=160#gev
-#   always blind discriminating mass histos after a certain value except when plotting CRs 
-        if 'mass' in variable and 'CR' not in args.analyzer:
-            start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
-            for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
-                hists["data_obs"].SetBinContent(bin,0)
-                hists["data_obs"].SetBinError(bin,0)
+    ##if args.region!='ss':            
+    ##    start_blinding_at=160#gev
+#   ##always blind discriminating mass histos after a certain value except when plotting CRs 
+    ##    if 'mass' in variable and 'CR' not in args.analyzer:
+    ##        start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
+    ##        for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
+    ##            hists["data_obs"].SetBinContent(bin,0)
+    ##            hists["data_obs"].SetBinError(bin,0)
 
     hists["data_obs"].Draw("ep")
     stack.Draw("histsame")

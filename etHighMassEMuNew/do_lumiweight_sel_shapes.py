@@ -63,34 +63,32 @@ args = parser.parse_args()
 
 lumidict2={}
 lumidict={}
+lumidict3={}
 
 lumidict['data_obs']=args.Lumi
 
 lumidict['Diboson']=1.0
 lumidict['WG']=1.0
 lumidict['W']=1.0
-lumidict['T']=1.0
-lumidict['TT']=1.0
+lumidict['T']=1.0/0.886
+lumidict['TT']=1.0/0.886
 lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
 lumidict['ZTauTau']=1.0
-lumidict['ggH_htt']=1.0
-lumidict['qqH_htt']=1.0
-lumidict['ggH_hww']=1.0
-lumidict['qqH_hww']=1.0
-lumidict2['LFV300']=1.33345743863e-07 
-lumidict2['LFV450']=4.65541809702e-08
-lumidict2['LFV600']=2.04664734848e-08 
-lumidict2['LFV750']=9.93800000005e-09
-lumidict2['LFV900']=5.37000000001e-09 
-#lumidict['LFV200']=1.0
-#lumidict['LFV300']=1.0
-#lumidict['LFV450']=1.0
-#lumidict['LFV600']=1.0
-#lumidict['LFV750']=1.0
-#lumidict['LFV900']=1.0
+lumidict['SMH']=1.0
+#lumidict['ggH_htt']=1.0
+#lumidict['ggH_htt']=1.0
+#lumidict['qqH_htt']=1.0
+#lumidict['ggH_hww']=1.0
+#lumidict['qqH_hww']=1.0
+lumidict['LFV200']=1.0
+lumidict['LFV300']=1.0
+lumidict['LFV450']=1.0
+lumidict['LFV600']=1.0
+lumidict['LFV750']=1.0
+lumidict['LFV900']=1.0
 lumidict['QCD_mc']=1.0
 
 
@@ -105,10 +103,11 @@ lumidict2['WJETSMC']=3e-04
 lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
 lumidict2['ZTauTau']=2.1e-05
-lumidict2['ggH_htt']=2.07e-06
-lumidict2['qqH_htt']=4.2e-08
-lumidict2['ggH_hww']=2.07e-06
-lumidict2['qqH_hww']=4.2e-08
+lumidict2['SMH']=2.07e-06
+#lumidict2['ggH_htt']=2.07e-06
+#lumidict2['qqH_htt']=4.2e-08
+#lumidict2['ggH_hww']=2.07e-06
+#lumidict2['qqH_hww']=4.2e-08
 lumidict2['LFV200']=1.694e-06
 lumidict2['LFV300']=1.33345743863e-07 
 lumidict2['LFV450']=4.65541809702e-08
@@ -120,6 +119,23 @@ lumidict2['WG']=1.56725042226e-06
 lumidict2['W']=1.56725042226e-06
 lumidict2['T']=5.23465826064e-06
 lumidict2['QCD']=float(1.0)/float(args.Lumi)
+
+
+
+lumidict3['LFV200']=6.94444444444e-05/1e-05
+lumidict3['LFV300']=3.65124744869e-06/2.11932656279e-06
+lumidict3['LFV450']=6.43521348821e-06/2.07168013259e-06
+lumidict3['LFV600']=5.99010434762e-06/2.08706396016e-06
+lumidict3['LFV750']=6.1508180588e-06/2.08449717759e-06
+lumidict3['LFV900']=4.89888697288e-06/2.08517523813e-06
+
+if 'SimpleEMAnalyzer450' in args.analyzer_name:
+   lumidict3['LFV200']=1.0
+   lumidict3['LFV300']=1.0
+   lumidict3['LFV450']=3.6615953571e-06/2.07168013259e-06
+   lumidict3['LFV600']=4.6469265228e-06/2.08706396016e-06
+   lumidict3['LFV750']=5.33617929562e-06/2.08449717759e-06
+   lumidict3['LFV900']=4.89888697288e-06/2.08517523813e-06
 
 syst_names_analyzer=['nosys','mesup','mesdown','eesup','eesdown','eresrhoup','eresrhodown','nosys','eresphidown','puup','pudown',
                 'chargeduesdown','chargeduesup','ecaluesdown','ecaluesup','hcaluesdown','hcaluesup','hfuesdown','hfuesup',
@@ -261,14 +277,43 @@ col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(50
 #met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 #pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
+filenameDict={
+   'data_obs': 'data_obs',
+   'Diboson': 'EWKDiboson',
+   'TT' : 'ttbar', 
+   'WJETSMC':  'WJets',
+   'DY' : 'DY', 
+   'Zothers' : 'DY', 
+   'ZTauTau' : 'DYTT',
+   'SMH' : 'SMH',
+#   'ggH_htt': 'SMH', 
+#   'qqH_htt': 'SMH', 
+#   'ggH_hww': 'SMH',
+#   'qqH_hww': 'SMH', 
+   'LFV200' : 'LFV200', 
+   'LFV300' : 'LFV300', 
+   'LFV450' : 'LFV450', 
+   'LFV600' : 'LFV600',  
+   'LFV750' : 'LFV750',
+   'LFV900' : 'LFV900',  
+   'QCD_mc' : 'QCDmc',
+   'WG' : 'WG',
+   'W' : 'W', 
+   'T' : 'singlet', 
+   'QCD': 'QCD'
+   }
 
 
 variable_list=[
 #   ('BDT_value', 'BDT_value', 1),
    ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
-#   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
+   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
    ]
 
+catDict={
+   'mutaue_0jet_selected' : '0jet',
+   "mutaue_1jet_selected" : '1jet'
+   }
 
 if args.numCategories==3:
    category_names=["mutaue_0jet_selected","mutaue_1jet_selected"]#,"mutaue_2jet_selected"]
@@ -290,7 +335,7 @@ for var in variable_list:
    for i_cat in range(len(category_names)):
       histos[category_names[i_cat]]=[]
       for filename in os.listdir('Simple'+args.analyzer_name+str(args.Lumi)):
-         if "FAKES" in filename or "MuTau" in filename or filename=='QCD.root':continue
+         if "FAKES" in filename or "ETau" in filename or filename=='QCD.root':continue
          file=ROOT.TFile('Simple'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          title=filename.split('.')[0].replace("_with_shapes","")
          for k in range(len(syst_names_analyzer)):
@@ -300,9 +345,11 @@ for var in variable_list:
       # print histo.GetNbinsX()
 
             binning=var[2]
-
+            if 'data_obs' in filename and syst_names_analyzer[k]!='nosys' : continue
+            if 'data_obs' in filename and syst_names_datacard[k]!='': continue
+            print "using histo: ", title+" "+syst_names_analyzer[k], "in ", filename
             if not histo:
-               print "Couldn't find histo: ",title+" "+syst_names_analyzer[k]
+               print "Couldn't find histo: ", title+" "+syst_names_analyzer[k], "in ", filename
                continue
 
             if 'QCD'!=title:
@@ -318,7 +365,7 @@ for var in variable_list:
                histo.Scale(lumidict['data_obs']/lumidict[title])      
             if 'data' in filename:
                histo.SetBinErrorOption(ROOT.TH1.kPoisson)
-
+ 
             lowBound=0
             highBound=histo.GetNbinsX()
             for bin in range(1,highBound):
@@ -331,16 +378,20 @@ for var in variable_list:
                   highBound = bin
                   break
             for j in range(lowBound, highBound+1):
-                if lowBound==0:continue
-                #if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
-                if (histo.GetBinContent(j)<=0) and "data" not in filename :
-                   histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[title])))
-                   histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[title])))
-             #            print "found neg bin  ",j
-            if 'nominal' not in syst_names_datacard[k]:
-               new_title=title+"_"+syst_names_datacard[k]
+               if lowBound==0:continue
+               if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
+                  #if (histo.GetBinContent(j)<=0) and "data" not in filename :
+                  histo.SetBinContent(j,0.00001*float((lumidict['data_obs'])*float(lumidict2[title])))
+                  histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[title])))
+                  #            print "found neg bin  ",j
+            new_title = filenameDict[title]
+            if 'LFV' in filename:
+               histo.Scale(lumidict3[new_title])
+
+            if syst_names_datacard[k]!='':
+               new_title=new_title+"_"+syst_names_datacard[k]
             else:
-               new_title=title
+               new_title=new_title
             histo.SetTitle(new_title)
             histo.SetName(new_title)
             new_histo=copy.copy(histo)
@@ -357,7 +408,7 @@ for var in variable_list:
 #   print outputfile
    outputfile.cd()
    for key in histos.keys():
-      dir0 = outputfile.mkdir(key);
+      dir0 = outputfile.mkdir(catDict[key]);
   # print dir
       dir0.cd();
          #   print key

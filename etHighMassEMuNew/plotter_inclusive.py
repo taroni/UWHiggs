@@ -71,7 +71,7 @@ parser.add_argument(
     type=int,
     action="store",
     dest="higgsSF",
-    default=10.,
+    default=5.,
     help="Provide the Scale Factor for the SM-Higgs signals.  50x is default")
 parser.add_argument(
     "--inputFile",
@@ -368,6 +368,8 @@ mymax=hist_data.GetBinContent(hist_data.GetMaximumBin())
 mystackMax=mystack.GetMaximum()
 if mystackMax>mymax:
     hist_data.GetYaxis().SetRangeUser(0.01, 1.2*mystackMax)
+else:
+    hist_data.GetYaxis().SetRangeUser(0.01,1.2*mymax)
 
 errorBand.Draw("e2same")
 

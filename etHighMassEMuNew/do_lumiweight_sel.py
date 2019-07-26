@@ -70,35 +70,34 @@ args = parser.parse_args()
 
 lumidict2={}
 lumidict={}
+lumidict3={}
 
 lumidict['data_obs']=args.Lumi
 
 lumidict['Diboson']=1.0
 lumidict['WG']=1.0
 lumidict['W']=1.0
-lumidict['T']=1.0
-lumidict['TT']=1.0
+lumidict['T']=1.0/0.886
+lumidict['TT']=1.0/0.886
 lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
 lumidict['ZTauTau']=1.0
-lumidict['ggH_htt']=1.0
-lumidict['qqH_htt']=1.0
-lumidict['ggH_hww']=1.0
-lumidict['qqH_hww']=1.0
-lumidict['LFV200']=590318.772137
-lumidict['LFV300']=7160060.69803
-lumidict['LFV450']=20986956.5217
-lumidict['LFV600']=47866333.6663
-lumidict['LFV750']=96544978.869
-lumidict['LFV900']=178613035.382
-##lumidict['LFV200']=1.0
-##lumidict['LFV300']=1.0
-##lumidict['LFV450']=1.0
-##lumidict['LFV600']=1.0
-##lumidict['LFV750']=1.0
-##lumidict['LFV900']=1.0
+lumidict['SMH']=1.0
+#lumidict['ggH_htt']=1.0
+#lumidict['qqH_htt']=1.0
+#lumidict['ggH_hww']=1.0
+#lumidict['qqH_hww']=1.0
+lumidict['LFV200']=1.0
+lumidict['LFV300']=1.0
+lumidict['LFV450']=1.0
+lumidict['LFV600']=1.0
+lumidict['LFV750']=1.0
+lumidict['LFV900']=1.0
+
+
+
 lumidict['QCD_mc']=1.0
 
 
@@ -113,10 +112,11 @@ lumidict2['WJETSMC']=3e-04
 lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
 lumidict2['ZTauTau']=2.1e-05
-lumidict2['ggH_htt']=2.07e-06
-lumidict2['qqH_htt']=4.2e-08
-lumidict2['ggH_hww']=2.07e-06
-lumidict2['qqH_hww']=4.2e-08
+lumidict2['SMH']=2.07e-06
+#lumidict2['ggH_htt']=2.07e-06
+#lumidict2['qqH_htt']=4.2e-08
+#lumidict2['ggH_hww']=2.07e-06
+#lumidict2['qqH_hww']=4.2e-08
 lumidict2['LFV200']=1.694e-06
 lumidict2['LFV300']=1.33345743863e-07 
 lumidict2['LFV450']=4.65541809702e-08
@@ -130,6 +130,20 @@ lumidict2['W']=1.56725042226e-06
 lumidict2['T']=5.23465826064e-06
 lumidict2['QCD']=float(1.0)/float(args.Lumi)
 
+lumidict3['LFV200']=6.94444444444e-05/1e-05
+lumidict3['LFV300']=3.65124744869e-06/2.11932656279e-06
+lumidict3['LFV450']=6.43521348821e-06/2.07168013259e-06
+lumidict3['LFV600']=5.99010434762e-06/2.08706396016e-06
+lumidict3['LFV750']=6.1508180588e-06/2.08449717759e-06
+lumidict3['LFV900']=4.89888697288e-06/2.08517523813e-06
+
+if 'SimpleEMAnalyzer450' in args.analyzer_name:
+   lumidict3['LFV200']=1.0
+   lumidict3['LFV300']=1.0
+   lumidict3['LFV450']=3.6615953571e-06/2.07168013259e-06
+   lumidict3['LFV600']=4.6469265228e-06/2.08706396016e-06
+   lumidict3['LFV750']=5.33617929562e-06/2.08449717759e-06
+   lumidict3['LFV900']=4.89888697288e-06/2.08517523813e-06
 
 col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
 #met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
@@ -164,7 +178,7 @@ for var in variable_list:
    for i_cat in range(len(category_names)):
       histos[category_names[i_cat]]=[]
       for filename in os.listdir("Simple"+args.analyzer_name+str(args.Lumi)):
-         if "FAKES" in filename or "MuTau" in filename or "QCD_with_shapes" in filename:continue
+         if "FAKES" in filename or "ETau" in filename or "QCD_with_shapes" in filename:continue
          if args.region=='ss' and 'QCD' in filename:continue
          file=ROOT.TFile("Simple"+args.analyzer_name+str(args.Lumi)+'/'+filename)
          new_title=filename.split('.')[0]
@@ -190,6 +204,9 @@ for var in variable_list:
          if 'data' in filename:
             histo.SetBinErrorOption(ROOT.TH1.kPoisson)
 
+         if 'LFV' in filename:
+            histo.Scale(lumidict3[new_title])
+
          lowBound=0
          highBound=histo.GetNbinsX()
          for bin in range(1,highBound):
@@ -203,8 +220,8 @@ for var in variable_list:
                break
          for j in range(lowBound, highBound+1):
             if lowBound==0:continue
-            #if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
-            if (histo.GetBinContent(j)<=0) and "data" not in filename:
+            if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
+            #if (histo.GetBinContent(j)<=0) and "data" not in filename:
                histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
                histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
              #            print "found neg bin  ",j
